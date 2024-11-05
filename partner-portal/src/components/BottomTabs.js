@@ -1,5 +1,3 @@
-// components/BottomTabs.js
-
 import { Flex, Button, IconButton } from "@chakra-ui/react";
 import { CloseIcon } from "@chakra-ui/icons";
 
