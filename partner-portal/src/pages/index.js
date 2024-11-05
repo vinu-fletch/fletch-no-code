@@ -18,7 +18,7 @@ import GlobalCustomization from "../components/GlobalCustomization";
 import Head from "next/head";
 
 const MainPage = ({ setCustomTheme, globalSettings, setGlobalSettings }) => {
-  const [activeView, setActiveView] = useState("globalCustomization"); // or "globalCustomization"
+  const [activeView, setActiveView] = useState("globalCustomization"); // or "formBuilder"
   const [screens, setScreens] = useState(["Screen 1"]);
   const [activeScreen, setActiveScreen] = useState("Screen 1");
   const theme = useTheme();
@@ -41,17 +41,17 @@ const MainPage = ({ setCustomTheme, globalSettings, setGlobalSettings }) => {
   return (
     <Flex minHeight="100vh">
       {/* Sidebar Navigation */}
-      <Box width="250px" bg="background.dark" p={4}>
+      <Box width="250px" bg="background.dark" p={4} color="text.primary">
         <VStack spacing={4} align="stretch">
           <Button
-            variant={activeView === "globalCustomization" ? "solid" : "outline"}
+            variant={activeView === "globalCustomization" ? "outline" : "solid"}
             colorScheme="primary"
             onClick={() => setActiveView("globalCustomization")}
           >
             Global Customization
           </Button>
           <Button
-            variant={activeView === "formBuilder" ? "solid" : "outline"}
+            variant={activeView === "formBuilder" ? "outline" : "solid"}
             colorScheme="primary"
             onClick={() => setActiveView("formBuilder")}
           >
@@ -61,7 +61,7 @@ const MainPage = ({ setCustomTheme, globalSettings, setGlobalSettings }) => {
       </Box>
 
       {/* Main Content */}
-      <Box flex="1" bg="background.light">
+      <Box flex="1" bg="background.light" color="text.primary">
         {/* Dynamic Font */}
         <Head>
           <link rel="stylesheet" href={fontLink} />
@@ -85,7 +85,7 @@ const MainPage = ({ setCustomTheme, globalSettings, setGlobalSettings }) => {
             {/* Header */}
             <Box
               bg="primary.300"
-              color="white"
+              color="text.primary"
               p={4}
               display="flex"
               alignItems="center"

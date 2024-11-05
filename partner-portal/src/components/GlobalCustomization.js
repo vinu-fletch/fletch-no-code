@@ -98,7 +98,7 @@ const GlobalCustomization = ({
   };
 
   return (
-    <Box p={8} bg="background.light" minHeight="100vh">
+    <Box p={8} bg="background.semi" minHeight="100vh">
       <Heading mb={6}>Global Customization</Heading>
       <VStack spacing={4} align="stretch">
         <FormControl>

@@ -4,22 +4,23 @@ import { extendTheme } from "@chakra-ui/react";
 const theme = extendTheme({
   colors: {
     primary: {
-      100: "#b3ecff", // Lightest shade
-      200: "#4dd0ff", // Medium shade
-      300: "#0088cc", // Darkest shade
+      100: "#4a5568",
+      200: "#2d3748",
+      300: "#1a202c", 
     },
     secondary: {
-      100: "#ffb3cf", // Lightest shade
-      200: "#ff4d8c", // Medium shade
-      300: "#e00050", // Darkest shade
+      100: "#718096",
+      200: "#4a5568",
+      300: "#2d3748",
     },
     text: {
-      primary: "#000000",
-      secondary: "#555555",
+      primary: "#ffffff",
+      secondary: "#a0aec0",
     },
     background: {
-      light: "#ffffff",
-      dark: "#f0f0f0",
+      light: "#1a202c",
+      dark: "#171923", 
+      semi: "#2e2432"
     },
   },
   fonts: {
@@ -29,7 +30,7 @@ const theme = extendTheme({
   fontSizes: {
     xs: "12px",
     sm: "14px",
-    md: "16px", // Default font size
+    md: "16px",
     lg: "18px",
     xl: "24px",
   },
@@ -39,7 +40,7 @@ const theme = extendTheme({
     1: "4px",
     2: "8px",
     3: "12px",
-    4: "16px", // Default spacing
+    4: "16px",
     5: "20px",
     6: "24px",
     8: "32px",
@@ -48,7 +49,7 @@ const theme = extendTheme({
   radii: {
     none: "0",
     sm: "2px",
-    md: "4px", // Default border radius
+    md: "4px",
     lg: "8px",
     full: "9999px",
   },
