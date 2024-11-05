@@ -1,38 +1,53 @@
 // components/FieldSidebar.js
-import { Box, Heading } from "@chakra-ui/react";
-import { useDraggable } from "@dnd-kit/core";
 
-const DraggableField = ({ id, label }) => {
-  const { attributes, listeners, setNodeRef } = useDraggable({
-    id,
-    data: { label },
-  });
+import { Box, Heading, Button } from "@chakra-ui/react";
+import PincodeFieldConfig from "./fields/pincode-form";
 
+const fields = [
+  { id: "ssn", label: "SSN", type: "ssn" },
+  { id: "pincode", label: "Pincode", type: "pincode" },
+  // Add more fields as needed
+];
+
+const FieldSidebar = ({
+  selectedField,
+  onFieldSelect,
+  onSaveField,
+  onCancel,
+}) => {
+  if (selectedField && selectedField.type === "pincode") {
+    return (
+      <PincodeFieldConfig
+        onSave={(fieldAttributes) => {
+          onSaveField({
+            ...selectedField,
+            attributes: fieldAttributes,
+          });
+        }}
+        onCancel={onCancel}
+      />
+    );
+  }
+
+  // Default view when no field is selected
   return (
-    <Box
-      ref={setNodeRef}
-      {...listeners}
-      {...attributes}
-      p={4}
-      bg="secondary.200"
-      mb={2}
-      borderRadius="md"
-      cursor="grab"
-    >
-      {label}
-    </Box>
-  );
-};
-
-const FieldSidebar = () => {
-  return (
-    <Box width="250px" p={4} bg="secondary.100">
+    <Box width="300px" p={4} bg="background.dark" color="text.primary">
       <Heading size="md" mb={4}>
-        Fields
+        Add Field
       </Heading>
-      <DraggableField id="ssn" label="SSN" />
-      <DraggableField id="pincode" label="Pincode" />
-      {/* Add more fields as needed */}
+      {fields.map((field) => (
+        <Button
+          key={field.id}
+          onClick={() => onFieldSelect(field)}
+          width="100%"
+          mb={2}
+          bg="secondary.200"
+          color="text.primary"
+          _hover={{ bg: "secondary.100" }}
+        >
+          {field.label}
+        </Button>
+      ))}
     </Box>
   );
 };
