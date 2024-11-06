@@ -1,5 +1,18 @@
-import { Flex, Button, IconButton } from "@chakra-ui/react";
-import { CloseIcon } from "@chakra-ui/icons";
+// components/BottomTabs.js
+
+import { useState } from "react";
+import {
+  Flex,
+  Button,
+  Menu,
+  MenuButton,
+  MenuList,
+  MenuItem,
+  Editable,
+  EditableInput,
+  EditablePreview,
+  Box,
+} from "@chakra-ui/react";
 
 const BottomTabs = ({
   screens,
@@ -7,6 +20,9 @@ const BottomTabs = ({
   activeScreenIndex,
   setActiveScreenIndex,
 }) => {
+  const [contextMenuIndex, setContextMenuIndex] = useState(null);
+  const [editingIndex, setEditingIndex] = useState(null);
+
   const addScreen = () => {
     const newScreen = {
       name: `Screen ${screens.length + 1}`,
@@ -30,6 +46,40 @@ const BottomTabs = ({
         setActiveScreenIndex(activeScreenIndex - 1);
       }
     }
+    setContextMenuIndex(null); // Close context menu
+  };
+
+  const cloneScreen = (index) => {
+    const screenToClone = screens[index];
+    const clonedScreen = {
+      ...screenToClone,
+      name: `${screenToClone.name} (Copy)`,
+    };
+    const updatedScreens = [
+      ...screens.slice(0, index + 1),
+      clonedScreen,
+      ...screens.slice(index + 1),
+    ];
+    setScreens(updatedScreens);
+    setActiveScreenIndex(index + 1); // Set focus on the cloned screen
+    setContextMenuIndex(null); // Close context menu
+  };
+
+  const handleContextMenu = (event, index) => {
+    event.preventDefault();
+    setContextMenuIndex(index);
+  };
+
+  const handleNameChange = (newName, index) => {
+    const updatedScreens = screens.map((screen, i) =>
+      i === index ? { ...screen, name: newName } : screen
+    );
+    setScreens(updatedScreens);
+    setEditingIndex(null); // Exit edit mode
+  };
+
+  const handleStartEditing = (index) => {
+    setEditingIndex(index);
   };
 
   return (
@@ -43,27 +93,54 @@ const BottomTabs = ({
       color="text.primary"
     >
       {screens.map((screen, index) => (
-        <Flex pos="relative" key={screen.name} alignItems="center" mr={2}>
-          <Button
+        <Menu
+          key={`${screen.name}-${index}`}
+          isOpen={contextMenuIndex === index}
+        >
+          <MenuButton
+            as={Button}
             onClick={() => setActiveScreenIndex(index)}
+            onContextMenu={(event) => handleContextMenu(event, index)}
             variant={activeScreenIndex === index ? "outline" : "solid"}
             colorScheme="primary"
+            mr={2}
           >
-            {screen.name}
-          </Button>
-          <IconButton
-            pos="absolute"
-            top="-20px"
-            right="-20px"
-            aria-label="Delete Screen"
-            icon={<CloseIcon size="sm" />}
-            width="25px"
-            height="25px"
-            colorScheme="red"
-            ml={1}
-            onClick={() => deleteScreen(index)}
-          />
-        </Flex>
+            <Editable
+              value={screen.name}
+              isEditing={editingIndex === index}
+              onSubmit={(newName) => handleNameChange(newName, index)}
+            >
+              <Box onDoubleClick={() => handleStartEditing(index)}>
+                <EditablePreview />
+              </Box>
+              <EditableInput />
+            </Editable>
+          </MenuButton>
+          <MenuList
+            bg="gray.800"
+            color="white"
+            borderColor="gray.600"
+            onMouseLeave={() => setContextMenuIndex(null)} // Close menu when mouse leaves
+            onClose={() => setContextMenuIndex(null)}
+          >
+            <MenuItem
+              onClick={() => cloneScreen(index)}
+              _hover={{ bg: "gray.700" }}
+              bg="gray.800"
+              color="white"
+            >
+              Clone Screen
+            </MenuItem>
+            <MenuItem
+              onClick={() => deleteScreen(index)}
+              _hover={{ bg: "gray.700" }}
+              bg="gray.800"
+              color="white"
+            >
+              Delete Screen
+            </MenuItem>
+          </MenuList>
+        </Menu>
       ))}
       <Button colorScheme="secondary" onClick={addScreen}>
         + Add Screen

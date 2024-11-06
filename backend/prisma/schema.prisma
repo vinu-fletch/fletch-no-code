@@ -7,17 +7,71 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model partner {
-  id         String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  name       String    @db.VarChar(255)
-  logo       String?   @db.VarChar(255)
-  isactive   Boolean?  @default(true)
-  created_at DateTime? @default(now()) @db.Timestamp(6)
-  updated_at DateTime? @default(now()) @db.Timestamp(6)
+model Partner {
+  id         String    @id @default(uuid())
+  name       String
+  logo       String?   // URL or path to the logo
+  isActive   Boolean   @default(true)
+  created_at DateTime  @default(now())
+  updated_at DateTime  @updatedAt
+
+  // Relationships
+  configs    PartnerConfig[]
+  screens    Screen[]
+  fields     Field[]  // This is the opposite relation field to the `partner` field in the Field model
+  categories Category[] // New relation for categories
 }
 
-model xyz {
-  id          Int       @id @default(autoincrement())
-  create_time DateTime? @db.Date
-  name        String?   @db.VarChar(255)
+model Category {
+  id         String   @id @default(uuid())
+  partner_id String
+  partner    Partner  @relation(fields: [partner_id], references: [id], onDelete: Cascade)
+  name       String   // e.g., Data Collection, Offers, Payment
+  isActive   Boolean  @default(true) // Enable/disable at the partner level
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  // Relationships
+  screens    Screen[] // Each category can have multiple screens
+}
+
+model PartnerConfig {
+  id              String   @id @default(uuid())
+  partner_id      String
+  partner         Partner  @relation(fields: [partner_id], references: [id], onDelete: Cascade)
+  globalConfig    Json     // JSON field for global theme and styling settings
+  headerConfig    Json     // JSON field for header-specific configurations
+  footerConfig    Json     // JSON field for footer-specific configurations
+  layoutConfig    Json     // JSON field for layout settings
+  screen_ids      String[] // Array of screen IDs associated with this partner configuration
+  created_at      DateTime @default(now())
+  updated_at      DateTime @updatedAt
+}
+
+model Screen {
+  id                String   @id @default(uuid())
+  partner_id        String
+  partner           Partner  @relation(fields: [partner_id], references: [id], onDelete: Cascade)
+  category_id       String
+  category          Category @relation(fields: [category_id], references: [id], onDelete: Cascade) // Link to Category
+  isActive          Boolean  @default(true)
+  screenConfig      Json     // JSON field for screen-specific configurations, e.g., background color
+  field_ids         String[] // Array of field IDs associated with this screen
+  created_at        DateTime @default(now())
+  updated_at        DateTime @updatedAt
+
+  // Relationships
+  fields            Field[]
+}
+
+model Field {
+  id                String   @id @default(uuid())
+  screen_id         String
+  partner_id        String
+  screen            Screen   @relation(fields: [screen_id], references: [id], onDelete: Cascade)
+  partner           Partner  @relation(fields: [partner_id], references: [id], onDelete: Cascade)
+  type              String   // Type of field, e.g., text, dropdown, checkbox, etc.
+  fieldConfig       Json     // JSON field for field-specific settings, e.g., placeholder, padding, borderRadius
+  created_at        DateTime @default(now())
+  updated_at        DateTime @updatedAt
 }
