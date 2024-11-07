@@ -38,12 +38,32 @@ async function getPartnerByName(req, res) {
 }
 
 // Controller to update a partner by ID
-async function updatePartner(req, res) {
+async function updatePartnerConfig(req, res) {
+  const { id } = req.params; // The `PartnerConfig` ID for updating
+  const partnerId = req.body.partner_id; // Assume partner_id is sent in the request body
+  const { createNewVersion, globalConfig, headerConfig, footerConfig, layoutConfig } = req.body;
+
   try {
-    const partner = await partnerService.updatePartner(req.params.id, req.body);
-    res.status(200).json(partner);
+    // Collect only provided fields in updates object
+    const updates = {};
+    if (globalConfig) updates.globalConfig = globalConfig;
+    if (headerConfig) updates.headerConfig = headerConfig;
+    if (footerConfig) updates.footerConfig = footerConfig;
+    if (layoutConfig) updates.layoutConfig = layoutConfig;
+
+    // Call service to handle either update or new version creation
+    const updatedConfig = await partnerService.updateOrCreatePartnerConfig(
+      partnerId,
+      id,
+      updates,
+      createNewVersion
+    );
+
+    // Return 201 status for new version creation, 200 for update
+    res.status(createNewVersion ? 201 : 200).json(updatedConfig);
   } catch (error) {
-    res.status(500).json({ error: 'Failed to update partner' });
+    console.error("Error updating partner configuration:", error);
+    res.status(500).json({ error: "Failed to update partner configuration" });
   }
 }
 
@@ -61,6 +81,6 @@ module.exports = {
   createPartner,
   getAllPartners,
   getPartnerByName,
-  updatePartner,
+  updatePartnerConfig,
   deletePartner,
 };
