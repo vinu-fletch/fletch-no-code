@@ -10,7 +10,7 @@ const Canvas = ({ screens, activeScreenIndex, globalSettings }) => {
       flex="1"
       minHeight="calc(100vh - 100px)"
       overflowY="auto"
-      bg={currentScreen.backgroundColor || "background.light"}
+      bg={currentScreen.backgroundColor || "background.dark"}
       p={4}
       color="text.primary"
     >

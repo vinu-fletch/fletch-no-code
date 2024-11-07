@@ -112,7 +112,7 @@ const FormBuilderPage = ({ globalSettings }) => {
         )}
 
         {/* Screen Settings */}
-        <Box p={4} bg="background.light" color="text.primary">
+        <Box p={4} bg="background.dark" color="text.primary">
           <Heading size="md" mb={4}>
             Screen Settings
           </Heading>

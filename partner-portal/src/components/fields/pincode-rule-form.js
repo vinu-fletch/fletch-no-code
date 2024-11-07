@@ -76,7 +76,7 @@ const PincodeRuleConfig = ({ onSave }) => {
   };
 
   return (
-    <Box mt={4} p={4} bg="background.light" borderRadius="md">
+    <Box mt={4} p={4} bg="background.dark" borderRadius="md">
       <Heading size="sm" mb={2}>
         Pincode Validation Rule
       </Heading>

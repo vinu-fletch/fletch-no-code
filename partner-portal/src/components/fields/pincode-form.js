@@ -71,7 +71,7 @@ const PincodeFieldConfig = ({ onSave, onCancel }) => {
             name="label"
             value={fieldAttributes.label || ""}
             onChange={handleInputChange}
-            bg="background.light"
+            bg="background.dark"
             color="text.primary"
           />
         </FormControl>
@@ -82,7 +82,7 @@ const PincodeFieldConfig = ({ onSave, onCancel }) => {
             name="name"
             value={fieldAttributes.name || ""}
             onChange={handleInputChange}
-            bg="background.light"
+            bg="background.dark"
             color="text.primary"
           />
         </FormControl>
@@ -93,7 +93,7 @@ const PincodeFieldConfig = ({ onSave, onCancel }) => {
             name="placeholder"
             value={fieldAttributes.placeholder || ""}
             onChange={handleInputChange}
-            bg="background.light"
+            bg="background.dark"
             color="text.primary"
           />
         </FormControl>
@@ -120,7 +120,7 @@ const PincodeFieldConfig = ({ onSave, onCancel }) => {
             value={fieldAttributes.style?.width || ""}
             onChange={handleStyleChange}
             placeholder="e.g., 100%, 200px"
-            bg="background.light"
+            bg="background.dark"
             color="text.primary"
           />
         </FormControl>
@@ -132,7 +132,7 @@ const PincodeFieldConfig = ({ onSave, onCancel }) => {
             value={fieldAttributes.style?.height || ""}
             onChange={handleStyleChange}
             placeholder="e.g., auto, 50px"
-            bg="background.light"
+            bg="background.dark"
             color="text.primary"
           />
         </FormControl>
@@ -144,7 +144,7 @@ const PincodeFieldConfig = ({ onSave, onCancel }) => {
             value={fieldAttributes.style?.backgroundColor || ""}
             onChange={handleStyleChange}
             placeholder="e.g., #ffffff"
-            bg="background.light"
+            bg="background.dark"
             color="text.primary"
           />
         </FormControl>
@@ -156,7 +156,7 @@ const PincodeFieldConfig = ({ onSave, onCancel }) => {
             value={fieldAttributes.style?.textColor || ""}
             onChange={handleStyleChange}
             placeholder="e.g., #000000"
-            bg="background.light"
+            bg="background.dark"
             color="text.primary"
           />
         </FormControl>
