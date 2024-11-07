@@ -1,195 +1,289 @@
 // components/GlobalCustomization.js
+
 import {
   Box,
-  Button,
   Input,
   Select,
   Textarea,
-  Switch,
   FormControl,
   FormLabel,
   VStack,
   Heading,
+  Accordion,
+  AccordionItem,
+  AccordionButton,
+  AccordionPanel,
+  AccordionIcon,
+  Slider,
+  SliderTrack,
+  SliderFilledTrack,
+  SliderThumb,
+  Text,
+  Button,
+  HStack,
+  Flex,
 } from "@chakra-ui/react";
 import { useState, useEffect } from "react";
-import { ChromePicker } from "react-color";
+import { usePartnerStore } from "../store";
 
-const GlobalCustomization = ({
-  setCustomTheme,
-  setGlobalSettings,
-  globalSettings,
-}) => {
-  const [logo, setLogo] = useState(globalSettings.logo || null);
-  const [logoURL, setLogoURL] = useState(globalSettings.logoURL || null);
-  const [font, setFont] = useState(globalSettings.font || "Arial");
-  const [disclaimer, setDisclaimer] = useState(globalSettings.disclaimer || "");
-  const [backgroundColor, setBackgroundColor] = useState(
-    globalSettings.backgroundColor || "#ffffff"
-  );
-  const [progressBar, setProgressBar] = useState(
-    globalSettings.progressBar || false
-  );
-  const [progressBarDisplayStyle, setProgressBarDisplayStyle] = useState(
-    globalSettings.progressBarDisplayStyle || "percentage"
-  );
-  const [successMessage, setSuccessMessage] = useState(
-    globalSettings.successMessage || ""
-  );
-  const [layoutWidth, setLayoutWidth] = useState(
-    globalSettings.layoutWidth || 100
-  );
+const GlobalCustomization = () => {
+  const partnerDraft = usePartnerStore((state) => state.partnerDraft);
+  const partnerData = usePartnerStore((state) => state.partnerData);
+  const updatePartnerDraft = usePartnerStore((state) => state.updatePartnerDraft);
+  const savePartnerDraft = usePartnerStore((state) => state.savePartnerDraft);
+  const discardPartnerDraft = usePartnerStore((state) => state.discardPartnerDraft);
 
+  // Ensure partnerDraft.config exists
+  const config = partnerDraft?.config || {};
+
+  // Header Config State
+  const [logoLink, setLogoLink] = useState("");
+  const [logoWidth, setLogoWidth] = useState("");
+  const [logoHeight, setLogoHeight] = useState("");
+  const [logoAlignment, setLogoAlignment] = useState("center");
+
+  // Footer Config State
+  const [footerText, setFooterText] = useState("");
+
+  // Layout Config State
+  const [layoutPercentage, setLayoutPercentage] = useState(60);
+
+  // Global Settings State
+  const [fontFamily, setFontFamily] = useState("");
+
+  // Populate state variables with values from partnerDraft when it changes
   useEffect(() => {
-    // Update the theme with the new background color and font
-    setCustomTheme((prevTheme) => ({
-      ...prevTheme,
-      colors: {
-        ...prevTheme.colors,
-        background: {
-          ...prevTheme.colors.background,
-          light: backgroundColor,
-        },
-      },
-      fonts: {
-        ...prevTheme.fonts,
-        body: font,
-        heading: font,
-      },
-    }));
+    if (partnerDraft && partnerDraft.config) {
+      const config = partnerDraft.config;
 
-    // Store global settings
-    setGlobalSettings({
-      logo,
-      logoURL,
-      font,
-      disclaimer,
-      backgroundColor,
-      progressBar,
-      progressBarDisplayStyle,
-      successMessage,
-      layoutWidth,
-    });
-  }, [
-    logo,
-    logoURL,
-    font,
-    disclaimer,
-    backgroundColor,
-    progressBar,
-    progressBarDisplayStyle,
-    successMessage,
-    layoutWidth,
-    setCustomTheme,
-    setGlobalSettings,
-  ]);
+      setLogoLink(config.header_config?.logo_link || "");
+      setLogoWidth(config.header_config?.logo_width || "");
+      setLogoHeight(config.header_config?.logo_height || "");
+      setLogoAlignment(config.header_config?.logo_alignment || "center");
 
-  const handleBackgroundColorChange = (color) => {
-    setBackgroundColor(color.hex);
-  };
+      setFooterText(config.footer_config?.footer_text || "");
+      setLayoutPercentage(config.layout_config?.layout_percentage || 60);
 
-  const handleLogoChange = (e) => {
-    const file = e.target.files[0];
-    setLogo(file);
-    const reader = new FileReader();
-    reader.onloadend = () => {
-      setLogoURL(reader.result);
-    };
-    reader.readAsDataURL(file);
-  };
+      setFontFamily(config.global_config?.font_family || "Arial");
+    }
+  }, [partnerData]);
+
+  // Check if there are unsaved changes
+  const hasUnsavedChanges =
+    JSON.stringify(partnerData) !== JSON.stringify(partnerDraft);
 
   return (
-    <Box p={8} bg="background.semi" minHeight="100vh">
-      <Heading mb={6}>Global Customization</Heading>
-      <VStack spacing={4} align="stretch">
-        <FormControl>
-          <FormLabel>Logo</FormLabel>
-          <Input
-            type="file"
-            accept="image/*"
-            onChange={handleLogoChange}
-          />
-          {logoURL && (
-            <Box mt={2}>
-              <img
-                src={logoURL}
-                alt="Logo Preview"
-                style={{ height: "40px" }}
-              />
-            </Box>
-          )}
-        </FormControl>
-
-        <FormControl>
-          <FormLabel>Font (Google Font)</FormLabel>
-          <Select value={font} onChange={(e) => setFont(e.target.value)}>
-            <option value="Arial">Arial</option>
-            <option value="Roboto">Roboto</option>
-            <option value="Open Sans">Open Sans</option>
-            {/* Add more fonts as needed */}
-          </Select>
-        </FormControl>
-
-        <FormControl>
-          <FormLabel>Disclaimer (Header or Footer)</FormLabel>
-          <Textarea
-            value={disclaimer}
-            onChange={(e) => setDisclaimer(e.target.value)}
-            placeholder="Enter disclaimer text"
-          />
-        </FormControl>
-
-        <FormControl>
-          <FormLabel>Background Color</FormLabel>
-          <ChromePicker
-            color={backgroundColor}
-            onChangeComplete={handleBackgroundColorChange}
-          />
-        </FormControl>
-
-        <FormControl display="flex" alignItems="center">
-          <FormLabel htmlFor="progress-bar" mb="0">
-            Show Progress Bar
-          </FormLabel>
-          <Switch
-            id="progress-bar"
-            isChecked={progressBar}
-            onChange={(e) => setProgressBar(e.target.checked)}
-          />
-        </FormControl>
-
-        {progressBar && (
-          <FormControl>
-            <FormLabel>Progress Bar Display Style</FormLabel>
-            <Select
-              value={progressBarDisplayStyle}
-              onChange={(e) => setProgressBarDisplayStyle(e.target.value)}
-            >
-              <option value="percentage">Percentage</option>
-              <option value="screenNumber">Screen Number</option>
-            </Select>
-          </FormControl>
+    <Box p={8} bg="black" minHeight="100vh">
+      <Flex justifyContent="space-between" alignItems="center" mb={6}>
+        <Heading>Global Customization</Heading>
+        {hasUnsavedChanges && (
+          <HStack spacing={4}>
+            <Button colorScheme="green" onClick={() => savePartnerDraft(false)}>
+              Save
+            </Button>
+            <Button colorScheme="blue" onClick={() => savePartnerDraft(true)}>
+              Save as New Version
+            </Button>
+            <Button colorScheme="red" onClick={discardPartnerDraft}>
+              Discard
+            </Button>
+          </HStack>
         )}
+      </Flex>
 
-        <FormControl>
-          <FormLabel>Success Message</FormLabel>
-          <Textarea
-            value={successMessage}
-            onChange={(e) => setSuccessMessage(e.target.value)}
-            placeholder="Enter success message"
-          />
-        </FormControl>
+      <Box bg="black" p={6} rounded="md" shadow="md">
+        <Accordion allowMultiple>
+          {/* Global Settings */}
+          <AccordionItem size="lg">
+            <AccordionButton>
+              <Box flex="1" textAlign="left" fontWeight="bold">
+                Global Settings
+              </Box>
+              <AccordionIcon />
+            </AccordionButton>
+            <AccordionPanel pb={4}>
+              <VStack spacing={4} align="stretch">
+                <FormControl>
+                  <FormLabel>Font Family</FormLabel>
+                  <Select
+                    value={fontFamily}
+                    onChange={(e) => {
+                      const value = e.target.value;
+                      setFontFamily(value);
+                      updatePartnerDraft({
+                        globalConfig: {
+                          ...config.globalConfig,
+                          font_family: value,
+                        },
+                      });
+                    }}
+                  >
+                    <option value="Arial">Arial</option>
+                    <option value="Roboto">Roboto</option>
+                    <option value="Open Sans">Open Sans</option>
+                    <option value="Lato">Lato</option>
+                    <option value="Montserrat">Montserrat</option>
+                    {/* Add more fonts as needed */}
+                  </Select>
+                </FormControl>
+              </VStack>
+            </AccordionPanel>
+          </AccordionItem>
 
-        <FormControl>
-          <FormLabel>Layout Width (%)</FormLabel>
-          <Input
-            type="number"
-            value={layoutWidth}
-            onChange={(e) => setLayoutWidth(e.target.value)}
-            min={50}
-            max={100}
-          />
-        </FormControl>
-      </VStack>
+          {/* Header Config */}
+          <AccordionItem mt={4}>
+            <AccordionButton>
+              <Box flex="1" textAlign="left" fontWeight="bold">
+                Header Configuration
+              </Box>
+              <AccordionIcon />
+            </AccordionButton>
+            <AccordionPanel pb={4}>
+              <VStack spacing={4} align="stretch">
+                <FormControl>
+                  <FormLabel>Logo Link (URL)</FormLabel>
+                  <Input
+                    type="text"
+                    value={logoLink}
+                    onChange={(e) => {
+                      const value = e.target.value;
+                      setLogoLink(value);
+                      updatePartnerDraft({
+                        header_config: {
+                          ...config.header_config,
+                          logo_link: value,
+                        },
+                      });
+                    }}
+                  />
+                </FormControl>
+                <HStack spacing={4}>
+                  <FormControl>
+                    <FormLabel>Logo Width (px)</FormLabel>
+                    <Input
+                      type="number"
+                      value={logoWidth}
+                      onChange={(e) => {
+                        const value = e.target.value;
+                        setLogoWidth(value);
+                        updatePartnerDraft({
+                          header_config: {
+                            ...config.header_config,
+                            logo_width: value,
+                          },
+                        });
+                      }}
+                    />
+                  </FormControl>
+                  <FormControl>
+                    <FormLabel>Logo Height (px)</FormLabel>
+                    <Input
+                      type="number"
+                      value={logoHeight}
+                      onChange={(e) => {
+                        const value = e.target.value;
+                        setLogoHeight(value);
+                        updatePartnerDraft({
+                          header_config: {
+                            ...config.header_config,
+                            logo_height: value,
+                          },
+                        });
+                      }}
+                    />
+                  </FormControl>
+                </HStack>
+                <FormControl>
+                  <FormLabel>Logo Alignment</FormLabel>
+                  <Select
+                    value={logoAlignment}
+                    onChange={(e) => {
+                      const value = e.target.value;
+                      setLogoAlignment(value);
+                      updatePartnerDraft({
+                        header_config: {
+                          ...config.header_config,
+                          logo_alignment: value,
+                        },
+                      });
+                    }}
+                  >
+                    <option value="center">Center</option>
+                    <option value="right">Right</option>
+                  </Select>
+                </FormControl>
+              </VStack>
+            </AccordionPanel>
+          </AccordionItem>
+
+          {/* Footer Config */}
+          <AccordionItem mt={4}>
+            <AccordionButton>
+              <Box flex="1" textAlign="left" fontWeight="bold">
+                Footer Configuration
+              </Box>
+              <AccordionIcon />
+            </AccordionButton>
+            <AccordionPanel pb={4}>
+              <FormControl>
+                <FormLabel>Footer Text (HTML)</FormLabel>
+                <Textarea
+                  value={footerText}
+                  onChange={(e) => {
+                    const value = e.target.value;
+                    setFooterText(value);
+                    updatePartnerDraft({
+                      footer_config: {
+                        ...config.footer_config,
+                        footer_text: value,
+                      },
+                    });
+                  }}
+                  placeholder="Enter footer HTML"
+                />
+              </FormControl>
+            </AccordionPanel>
+          </AccordionItem>
+
+          {/* Layout Config */}
+          <AccordionItem mt={4}>
+            <AccordionButton>
+              <Box flex="1" textAlign="left" fontWeight="bold">
+                Layout Configuration
+              </Box>
+              <AccordionIcon />
+            </AccordionButton>
+            <AccordionPanel pb={4}>
+              <FormControl>
+                <FormLabel>Layout Width (%)</FormLabel>
+                <Slider
+                  value={layoutPercentage}
+                  min={60}
+                  max={90}
+                  step={10}
+                  onChange={(val) => {
+                    setLayoutPercentage(val);
+                    updatePartnerDraft({
+                      layoutConfig: {
+                        ...config.layoutConfig,
+                        layout_percentage: val,
+                      },
+                    });
+                  }}
+                >
+                  <SliderTrack bg="gray.200">
+                    <SliderFilledTrack bg="blue.500" />
+                  </SliderTrack>
+                  <SliderThumb boxSize={6}>
+                    <Box color="blue.500" />
+                  </SliderThumb>
+                </Slider>
+                <Text mt={2}>{layoutPercentage}%</Text>
+              </FormControl>
+            </AccordionPanel>
+          </AccordionItem>
+        </Accordion>
+      </Box>
     </Box>
   );
 };

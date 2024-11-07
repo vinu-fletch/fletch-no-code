@@ -1,5 +1,7 @@
 
 const prisma = require('../db');
+const { toCamelCase, toUnderscoreCase } = require('../utils/caseConversion');
+
 
 // Service to create a new partner
 async function createPartner(data) {
@@ -31,20 +33,21 @@ async function getPartnerByName(name, version = null) {
 
   if (partner) {
     const config = partner.configs[0] || null; 
+    console.log("Config", config)
     return {
       id: partner.id,
       name: partner.name,
       logo: partner.logo,
       isActive: partner.isActive,
-      created_at: partner.created_at,
-      updated_at: partner.updated_at,
+      createdAt: partner.created_at,
+      updatedAt: partner.updated_at,
       config: config ? {
         id: config.id,
         version: config.version,
-        globalConfig: config.global_config,
-        headerConfig: config.header_config,
-        footerConfig: config.footer_config,
-        layoutConfig: config.layout_config,
+        global_config: config.global_config,
+        header_config: config.header_config,
+        footer_config: config.footer_config,
+        layout_config: config.layout_config,
         screen_ids: config.screen_ids,
         created_at: config.created_at,
         updated_at: config.updated_at
@@ -61,65 +64,51 @@ async function getPartnerByName(name, version = null) {
   
 }
   
-
-
-
-// Fetch the latest configuration version for a partner
-async function getLatestPartnerConfig(partnerId) {
-  return await prisma.partnerConfig.findFirst({
-    where: { partner_id: partnerId },
-    orderBy: { version: "desc" },
-  });
-}
-
-// Update an existing configuration by config ID, supporting partial updates
-async function updateExistingConfig(configId, updates) {
-  // Fetch the existing config to retain fields that are not being updated
-  const existingConfig = await prisma.partnerConfig.findUnique({
-    where: { id: configId },
-  });
-
-  if (!existingConfig) throw new Error("Configuration not found");
-
-  return await prisma.partnerConfig.update({
-    where: { id: configId },
-    data: {
-      globalConfig: updates.globalConfig ?? existingConfig.globalConfig,
-      headerConfig: updates.headerConfig ?? existingConfig.headerConfig,
-      footerConfig: updates.footerConfig ?? existingConfig.footerConfig,
-      layoutConfig: updates.layoutConfig ?? existingConfig.layoutConfig,
-      updated_at: new Date(),
-    },
-  });
-}
-
-// Create a new configuration version by duplicating the latest configuration and applying updates
-async function createNewConfigVersion(partnerId, latestConfig, updates) {
-  const newVersion = latestConfig.version + 1;
-  return await prisma.partnerConfig.create({
-    data: {
-      partner_id: partnerId,
-      version: newVersion,
-      globalConfig: updates.globalConfig || latestConfig.globalConfig,
-      headerConfig: updates.headerConfig || latestConfig.headerConfig,
-      footerConfig: updates.footerConfig || latestConfig.footerConfig,
-      layoutConfig: updates.layoutConfig || latestConfig.layoutConfig,
-      screen_ids: latestConfig.screen_ids,
-      created_at: new Date(),
-      updated_at: new Date(),
-    },
-  });
-}
-
 // Main function to handle update or version creation
 async function updateOrCreatePartnerConfig(partnerId, configId, updates, createNewVersion) {
+  const underscoreUpdates = (updates); // Convert updates to underscore_case for DB
+  console.log("Config id", configId)
+
   if (createNewVersion) {
-    const latestConfig = await getLatestPartnerConfig(partnerId);
+    const latestConfig = await prisma.partnerConfig.findFirst({
+      where: { partner_id: partnerId },
+      orderBy: { version: 'desc' },
+    });
+
     if (!latestConfig) throw new Error("No existing configuration found for this partner");
 
-    return await createNewConfigVersion(partnerId, latestConfig, updates);
+    return await prisma.partnerConfig.create({
+      data: {
+        partner_id: partnerId,
+        version: latestConfig.version + 1,
+        global_config: underscoreUpdates.global_config || latestConfig.global_config,
+        header_config: underscoreUpdates.header_config || latestConfig.header_config,
+        footer_config: underscoreUpdates.footer_config || latestConfig.footer_config,
+        layout_config: underscoreUpdates.layout_config || latestConfig.layout_config,
+        screen_ids: latestConfig.screen_ids,
+        created_at: new Date(),
+        updated_at: new Date(),
+      },
+    });
   } else {
-    return await updateExistingConfig(configId, updates);
+    const existingConfig = await prisma.partnerConfig.findUnique({
+      where: { id: configId },
+    });
+
+    if (!existingConfig) throw new Error("Configuration not found");
+
+    console.log("Existing Config", JSON.stringify(underscoreUpdates))
+
+    return await prisma.partnerConfig.update({
+      where: { id: configId },
+      data: {
+        global_config: underscoreUpdates.global_config ?? existingConfig.global_config,
+        header_config: underscoreUpdates.header_config ?? existingConfig.header_config,
+        footer_config: underscoreUpdates.footer_config ?? existingConfig.footer_config,
+        layout_config: underscoreUpdates.layout_config ?? existingConfig.layout_config,
+        updated_at: new Date(),
+      },
+    });
   }
 }
 

@@ -40,21 +40,22 @@ async function getPartnerByName(req, res) {
 // Controller to update a partner by ID
 async function updatePartnerConfig(req, res) {
   const { id } = req.params; // The `PartnerConfig` ID for updating
-  const partnerId = req.body.partner_id; // Assume partner_id is sent in the request body
-  const { createNewVersion, globalConfig, headerConfig, footerConfig, layoutConfig } = req.body;
+  const {partnerId} = req.body;
+  const { createNewVersion, config } = req.body;
+  const { global_config, header_config, footer_config, layout_config } = config;
 
   try {
     // Collect only provided fields in updates object
     const updates = {};
-    if (globalConfig) updates.globalConfig = globalConfig;
-    if (headerConfig) updates.headerConfig = headerConfig;
-    if (footerConfig) updates.footerConfig = footerConfig;
-    if (layoutConfig) updates.layoutConfig = layoutConfig;
+    if (global_config) updates.global_config = global_config;
+    if (header_config) updates.header_config = header_config;
+    if (footer_config) updates.footer_config = footer_config;
+    if (layout_config) updates.layout_config = layout_config;
 
     // Call service to handle either update or new version creation
     const updatedConfig = await partnerService.updateOrCreatePartnerConfig(
       partnerId,
-      id,
+      config.id,
       updates,
       createNewVersion
     );

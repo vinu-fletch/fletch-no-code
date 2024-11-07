@@ -1,4 +1,14 @@
-import { Box, Flex, VStack, Button, Text, HStack } from "@chakra-ui/react";
+// components/Layout.js
+
+import {
+  Box,
+  Flex,
+  VStack,
+  Button,
+  Text,
+  HStack,
+  Spacer,
+} from "@chakra-ui/react";
 import { useRouter } from "next/router";
 import { useState, useEffect } from "react";
 import { usePartnerStore } from "../store";
@@ -16,10 +26,10 @@ const Layout = ({ children }) => {
   useEffect(() => {
     async function fetchPartnerData() {
       try {
-        const response = await fetch("http://localhost:3000/partners/medlife"); // Adjust this endpoint to your API
+        const response = await fetch("http://localhost:3000/partners/medlife");
         const data = await response.json();
         console.log("Partner data:", data);
-        setPartnerData(data); // Store data in Zustand
+        setPartnerData(data);
       } catch (error) {
         console.error("Failed to fetch partner data:", error);
       }
@@ -36,11 +46,10 @@ const Layout = ({ children }) => {
     <Flex direction="column" minHeight="100vh">
       {/* Top Navigation */}
       <Box bg="background.dark" p={4} color="text.primary" width="100%">
-        <Flex justifyContent="space-between" maxWidth="1200px" mx="auto">
-          <Text fontWeight="bold">
-            {partnerData?.name || "Partner Name"}
-          </Text>
-          <Text fontSize="sm" color="text.secondary">
+        <Flex alignItems="center" maxWidth="1200px" mx="auto">
+          <Text fontWeight="bold">{partnerData?.name || "Partner Name"}</Text>
+          <Spacer />
+          <Text fontSize="sm" color="text.secondary" ml={4}>
             Version: {partnerData?.config?.version || "N/A"}
           </Text>
         </Flex>
@@ -82,7 +91,7 @@ const Layout = ({ children }) => {
         </Box>
 
         {/* Main Content */}
-        <Box flex="1" bg="background.dark" color="text.primary" p={8}>
+        <Box flex="1" bg="background.light" color="text.primary" p={8}>
           {children}
         </Box>
       </Flex>
