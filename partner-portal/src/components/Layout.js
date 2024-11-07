@@ -33,7 +33,21 @@ const Layout = ({ children }) => {
             colorScheme="primary"
             onClick={() => handleNavigation("/form-builder")}
           >
-            Form Builder
+            Data Collection
+          </Button>
+          <Button
+            variant={activeView === "/offers" ? "outline" : "solid"}
+            colorScheme="primary"
+            onClick={() => handleNavigation("/offers")}
+          >
+            Offers
+          </Button>
+          <Button
+            variant={activeView === "/payment" ? "outline" : "solid"}
+            colorScheme="primary"
+            onClick={() => handleNavigation("/payment")}
+          >
+            Payment
           </Button>
         </VStack>
       </Box>

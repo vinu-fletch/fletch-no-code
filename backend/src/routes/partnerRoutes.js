@@ -5,7 +5,7 @@ const router = express.Router();
 
 router.post('/', partnerController.createPartner);
 router.get('/', partnerController.getAllPartners);
-router.get('/:id', partnerController.getPartnerById);
+router.get('/name/:name', partnerController.getPartnerByName);
 router.put('/:id', partnerController.updatePartner);
 router.delete('/:id', partnerController.deletePartner);
 

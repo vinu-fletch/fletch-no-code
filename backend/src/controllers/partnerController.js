@@ -20,10 +20,13 @@ async function getAllPartners(req, res) {
   }
 }
 
-// Controller to get a partner by ID
-async function getPartnerById(req, res) {
+// Controller to get a partner by name
+async function getPartnerByName(req, res) {
   try {
-    const partner = await partnerService.getPartnerById(req.params.id);
+    const { name } = req.params;
+    const version = req.query.version ? parseInt(req.query.version, 10) : null;
+
+    const partner = await partnerService.getPartnerByName(name, version);
     if (partner) {
       res.status(200).json(partner);
     } else {
@@ -57,7 +60,7 @@ async function deletePartner(req, res) {
 module.exports = {
   createPartner,
   getAllPartners,
-  getPartnerById,
+  getPartnerByName,
   updatePartner,
   deletePartner,
 };
