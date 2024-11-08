@@ -26,7 +26,7 @@ async function getPartnerByName(name, version = null) {
           : { orderBy: { version: 'desc' }, take: 1 }),    // Otherwise, retrieve the latest version
       },
       categories: true,
-      screens: false,                                      
+      screens: true,                                      
       fields: false                                         
     }
   });
@@ -114,8 +114,6 @@ async function updateOrCreatePartnerConfig(partnerId, configId, updates, createN
     });
 
     if (!existingConfig) throw new Error("Configuration not found");
-
-    console.log("Existing Config", JSON.stringify(underscoreUpdates))
 
     return await prisma.partnerConfig.update({
       where: { id: configId },

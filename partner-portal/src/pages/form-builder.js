@@ -4,69 +4,68 @@ import { useState, useEffect } from "react";
 import {
   Flex,
   Box,
+  Button,
   useDisclosure,
 } from "@chakra-ui/react";
 import FieldSidebar from "../components/FieldSidebar";
 import Canvas from "../components/Canvas";
 import BottomTabs from "../components/BottomTabs";
 import Layout from "../components/Layout";
-
 import Head from "next/head";
 import { usePartnerStore } from "../store";
-import {ConfirmationModal} from "../components/modal/ConfirmationModal";
+import { ConfirmationModal } from "../components/modal/ConfirmationModal";
 import { ScreenSettings } from "@/components/ScreenSettings";
 import { DataCollectionToggle } from "@/components/data-collection/Toggle";
 
 const FormBuilderPage = ({ globalSettings }) => {
-  const [screens, setScreens] = useState([
-    {
-      name: "Screen 1",
-      backgroundColor: "",
-      heading: "",
-      continueButtonText: "",
-      fields: [],
-    },
-  ]);
+  const { isOpen, onOpen, onClose } = useDisclosure();
+  
+  // Zustand store hooks
+  const partnerData = usePartnerStore((state) => state.partnerData);
+  const partnerDraft = usePartnerStore((state) => state.partnerDraft);
+  const updatePartnerDraft = usePartnerStore((state) => state.updatePartnerDraft);
+  const savePartnerDraft = usePartnerStore((state) => state.savePartnerDraft);
+  const discardPartnerDraft = usePartnerStore((state) => state.discardPartnerDraft);
+  const updateCategoryStatus = usePartnerStore((state) => state.updateCategoryStatus);
+  
   const [activeScreenIndex, setActiveScreenIndex] = useState(0);
-
-
   const [selectedField, setSelectedField] = useState(null);
   const [dataCollectionEnabled, setDataCollectionEnabled] = useState(true);
 
-  const { isOpen, onOpen, onClose } = useDisclosure();
-  const partnerData = usePartnerStore((state) => state.partnerData);
-  const updateCategoryStatus = usePartnerStore(
-    (state) => state.updateCategoryStatus
-  );
-
+  // Find the Data Collection category in the store
   const dataCollectionCategory = partnerData?.categories?.find(
     (category) => category.name === "Data Collection"
   );
 
+  // Sync data collection state with category
   useEffect(() => {
     if (dataCollectionCategory) {
       setDataCollectionEnabled(dataCollectionCategory.is_active);
     }
   }, [dataCollectionCategory]);
 
+  // Update the draft screens state
+  const handleScreenUpdate = (updatedScreens) => {
+    updatePartnerDraft({ screens: updatedScreens });
+  };
+
+  // Select a field to edit in FieldSidebar
   const handleFieldSelect = (field) => {
     setSelectedField(field);
   };
 
-  const handleScreenUpdate = (screens) => {
-    setScreens(screens);
-  }
-
+  // Save a configured field to the current screen in the draft
   const handleSaveField = (fieldAttributes) => {
-    const updatedScreens = [...screens];
+    const updatedScreens = [...(partnerDraft.screens || [])];
     updatedScreens[activeScreenIndex].fields.push({
       ...selectedField,
       attributes: fieldAttributes,
     });
-    setScreens(updatedScreens);
+    handleScreenUpdate(updatedScreens);
     setSelectedField(null);
   };
 
+  // Toggle Data Collection with confirmation modal
   const handleDataCollectionToggle = (value) => {
     const newValue = value === "enable";
     if (newValue !== dataCollectionEnabled) {
@@ -74,8 +73,10 @@ const FormBuilderPage = ({ globalSettings }) => {
     }
   };
 
+  console.log("Partner draft", partnerDraft)
+
   const confirmToggleDataCollection = () => {
-    updateCategoryStatus(partnerData.id,"Data Collection", !dataCollectionEnabled);
+    updateCategoryStatus(partnerData.id, "Data Collection", !dataCollectionEnabled);
     setDataCollectionEnabled(!dataCollectionEnabled);
     onClose();
   };
@@ -93,15 +94,33 @@ const FormBuilderPage = ({ globalSettings }) => {
       </Head>
 
       <Flex direction="column" minHeight="100vh">
+        <Flex justify="space-between" align="center" bg="primary.300" color="text.primary" p={4}>
+          <DataCollectionToggle 
+            dataCollectionEnabled={dataCollectionEnabled} 
+            confirmToggleDataCollection={confirmToggleDataCollection} 
+            handleDataCollectionToggle={handleDataCollectionToggle}
+          />
+          <Flex gap={3}>
+            <Button onClick={savePartnerDraft} colorScheme="teal">
+              Save
+            </Button>
+            <Button onClick={discardPartnerDraft} colorScheme="red">
+              Discard
+            </Button>
+          </Flex>
+        </Flex>
+       
+       {
+        partnerDraft?.screens &&  <ScreenSettings screens={partnerDraft?.screens} activeScreenIndex={activeScreenIndex} onUpdateScreen={handleScreenUpdate} />
+       }
 
-        <DataCollectionToggle dataCollectionEnabled={dataCollectionEnabled} confirmToggleDataCollection={confirmToggleDataCollection} handleDataCollectionToggle={handleDataCollectionToggle}/>
-
-        <ScreenSettings screens={screens} activeScreenIndex={activeScreenIndex} onUpdateScreen={handleScreenUpdate} />
-
+       {
+        partnerDraft?.screens &&   
         <Flex flex="1">
+          {/* Canvas with a border and padding for visual separation */}
           <Box flex="1" p={4} border="1px solid" borderColor="gray.300" m={4}>
             <Canvas
-              screens={screens}
+              screens={partnerDraft?.screens}
               activeScreenIndex={activeScreenIndex}
               globalSettings={globalSettings}
             />
@@ -114,13 +133,17 @@ const FormBuilderPage = ({ globalSettings }) => {
             onCancel={() => setSelectedField(null)}
           />
         </Flex>
+       }
 
-        <BottomTabs
-          screens={screens}
-          setScreens={setScreens}
+       
+       {
+        partnerDraft?.screens &&  <BottomTabs
+          screens={partnerDraft?.screens}
+          setScreens={handleScreenUpdate}
           activeScreenIndex={activeScreenIndex}
           setActiveScreenIndex={setActiveScreenIndex}
         />
+       }
 
       </Flex>
 

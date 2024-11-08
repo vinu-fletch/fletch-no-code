@@ -10,22 +10,22 @@ const Canvas = ({ screens, activeScreenIndex, globalSettings }) => {
       flex="1"
       minHeight="calc(100vh - 100px)"
       overflowY="auto"
-      bg={currentScreen.backgroundColor || "background.dark"}
+      bg={currentScreen?.backgroundColor || "background.dark"}
       p={4}
       color="text.primary"
     >
       {/* Heading */}
-      {currentScreen.heading && (
+      {currentScreen?.heading && (
         <Heading size="lg" mb={4}>
-          {currentScreen.heading}
+          {currentScreen?.heading}
         </Heading>
       )}
 
       {/* Fields Display */}
-      {currentScreen.fields.length === 0 ? (
+      {currentScreen?.fields?.length === 0 ? (
         <Text color="text.secondary">No fields added yet.</Text>
       ) : (
-        currentScreen.fields.map((field, index) => (
+        currentScreen?.fields?.map((field, index) => (
           <Box
             key={index}
             p={4}

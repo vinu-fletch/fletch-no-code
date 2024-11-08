@@ -39,7 +39,7 @@ export const ScreenSettings = ({screens, activeScreenIndex, onUpdateScreen}) => 
                   <FormControl>
                     <FormLabel>Screen Heading (Optional)</FormLabel>
                     <Input
-                      value={screens[activeScreenIndex].heading}
+                      value={screens ? screens[activeScreenIndex]?.heading : ""}
                       onChange={(e) => {
                         const updatedScreens = [...screens];
                         updatedScreens[activeScreenIndex].heading = e.target.value;
@@ -60,7 +60,7 @@ export const ScreenSettings = ({screens, activeScreenIndex, onUpdateScreen}) => 
                       <Box
                         onClick={() => setShowColorPicker(!showColorPicker)}
                         bg={
-                          screens[activeScreenIndex].backgroundColor ||
+                          screens?.[activeScreenIndex]?.backgroundColor ||
                           "background.dark"
                         }
                         color="text.primary"
@@ -68,7 +68,7 @@ export const ScreenSettings = ({screens, activeScreenIndex, onUpdateScreen}) => 
                         borderRadius="md"
                         cursor="pointer"
                       >
-                        {screens[activeScreenIndex].backgroundColor || "Select Color"}
+                        {screens?.[activeScreenIndex]?.backgroundColor || "Select Color"}
                       </Box>
                       {showColorPicker && (
                         <Box mt={2} position="absolute" zIndex="2">
@@ -82,7 +82,7 @@ export const ScreenSettings = ({screens, activeScreenIndex, onUpdateScreen}) => 
                           />
                           <ChromePicker
                             color={
-                              screens[activeScreenIndex].backgroundColor ||
+                              screens?.[activeScreenIndex]?.backgroundColor ||
                               "#ffffff"
                             }
                             onChangeComplete={(color) => {
@@ -101,7 +101,7 @@ export const ScreenSettings = ({screens, activeScreenIndex, onUpdateScreen}) => 
                   <FormControl>
                     <FormLabel>Continue Button Text</FormLabel>
                     <Input
-                      value={screens[activeScreenIndex].continueButtonText || ""}
+                      value={screens[activeScreenIndex]?.continueButtonText || ""}
                       onChange={(e) => {
                         const updatedScreens = [...screens];
                         updatedScreens[activeScreenIndex].continueButtonText =
