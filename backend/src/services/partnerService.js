@@ -25,6 +25,7 @@ async function getPartnerByName(name, version = null) {
           ? { where: { version } }                         // Filter by specific version if provided
           : { orderBy: { version: 'desc' }, take: 1 }),    // Otherwise, retrieve the latest version
       },
+      categories: true,
       screens: false,                                      
       fields: false                                         
     }
@@ -33,7 +34,6 @@ async function getPartnerByName(name, version = null) {
 
   if (partner) {
     const config = partner.configs[0] || null; 
-    console.log("Config", config)
     return {
       id: partner.id,
       name: partner.name,
@@ -53,7 +53,8 @@ async function getPartnerByName(name, version = null) {
         updated_at: config.updated_at
       } : null,
       screens: partner.screens,
-      fields: partner.fields
+      fields: partner.fields,
+      categories: partner.categories
     };
   }
 

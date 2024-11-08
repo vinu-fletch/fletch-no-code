@@ -31,7 +31,7 @@ const FieldSidebar = ({
 
   // Default view when no field is selected
   return (
-    <Box width="300px" p={4} bg="background.dark" color="text.primary">
+    <Box width="300px" p={4} bg="background.gray" color="text.primary">
       <Heading size="md" mb={4}>
         Add Field
       </Heading>

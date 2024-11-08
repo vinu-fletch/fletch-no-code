@@ -61,7 +61,7 @@ model Screen {
   category_name     String   // Foreign key to Category by name
   category          Category @relation(fields: [partner_id, category_name], references: [partner_id, name], onDelete: Cascade)
   isActive          Boolean  @default(true)
-  screenConfig      Json     // JSON field for screen-specific configurations, e.g., background color
+  screen_config      Json     // JSON field for screen-specific configurations, e.g., background color
   field_ids         String[] // Array of field IDs associated with this screen
   created_at        DateTime @default(now())
   updated_at        DateTime @updatedAt
@@ -77,7 +77,7 @@ model Field {
   screen            Screen   @relation(fields: [screen_id], references: [id], onDelete: Cascade)
   partner           Partner  @relation(fields: [partner_id], references: [id], onDelete: Cascade)
   type              String   // Type of field, e.g., text, dropdown, checkbox, etc.
-  fieldConfig       Json     // JSON field for field-specific settings, e.g., placeholder, padding, borderRadius
+  field_config       Json     // JSON field for field-specific settings, e.g., placeholder, padding, borderRadius
   created_at        DateTime @default(now())
   updated_at        DateTime @updatedAt
 }
