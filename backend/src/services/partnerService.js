@@ -138,11 +138,55 @@ async function deletePartner(id) {
   });
 }
 
+async function getScreens(partnerId) {
+  return await prisma.screen.findMany({
+    where: { partner_id: partnerId, is_active: true },
+    include: { fields: true },
+  });
+}
+
+async function createScreen(partnerId, screenData) {
+  return await prisma.screen.create({
+    data: {
+      partner_id: partnerId,
+      category_name: screenData.category_name,
+      screen_config: screenData.screen_config,
+      field_ids: screenData.field_ids,
+      is_active: true,
+    },
+  });
+}
+
+// Update an existing screen
+async function updateScreen(screenId, updatedData) {
+  return await prisma.screen.update({
+    where: { id: screenId },
+    data: {
+      screen_config: updatedData.screen_config,
+      field_ids: updatedData.field_ids,
+      updated_at: new Date(),
+    },
+  });
+}
+
+// Delete a screen (soft delete by marking inactive)
+async function deleteScreen(screenId) {
+  return await prisma.screen.update({
+    where: { id: screenId },
+    data: { is_active: false },
+  });
+}
+
 module.exports = {
   createPartner,
   getAllPartners,
   getPartnerByName,
   updateOrCreatePartnerConfig,
   deletePartner,
-  updateCategoryStatus
+  updateCategoryStatus,
+  getScreens,
+  createScreen,
+  updateScreen,
+  deleteScreen,
+
 };

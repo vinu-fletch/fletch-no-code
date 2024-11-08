@@ -76,6 +76,40 @@ async function updateCategoryStatus(req, res)  {
   }
 };
 
+// Create a new screen
+async function createScreen(req, res) {
+  try {
+    const { partnerId } = req.params;
+    const screenData = req.body;
+    const newScreen = await partnerService.createScreen(partnerId, screenData);
+    res.status(201).json(newScreen);
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to create screen' });
+  }
+}
+
+// Update an existing screen
+async function updateScreen(req, res) {
+  try {
+    const { screenId } = req.params;
+    const updatedData = req.body;
+    const updatedScreen = await partnerService.updateScreen(screenId, updatedData);
+    res.status(200).json(updatedScreen);
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to update screen' });
+  }
+}
+
+// Delete a screen
+async function deleteScreen(req, res) {
+  try {
+    await partnerService.deleteScreen(req.params.screenId);
+    res.status(204).end();
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to delete screen' });
+  }
+}
+
 module.exports = {
   getPartnerByName,
   updatePartnerConfig,
