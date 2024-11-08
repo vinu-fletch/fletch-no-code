@@ -18,6 +18,7 @@ import {
   RadioGroup,
   Radio,
   HStack,
+  useDisclosure,
 } from "@chakra-ui/react";
 import FieldSidebar from "../components/FieldSidebar";
 import Canvas from "../components/Canvas";
@@ -25,6 +26,8 @@ import BottomTabs from "../components/BottomTabs";
 import Layout from "../components/Layout";
 import { ChromePicker } from "react-color";
 import Head from "next/head";
+import { usePartnerStore } from "../store";
+import {ConfirmationModal} from "../components/modal/ConfirmationModal";
 
 const FormBuilderPage = ({ globalSettings }) => {
   const [screens, setScreens] = useState([
@@ -39,14 +42,19 @@ const FormBuilderPage = ({ globalSettings }) => {
   const [activeScreenIndex, setActiveScreenIndex] = useState(0);
   const [progress, setProgress] = useState(0);
   const [showColorPicker, setShowColorPicker] = useState(false);
-
-  // State for selected field and its configuration
   const [selectedField, setSelectedField] = useState(null);
-
-  // State for Data Collection enabled/disabled
   const [dataCollectionEnabled, setDataCollectionEnabled] = useState(true);
 
-  // Update progress based on the active screen
+  const { isOpen, onOpen, onClose } = useDisclosure();
+  const partnerData = usePartnerStore((state) => state.partnerData);
+  const updateCategoryStatus = usePartnerStore(
+    (state) => state.updateCategoryStatus
+  );
+
+  const dataCollectionCategory = partnerData?.categories?.find(
+    (category) => category.name === "Data Collection"
+  );
+
   useEffect(() => {
     const currentIndex = activeScreenIndex + 1;
     const totalScreens = screens.length;
@@ -54,12 +62,16 @@ const FormBuilderPage = ({ globalSettings }) => {
     setProgress(progressValue);
   }, [activeScreenIndex, screens]);
 
-  // Handle selecting a field to add/configure
+  useEffect(() => {
+    if (dataCollectionCategory) {
+      setDataCollectionEnabled(dataCollectionCategory.is_active);
+    }
+  }, [dataCollectionCategory]);
+
   const handleFieldSelect = (field) => {
     setSelectedField(field);
   };
 
-  // Handle saving the configured field
   const handleSaveField = (fieldAttributes) => {
     const updatedScreens = [...screens];
     updatedScreens[activeScreenIndex].fields.push({
@@ -67,18 +79,29 @@ const FormBuilderPage = ({ globalSettings }) => {
       attributes: fieldAttributes,
     });
     setScreens(updatedScreens);
-    setSelectedField(null); // Reset to "Add Field" view
+    setSelectedField(null);
   };
 
-  // Dynamic font loading
   const fontLink = `https://fonts.googleapis.com/css2?family=${globalSettings.font?.replace(
     " ",
     "+"
   )}&display=swap`;
 
+  const handleDataCollectionToggle = (value) => {
+    const newValue = value === "enable";
+    if (newValue !== dataCollectionEnabled) {
+      onOpen();
+    }
+  };
+
+  const confirmToggleDataCollection = () => {
+    updateCategoryStatus(partnerData.id,"Data Collection", !dataCollectionEnabled);
+    setDataCollectionEnabled(!dataCollectionEnabled);
+    onClose();
+  };
+
   return (
     <Layout>
-      {/* Dynamic Font */}
       <Head>
         <link rel="stylesheet" href={fontLink} />
         <style>
@@ -91,7 +114,6 @@ const FormBuilderPage = ({ globalSettings }) => {
       </Head>
 
       <Flex direction="column" minHeight="100vh">
-        {/* Header */}
         <Box bg="primary.300" color="text.primary" p={4}>
           <Flex alignItems="center" justifyContent="space-around">
             <Flex alignItems="center">
@@ -104,14 +126,15 @@ const FormBuilderPage = ({ globalSettings }) => {
                   />
                 </Box>
               )}
-              <Heading minW="400px" mr={12} size="lg">Data Collection</Heading>
+              <Heading minW="400px" mr={12} size="lg">
+                Data Collection
+              </Heading>
             </Flex>
 
-            {/* Data Collection Radio Button */}
             <FormControl as="fieldset" display="flex" alignItems="center">
               <RadioGroup
                 value={dataCollectionEnabled ? "enable" : "disable"}
-                onChange={(value) => setDataCollectionEnabled(value === "enable")}
+                onChange={handleDataCollectionToggle}
               >
                 <HStack spacing="24px">
                   <Radio value="enable">Enable</Radio>
@@ -122,7 +145,6 @@ const FormBuilderPage = ({ globalSettings }) => {
           </Flex>
         </Box>
 
-        {/* Progress Bar */}
         {globalSettings.progressBar && (
           <Progress
             value={progress}
@@ -133,7 +155,6 @@ const FormBuilderPage = ({ globalSettings }) => {
           />
         )}
 
-        {/* Screen Settings */}
         <Box p={4} bg="background.dark" color="text.primary" width="100%">
           <Accordion allowMultiple>
             <AccordionItem>
@@ -209,7 +230,6 @@ const FormBuilderPage = ({ globalSettings }) => {
                     </Box>
                   </FormControl>
 
-                  {/* Continue Button Text */}
                   <FormControl>
                     <FormLabel>Continue Button Text</FormLabel>
                     <Input
@@ -234,9 +254,7 @@ const FormBuilderPage = ({ globalSettings }) => {
           </Accordion>
         </Box>
 
-        {/* Main Content */}
         <Flex flex="1">
-          {/* Canvas on the left with full width */}
           <Box flex="1" p={4} border="1px solid" borderColor="gray.300" m={4}>
             <Canvas
               screens={screens}
@@ -245,7 +263,6 @@ const FormBuilderPage = ({ globalSettings }) => {
             />
           </Box>
 
-          {/* Field Sidebar on the right */}
           <FieldSidebar
             selectedField={selectedField}
             onFieldSelect={handleFieldSelect}
@@ -254,7 +271,6 @@ const FormBuilderPage = ({ globalSettings }) => {
           />
         </Flex>
 
-        {/* Bottom Tabs */}
         <BottomTabs
           screens={screens}
           setScreens={setScreens}
@@ -262,7 +278,6 @@ const FormBuilderPage = ({ globalSettings }) => {
           setActiveScreenIndex={setActiveScreenIndex}
         />
 
-        {/* Disclaimer */}
         {globalSettings.disclaimer && (
           <Box
             p={4}
@@ -274,6 +289,16 @@ const FormBuilderPage = ({ globalSettings }) => {
           </Box>
         )}
       </Flex>
+
+      <ConfirmationModal
+        isOpen={isOpen}
+        onClose={onClose}
+        onConfirm={confirmToggleDataCollection}
+        title="Confirm Action"
+        description={`Are you sure you want to ${
+          dataCollectionEnabled ? "disable" : "enable"
+        } Data Collection?`}
+      />
     </Layout>
   );
 };

@@ -64,6 +64,23 @@ async function getPartnerByName(name, version = null) {
   }
   
 }
+
+async function updateCategoryStatus(partnerId, categoryName, isActive)  {
+  try {
+    return await prisma.category.updateMany({
+      where: {
+        partner_id: partnerId,
+        name: categoryName,
+      },
+      data: {
+        is_active: isActive,
+      },
+    });
+  } catch (error) {
+    console.error("Error updating category status:", error);
+    throw error;
+  }
+};
   
 // Main function to handle update or version creation
 async function updateOrCreatePartnerConfig(partnerId, configId, updates, createNewVersion) {
@@ -127,4 +144,5 @@ module.exports = {
   getPartnerByName,
   updateOrCreatePartnerConfig,
   deletePartner,
+  updateCategoryStatus
 };

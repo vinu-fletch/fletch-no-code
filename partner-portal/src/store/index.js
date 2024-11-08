@@ -64,6 +64,31 @@ export const usePartnerStore = create((set, get) => ({
     }
   },
 
+   updateCategoryStatus: async (partnerId, categoryName, isActive) => {
+    try {
+      const response = await fetch(`http://localhost:3000/partners/category/${categoryName}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ partnerId, isActive }),
+      });
+      const result = await response.json();
+      if (result.success) {
+        set((state) => ({
+          partnerData: {
+            ...state.partnerData,
+            categories: state.partnerData.categories.map((cat) =>
+              cat.name === categoryName ? { ...cat, is_active: isActive } : cat
+            ),
+          },
+        }));
+      }
+    } catch (error) {
+      console.error("Failed to update category:", error);
+    }
+  },
+
   discardPartnerDraft: () =>
     set((state) => ({
       partnerDraft: { ...state.partnerData }, // Reset draft to the original data

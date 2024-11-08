@@ -1,24 +1,5 @@
 const partnerService = require('../services/partnerService');
 
-// Controller to create a new partner
-async function createPartner(req, res) {
-  try {
-    const partner = await partnerService.createPartner(req.body);
-    res.status(201).json(partner);
-  } catch (error) {
-    res.status(500).json({ error: 'Failed to create partner' });
-  }
-}
-
-// Controller to get all partners
-async function getAllPartners(req, res) {
-  try {
-    const partners = await partnerService.getAllPartners();
-    res.status(200).json(partners);
-  } catch (error) {
-    res.status(500).json({ error: 'Failed to retrieve partners' });
-  }
-}
 
 // Controller to get a partner by name
 async function getPartnerByName(req, res) {
@@ -78,10 +59,26 @@ async function deletePartner(req, res) {
   }
 }
 
+async function updateCategoryStatus(req, res)  {
+  const { categoryName } = req.params;
+  const { partnerId, isActive } = req.body; // partnerId and isActive will come from the request body
+
+  try {
+    const updatedCategory = await partnerService.updateCategoryStatus(partnerId, categoryName, isActive);
+    if (updatedCategory) {
+      res.status(200).json({ success: true, category: updatedCategory });
+    } else {
+      res.status(404).json({ success: false, message: "Category not found" });
+    }
+  } catch (error) {
+    console.error("Error updating category status:", error);
+    res.status(500).json({ success: false, error: "Failed to update category status" });
+  }
+};
+
 module.exports = {
-  createPartner,
-  getAllPartners,
   getPartnerByName,
   updatePartnerConfig,
   deletePartner,
+  updateCategoryStatus
 };
