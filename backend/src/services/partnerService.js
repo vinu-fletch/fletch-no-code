@@ -145,16 +145,42 @@ async function getScreens(partnerId) {
   });
 }
 
-async function createScreen(partnerId, screenData) {
-  return await prisma.screen.create({
+async function createScreen(partnerName, configVersion, screen_config) {
+  // Step 1: Check if partner and config version exist
+  const partner = await prisma.partner.findFirst({
+    where: { name: partnerName, is_active: true },
+    include: {
+      configs: {
+        where: { version: parseInt(configVersion, 10) },
+      },
+    },
+  });
+
+  if (!partner || !partner.configs.length) {
+    throw new Error('Partner or configuration version not found');
+  }
+
+  const partnerConfig = partner.configs[0];
+
+  // Step 2: Create the new screen
+  const newScreen = await prisma.screen.create({
     data: {
-      partner_id: partnerId,
-      category_name: screenData.category_name,
-      screen_config: screenData.screen_config,
-      field_ids: screenData.field_ids,
+      partner_id: partner.id,
+      category_name: "Data Collection",
+      screen_config: screen_config || {},
+      field_ids: [],
       is_active: true,
     },
   });
+
+  // Step 3: Update the partner config with the new screen ID
+  const updatedScreenIds = [...(partnerConfig.screen_ids || []), newScreen.id];
+  await prisma.partnerConfig.update({
+    where: { id: partnerConfig.id },
+    data: { screen_ids: updatedScreenIds },
+  });
+
+  return newScreen;
 }
 
 // Update an existing screen

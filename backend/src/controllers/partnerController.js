@@ -76,12 +76,13 @@ async function updateCategoryStatus(req, res)  {
   }
 };
 
-// Create a new screen
 async function createScreen(req, res) {
   try {
-    const { partnerId } = req.params;
-    const screenData = req.body;
-    const newScreen = await partnerService.createScreen(partnerId, screenData);
+    const { name, configVersion } = req.params;
+    const { screen_config } = req.body;
+    
+    const newScreen = await partnerService.createScreen(name, configVersion, screen_config);
+
     res.status(201).json(newScreen);
   } catch (error) {
     res.status(500).json({ error: 'Failed to create screen' });
@@ -114,5 +115,8 @@ module.exports = {
   getPartnerByName,
   updatePartnerConfig,
   deletePartner,
-  updateCategoryStatus
+  updateCategoryStatus,
+  createScreen,
+  updateScreen,
+  deleteScreen
 };
