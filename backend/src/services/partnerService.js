@@ -144,13 +144,16 @@ async function getScreens(partnerId) {
   });
 }
 
-async function saveScreens(partnerId, configurationVersion, categoryName, screens) {
+
+async function saveScreens(partnerId, configurationVersionString, categoryName, screens) {
   return await prisma.$transaction(async (prisma) => {
     // Ensure the category exists
-    await createCategoryIfNotExists(partnerId, categoryName);
+    // await createCategoryIfNotExists(partnerId, categoryName);
 
     const createScreensData = [];
     const updateScreenPromises = [];
+
+    const configurationVersion = parseInt(configurationVersionString);
 
     for (const screen of screens) {
       const { id, screen_config } = screen;
@@ -226,8 +229,6 @@ async function deleteScreen(screenId) {
 }
 
 module.exports = {
-  createPartner,
-  getAllPartners,
   getPartnerByName,
   updateOrCreatePartnerConfig,
   deletePartner,
