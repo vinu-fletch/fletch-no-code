@@ -23,17 +23,21 @@ const BottomTabs = ({
   const [contextMenuIndex, setContextMenuIndex] = useState(null);
   const [editingIndex, setEditingIndex] = useState(null);
 
+  // Add a new screen to the screens array
   const addScreen = () => {
     const newScreen = {
       name: `Screen ${screens.length + 1}`,
       backgroundColor: "",
       heading: "",
+      continueButtonText: "",
       fields: [],
     };
-    setScreens([...screens, newScreen]);
-    setActiveScreenIndex(screens.length); // Set to the new screen
+    const updatedScreens = [...screens, newScreen];
+    setScreens(updatedScreens);
+    setActiveScreenIndex(updatedScreens.length - 1); // Set to the new screen
   };
 
+  // Delete a screen by index
   const deleteScreen = (index) => {
     if (screens.length > 1) {
       const updatedScreens = screens.filter((_, i) => i !== index);
@@ -49,6 +53,7 @@ const BottomTabs = ({
     setContextMenuIndex(null); // Close context menu
   };
 
+  // Clone a screen by index
   const cloneScreen = (index) => {
     const screenToClone = screens[index];
     const clonedScreen = {
@@ -65,11 +70,13 @@ const BottomTabs = ({
     setContextMenuIndex(null); // Close context menu
   };
 
+  // Open context menu on right-click
   const handleContextMenu = (event, index) => {
     event.preventDefault();
     setContextMenuIndex(index);
   };
 
+  // Update screen name on change
   const handleNameChange = (newName, index) => {
     const updatedScreens = screens.map((screen, i) =>
       i === index ? { ...screen, name: newName } : screen
@@ -78,6 +85,7 @@ const BottomTabs = ({
     setEditingIndex(null); // Exit edit mode
   };
 
+  // Start editing screen name
   const handleStartEditing = (index) => {
     setEditingIndex(index);
   };

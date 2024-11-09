@@ -14,16 +14,13 @@ export const usePartnerStore = create((set, get) => ({
 
   updatePartnerDraft: (updates) =>
     set((state) => {
-      const newConfig = {
-        ...state.partnerDraft?.config,
+      const newDraft = {
+        ...state.partnerDraft,
         ...updates,
       };
 
       return {
-        partnerDraft: {
-          ...state.partnerDraft,
-          config: newConfig,
-        },
+        partnerDraft: newDraft,
       };
     }),
 
@@ -40,15 +37,14 @@ export const usePartnerStore = create((set, get) => ({
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
-            config: {...partnerDraft.config},
+            config: { ...partnerDraft.config },
             partnerId: partnerDraft.id,
             configId: partnerData.config.id,
-            createNewVersion: createNewVersion,
+            createNewVersion,
           }),
         }
       );
       const updatedConfig = await response.json();
-      // Update both partnerData and partnerDraft with the response
       set({
         partnerData: {
           ...partnerDraft,
@@ -64,7 +60,7 @@ export const usePartnerStore = create((set, get) => ({
     }
   },
 
-   updateCategoryStatus: async (partnerId, categoryName, isActive) => {
+  updateCategoryStatus: async (partnerId, categoryName, isActive) => {
     try {
       const response = await fetch(`http://localhost:3000/partners/category/${categoryName}`, {
         method: "PUT",
@@ -91,6 +87,6 @@ export const usePartnerStore = create((set, get) => ({
 
   discardPartnerDraft: () =>
     set((state) => ({
-      partnerDraft: { ...state.partnerData }, // Reset draft to the original data
+      partnerDraft: { ...state.partnerData },
     })),
 }));

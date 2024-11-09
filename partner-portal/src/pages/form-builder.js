@@ -73,8 +73,6 @@ const FormBuilderPage = ({ globalSettings }) => {
     }
   };
 
-  console.log("Partner draft", partnerDraft)
-
   const confirmToggleDataCollection = () => {
     updateCategoryStatus(partnerData.id, "Data Collection", !dataCollectionEnabled);
     setDataCollectionEnabled(!dataCollectionEnabled);
@@ -101,7 +99,7 @@ const FormBuilderPage = ({ globalSettings }) => {
             handleDataCollectionToggle={handleDataCollectionToggle}
           />
           <Flex gap={3}>
-            <Button onClick={savePartnerDraft} colorScheme="teal">
+            <Button onClick={() => savePartnerDraft(false)} colorScheme="teal">
               Save
             </Button>
             <Button onClick={discardPartnerDraft} colorScheme="red">

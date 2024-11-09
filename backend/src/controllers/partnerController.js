@@ -76,30 +76,18 @@ async function updateCategoryStatus(req, res)  {
   }
 };
 
-async function createScreen(req, res) {
-  try {
-    const { name, configVersion } = req.params;
-    const { screen_config } = req.body;
-    
-    const newScreen = await partnerService.createScreen(name, configVersion, screen_config);
+async function saveScreens (req, res)  {
+  const { partnerName, configVersion, categoryName } = req.params;
+  const { screens } = req.body;
 
-    res.status(201).json(newScreen);
-  } catch (error) {
-    res.status(500).json({ error: 'Failed to create screen' });
-  }
-}
-
-// Update an existing screen
-async function updateScreen(req, res) {
   try {
-    const { screenId } = req.params;
-    const updatedData = req.body;
-    const updatedScreen = await partnerService.updateScreen(screenId, updatedData);
-    res.status(200).json(updatedScreen);
+    const result = await partnerService.saveScreens(partnerName, configVersion, categoryName, screens);
+    res.status(200).json({ success: true, screens: result });
   } catch (error) {
-    res.status(500).json({ error: 'Failed to update screen' });
+    console.error('Error saving screens:', error);
+    res.status(500).json({ success: false, error: error.message });
   }
-}
+};
 
 // Delete a screen
 async function deleteScreen(req, res) {
@@ -116,7 +104,6 @@ module.exports = {
   updatePartnerConfig,
   deletePartner,
   updateCategoryStatus,
-  createScreen,
-  updateScreen,
+  saveScreens,
   deleteScreen
 };
