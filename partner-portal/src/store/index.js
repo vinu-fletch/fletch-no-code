@@ -89,4 +89,48 @@ export const usePartnerStore = create((set, get) => ({
     set((state) => ({
       partnerDraft: { ...state.partnerData },
     })),
+
+    //  Function to update screens of any category
+  updateScreens: async () => {
+    const state = get();
+    const { partnerDraft, partnerData } = state;
+
+    const partnerName = partnerData.name;
+    const configVersion = partnerData.config.version;
+    const categoryName = 'Data Collection'; // Replace with actual category name if needed
+    const screens = partnerDraft.screens;
+
+    try {
+      const response = await fetch(
+        `http://localhost:3000/partners/${partnerName}/config/${configVersion}/category/${categoryName}/screens`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            screens,
+          }),
+        }
+      );
+      const result = await response.json();
+
+      if (result.success) {
+        // Update partnerData and partnerDraft with the new screens
+        set({
+          partnerData: {
+            ...partnerData,
+            screens: result.screens,
+          },
+          partnerDraft: {
+            ...partnerDraft,
+            screens: result.screens,
+          },
+        });
+      }
+    } catch (error) {
+      console.error("Failed to update screens:", error);
+    }
+  },
+  
 }));
