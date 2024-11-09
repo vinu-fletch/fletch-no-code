@@ -67,9 +67,9 @@ const Layout = ({ children }) => {
               Global Customization
             </Button>
             <Button
-              variant={activeView === "/form-builder" ? "outline" : "solid"}
+              variant={activeView === "/data-collection" ? "outline" : "solid"}
               colorScheme="primary"
-              onClick={() => handleNavigation("/form-builder")}
+              onClick={() => handleNavigation("/data-collection")}
             >
               Data Collection
             </Button>

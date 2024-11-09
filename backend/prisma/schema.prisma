@@ -8,76 +8,77 @@ datasource db {
 }
 
 model Partner {
-  id          String    @id @default(uuid())
-  name        String
-  logo        String?
-  is_active   Boolean   @default(true)
-  created_at  DateTime  @default(now())
-  updated_at  DateTime  @updatedAt
+  id         String   @id @default(uuid())
+  name       String
+  logo       String?
+  is_active  Boolean  @default(true)
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
 
-  configs     PartnerConfig[]
-  screens     Screen[]
-  fields      Field[]
-  categories  Category[]
+  configs    PartnerConfig[]
+  screens    Screen[]
+  fields     Field[]
+  categories Category[]
 
-  @@map("partner")  // Map to the "partner" table in the DB
+  @@map("partner") // Map to the "partner" table in the DB
 }
 
 model Category {
-  id          String   @id @default(uuid())
-  partner_id  String
-  partner     Partner  @relation(fields: [partner_id], references: [id], onDelete: Cascade)
-  name        String
-  is_active   Boolean  @default(true)
-  created_at  DateTime @default(now())
-  updated_at  DateTime @updatedAt
+  id         String   @id @default(uuid())
+  partner_id String
+  partner    Partner  @relation(fields: [partner_id], references: [id], onDelete: Cascade)
+  name       String
+  is_active  Boolean  @default(true)
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
 
-  screens     Screen[]
+  screens Screen[]
 
-  @@map("category")  // Map to the "category" table in the DB
   @@unique([partner_id, name])
+  @@map("category") // Map to the "category" table in the DB
 }
 
 model PartnerConfig {
-  id             String   @id @default(uuid())
-  partner_id     String
-  partner        Partner  @relation(fields: [partner_id], references: [id], onDelete: Cascade)
-  global_config  Json
-  header_config  Json
-  footer_config  Json
-  layout_config  Json
-  screen_ids     String[]
-  version        Int      @default(autoincrement())
-  created_at     DateTime @default(now())
-  updated_at     DateTime @updatedAt
+  id            String   @id @default(uuid())
+  partner_id    String
+  partner       Partner  @relation(fields: [partner_id], references: [id], onDelete: Cascade)
+  global_config Json
+  header_config Json
+  footer_config Json
+  layout_config Json
+  version       Int      @default(autoincrement())
+  created_at    DateTime @default(now())
+  updated_at    DateTime @updatedAt
 
-  @@map("partnerconfig")  // Map to the "partnerconfig" table in the DB
+  @@map("partnerconfig") // Map to the "partnerconfig" table in the DB
 }
 
 model Screen {
-  id                String   @id @default(uuid())
-  partner_id        String
-  partner           Partner  @relation(fields: [partner_id], references: [id], onDelete: Cascade)
-  category_name     String   // Foreign key to Category by name
-  category          Category @relation(fields: [partner_id, category_name], references: [partner_id, name], onDelete: Cascade)
-  isActive          Boolean  @default(true)
-  screen_config      Json     // JSON field for screen-specific configurations, e.g., background color
-  field_ids         String[] // Array of field IDs associated with this screen
-  created_at        DateTime @default(now())
-  updated_at        DateTime @updatedAt
+  id                    String   @id @default(uuid())
+  partner_id            String
+  partner               Partner  @relation(fields: [partner_id], references: [id], onDelete: Cascade)
+  category_name         String
+  category              Category @relation(fields: [partner_id, category_name], references: [partner_id, name], onDelete: Cascade)
+  configuration_version Int // Added field
+  is_active              Boolean  @default(true)
+  screen_config         Json
+  created_at            DateTime @default(now())
+  updated_at            DateTime @updatedAt
 
   // Relationships
-  fields            Field[]
+  fields Field[]
 }
 
 model Field {
-  id                String   @id @default(uuid())
-  screen_id         String
-  partner_id        String
-  screen            Screen   @relation(fields: [screen_id], references: [id], onDelete: Cascade)
-  partner           Partner  @relation(fields: [partner_id], references: [id], onDelete: Cascade)
-  type              String   // Type of field, e.g., text, dropdown, checkbox, etc.
-  field_config       Json     // JSON field for field-specific settings, e.g., placeholder, padding, borderRadius
-  created_at        DateTime @default(now())
-  updated_at        DateTime @updatedAt
+  id                    String   @id @default(uuid())
+  screen_id             String
+  screen                Screen   @relation(fields: [screen_id], references: [id], onDelete: Cascade)
+  configuration_version Int // Added field
+  type                  String
+  field_config          Json
+  is_active              Boolean  @default(true)
+  created_at            DateTime @default(now())
+  updated_at            DateTime @updatedAt
+  Partner               Partner? @relation(fields: [partnerId], references: [id])
+  partnerId             String?
 }

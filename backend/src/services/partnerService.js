@@ -3,17 +3,7 @@ const prisma = require('../db');
 const { toCamelCase, toUnderscoreCase } = require('../utils/caseConversion');
 
 
-// Service to create a new partner
-async function createPartner(data) {
-  return await prisma.partner.create({
-    data,
-  });
-}
 
-// Service to get all partners
-async function getAllPartners() {
-  return await prisma.partner.findMany();
-}
 
 async function getPartnerByName(name, version = null) {
   try {
@@ -41,7 +31,7 @@ async function getPartnerByName(name, version = null) {
         heading: "",
         continueButtonText: "Continue",
         fields: [],
-        isActive: true,
+        is_active: true,
         screen_config: {},
       }];
 
@@ -154,140 +144,76 @@ async function getScreens(partnerId) {
   });
 }
 
-async function saveScreens (partnerName, configVersion, categoryName, screens)  {
-  // Start a transaction
+async function saveScreens(partnerId, configurationVersion, categoryName, screens) {
   return await prisma.$transaction(async (prisma) => {
-    // Step 1: Retrieve partner and config
-    const partner = await prisma.partner.findFirst({
-      where: { name: partnerName, is_active: true },
-      include: {
-        configs: {
-          where: { version: parseInt(configVersion, 10) },
-        },
-        categories: true, // Include categories to verify categoryName
-      },
-    });
+    // Ensure the category exists
+    await createCategoryIfNotExists(partnerId, categoryName);
 
-    if (!partner || !partner.configs.length) {
-      throw new Error('Partner or configuration version not found');
+    const createScreensData = [];
+    const updateScreenPromises = [];
+
+    for (const screen of screens) {
+      const { id, screen_config } = screen;
+
+      if (id) {
+        // Update existing screen
+        updateScreenPromises.push(
+          prisma.screen.update({
+            where: { id },
+            data: {
+              screen_config: screen_config || {},
+              is_active: true,
+              configuration_version: configurationVersion,
+            },
+          })
+        );
+      } else {
+        // Prepare data for batch creation
+        createScreensData.push({
+          partner_id: partnerId,
+          category_name: categoryName,
+          screen_config: screen_config || {},
+          is_active: true,
+          configuration_version: configurationVersion,
+        });
+      }
     }
-
-    const partnerConfig = partner.configs[0];
-
-    // Check if the category exists for the partner
-    const category = partner.categories.find(cat => cat.name === categoryName);
-    if (!category) {
-      throw new Error(`Category '${categoryName}' not found for partner '${partnerName}'`);
-    }
-
-    // Step 2: Fetch existing screens for comparison
-    const existingScreens = await prisma.screen.findMany({
-      where: {
-        id: { in: partnerConfig.screen_ids },
-        isActive: true,
-        category_name: categoryName, // Filter by categoryName
-      },
-    });
-
-    const existingScreenIds = existingScreens.map((s) => s.id);
-    const incomingScreenIds = screens.filter((s) => s.id).map((s) => s.id);
-
-    // Step 3: Determine screens to create, update, and delete
-    const screensToCreate = screens.filter((s) => !s.id);
-    const screensToUpdate = screens.filter((s) => s.id && existingScreenIds.includes(s.id));
-    const screensToDelete = existingScreens.filter((s) => !incomingScreenIds.includes(s.id));
-
-    // Step 4: Process Screens Conditionally
 
     // Create new screens if any
-    let createdScreens = [];
-    if (screensToCreate.length > 0) {
-      // Prepare data for batch creation
-      const createScreensData = screensToCreate.map((screen) => ({
-        partner_id: partner.id,
-        category_name: categoryName, // Use categoryName from the argument
-        screen_config: screen.screen_config || {},
-        isActive: true,
-      }));
-
-      // Create screens
+    if (createScreensData.length > 0) {
       await prisma.screen.createMany({
         data: createScreensData,
       });
-
-      // Fetch the newly created screens with their IDs
-      const newScreens = await prisma.screen.findMany({
-        where: {
-          partner_id: partner.id,
-          isActive: true,
-          category_name: categoryName,
-          screen_config: {
-            in: screensToCreate.map((s) => s.screen_config),
-          },
-        },
-      });
-
-      createdScreens = newScreens;
     }
 
-    // Update existing screens if any
-    if (screensToUpdate.length > 0) {
-      const updateScreenPromises = screensToUpdate.map((screen) =>
-        prisma.screen.update({
-          where: { id: screen.id },
-          data: {
-            screen_config: screen.screen_config || {},
-            isActive: true,
-          },
-        })
-      );
-
+    // Update existing screens
+    if (updateScreenPromises.length > 0) {
       await Promise.all(updateScreenPromises);
     }
 
-    // Deactivate screens that are not in the incoming list
-    if (screensToDelete.length > 0) {
-      await prisma.screen.updateMany({
-        where: {
-          id: { in: screensToDelete.map((s) => s.id) },
-        },
-        data: { isActive: false },
-      });
-    }
-
-    // Step 5: Update partner config's screen_ids
-    const allScreenIds = [
-      ...existingScreens.filter((s) => incomingScreenIds.includes(s.id)).map((s) => s.id),
-      ...createdScreens.map((s) => s.id),
-    ];
-
-    await prisma.partnerConfig.update({
-      where: { id: partnerConfig.id },
-      data: { screen_ids: allScreenIds },
-    });
-
-    // Step 6: Return the updated list of screens
-    const updatedScreensList = await prisma.screen.findMany({
+    // Deactivate screens not included in the incoming data
+    const incomingScreenIds = screens.filter((s) => s.id).map((s) => s.id);
+    await prisma.screen.updateMany({
       where: {
-        id: { in: allScreenIds },
-        isActive: true,
-        category_name: categoryName, // Filter by categoryName
+        partner_id: partnerId,
+        category_name: categoryName,
+        configuration_version: configurationVersion,
+        id: { notIn: incomingScreenIds },
+        is_active: true,
       },
+      data: { is_active: false },
     });
 
-    return updatedScreensList;
-  });
-}
-
-// Update an existing screen
-async function updateScreen(screenId, updatedData) {
-  return await prisma.screen.update({
-    where: { id: screenId },
-    data: {
-      screen_config: updatedData.screen_config,
-      field_ids: updatedData.field_ids,
-      updated_at: new Date(),
-    },
+    // Fetch and return the updated list of screens
+    return await prisma.screen.findMany({
+      where: {
+        partner_id: partnerId,
+        category_name: categoryName,
+        configuration_version: configurationVersion,
+        is_active: true,
+      },
+      include: { fields: true },
+    });
   });
 }
 
@@ -308,7 +234,6 @@ module.exports = {
   updateCategoryStatus,
   getScreens,
   saveScreens,
-  updateScreen,
   deleteScreen,
 
 };

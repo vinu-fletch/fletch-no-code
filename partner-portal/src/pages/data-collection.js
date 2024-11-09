@@ -1,7 +1,5 @@
-// pages/form-builder.js
 
-import { useState, useEffect } from "react";
-import {
+import { useState, useEffect } from "react";import {
   Flex,
   Box,
   Button,
@@ -12,22 +10,22 @@ import Canvas from "../components/Canvas";
 import BottomTabs from "../components/BottomTabs";
 import Layout from "../components/Layout";
 import Head from "next/head";
-import { usePartnerStore } from "../store";
+import { usePartnerStore } from "../store"; // Ensure the correct path
 import { ConfirmationModal } from "../components/modal/ConfirmationModal";
 import { ScreenSettings } from "@/components/ScreenSettings";
 import { DataCollectionToggle } from "@/components/data-collection/Toggle";
 
-const FormBuilderPage = ({ globalSettings }) => {
+const DataCollectionFormBuilderPage = ({ globalSettings }) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
-  
+
   // Zustand store hooks
   const partnerData = usePartnerStore((state) => state.partnerData);
   const partnerDraft = usePartnerStore((state) => state.partnerDraft);
   const updatePartnerDraft = usePartnerStore((state) => state.updatePartnerDraft);
-  const savePartnerDraft = usePartnerStore((state) => state.savePartnerDraft);
+  const updateScreens = usePartnerStore((state) => state.updateScreens); // <-- Added this line
   const discardPartnerDraft = usePartnerStore((state) => state.discardPartnerDraft);
   const updateCategoryStatus = usePartnerStore((state) => state.updateCategoryStatus);
-  
+
   const [activeScreenIndex, setActiveScreenIndex] = useState(0);
   const [selectedField, setSelectedField] = useState(null);
   const [dataCollectionEnabled, setDataCollectionEnabled] = useState(true);
@@ -99,7 +97,7 @@ const FormBuilderPage = ({ globalSettings }) => {
             handleDataCollectionToggle={handleDataCollectionToggle}
           />
           <Flex gap={3}>
-            <Button onClick={() => savePartnerDraft(false)} colorScheme="teal">
+            <Button onClick={updateScreens} colorScheme="teal"> {/* <-- Updated this line */}
               Save
             </Button>
             <Button onClick={discardPartnerDraft} colorScheme="red">
@@ -158,4 +156,4 @@ const FormBuilderPage = ({ globalSettings }) => {
   );
 };
 
-export default FormBuilderPage;
+export default DataCollectionFormBuilderPage;
