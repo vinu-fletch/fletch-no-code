@@ -46,6 +46,8 @@ model PartnerConfig {
   header_config Json
   footer_config Json
   layout_config Json
+  screen_ids    Json?
+
   version       Int      @default(autoincrement())
   created_at    DateTime @default(now())
   updated_at    DateTime @updatedAt

@@ -102,7 +102,7 @@ export const usePartnerStore = create((set, get) => ({
 
     try {
       const response = await fetch(
-        `http://localhost:3000/partners/${partnerName}/config/${configVersion}/category/${categoryName}/screens`,
+        `http://localhost:3000/partners/${partnerData.id}/config/${configVersion}/category/${categoryName}/screens`,
         {
           method: "PUT",
           headers: {
@@ -120,11 +120,11 @@ export const usePartnerStore = create((set, get) => ({
         set({
           partnerData: {
             ...partnerData,
-            screens: result.screens,
+            screens: result.data.screens,
           },
           partnerDraft: {
             ...partnerDraft,
-            screens: result.screens,
+            screens: result.data.screens,
           },
         });
       }

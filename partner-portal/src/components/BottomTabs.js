@@ -1,5 +1,3 @@
-// components/BottomTabs.js
-
 import { useState } from "react";
 import {
   Flex,
@@ -8,10 +6,6 @@ import {
   MenuButton,
   MenuList,
   MenuItem,
-  Editable,
-  EditableInput,
-  EditablePreview,
-  Box,
 } from "@chakra-ui/react";
 
 const BottomTabs = ({
@@ -21,15 +15,19 @@ const BottomTabs = ({
   setActiveScreenIndex,
 }) => {
   const [contextMenuIndex, setContextMenuIndex] = useState(null);
-  const [editingIndex, setEditingIndex] = useState(null);
+
+  // Ensure screens have default names based on their index
+  const getDefaultScreenName = (index) => `Screen ${index + 1}`;
 
   // Add a new screen to the screens array
   const addScreen = () => {
     const newScreen = {
-      name: `Screen ${screens.length + 1}`,
-      backgroundColor: "",
-      heading: "",
-      continueButtonText: "",
+      name: getDefaultScreenName(screens.length),
+      screen_config: {
+        background_color: "",
+        heading: "",
+        continue_button_text: "",
+      },
       fields: [],
     };
     const updatedScreens = [...screens, newScreen];
@@ -76,20 +74,6 @@ const BottomTabs = ({
     setContextMenuIndex(index);
   };
 
-  // Update screen name on change
-  const handleNameChange = (newName, index) => {
-    const updatedScreens = screens.map((screen, i) =>
-      i === index ? { ...screen, name: newName } : screen
-    );
-    setScreens(updatedScreens);
-    setEditingIndex(null); // Exit edit mode
-  };
-
-  // Start editing screen name
-  const handleStartEditing = (index) => {
-    setEditingIndex(index);
-  };
-
   return (
     <Flex
       position="fixed"
@@ -102,7 +86,7 @@ const BottomTabs = ({
     >
       {screens.map((screen, index) => (
         <Menu
-          key={`${screen.name}-${index}`}
+          key={`${screen.name || getDefaultScreenName(index)}-${index}`}
           isOpen={contextMenuIndex === index}
         >
           <MenuButton
@@ -113,16 +97,7 @@ const BottomTabs = ({
             colorScheme="primary"
             mr={2}
           >
-            <Editable
-              value={screen.name}
-              isEditing={editingIndex === index}
-              onSubmit={(newName) => handleNameChange(newName, index)}
-            >
-              <Box onDoubleClick={() => handleStartEditing(index)}>
-                <EditablePreview />
-              </Box>
-              <EditableInput />
-            </Editable>
+            {screen.name || getDefaultScreenName(index)}
           </MenuButton>
           <MenuList
             bg="gray.800"

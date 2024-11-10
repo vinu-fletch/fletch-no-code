@@ -1,5 +1,5 @@
-
-import { useState, useEffect } from "react";import {
+import { useState, useEffect } from "react";
+import {
   Flex,
   Box,
   Button,
@@ -10,7 +10,7 @@ import Canvas from "../components/Canvas";
 import BottomTabs from "../components/BottomTabs";
 import Layout from "../components/Layout";
 import Head from "next/head";
-import { usePartnerStore } from "../store"; // Ensure the correct path
+import { usePartnerStore } from "../store"; 
 import { ConfirmationModal } from "../components/modal/ConfirmationModal";
 import { ScreenSettings } from "@/components/ScreenSettings";
 import { DataCollectionToggle } from "@/components/data-collection/Toggle";
@@ -22,13 +22,21 @@ const DataCollectionFormBuilderPage = ({ globalSettings }) => {
   const partnerData = usePartnerStore((state) => state.partnerData);
   const partnerDraft = usePartnerStore((state) => state.partnerDraft);
   const updatePartnerDraft = usePartnerStore((state) => state.updatePartnerDraft);
-  const updateScreens = usePartnerStore((state) => state.updateScreens); // <-- Added this line
+  const updateScreens = usePartnerStore((state) => state.updateScreens);
   const discardPartnerDraft = usePartnerStore((state) => state.discardPartnerDraft);
   const updateCategoryStatus = usePartnerStore((state) => state.updateCategoryStatus);
 
   const [activeScreenIndex, setActiveScreenIndex] = useState(0);
   const [selectedField, setSelectedField] = useState(null);
   const [dataCollectionEnabled, setDataCollectionEnabled] = useState(true);
+  const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
+
+  // Initialize partnerDraft as a deep copy of partnerData
+  useEffect(() => {
+    if (partnerData) {
+      updatePartnerDraft(JSON.parse(JSON.stringify(partnerData)));
+    }
+  }, [partnerData]);
 
   // Find the Data Collection category in the store
   const dataCollectionCategory = partnerData?.categories?.find(
@@ -44,7 +52,9 @@ const DataCollectionFormBuilderPage = ({ globalSettings }) => {
 
   // Update the draft screens state
   const handleScreenUpdate = (updatedScreens) => {
-    updatePartnerDraft({ screens: updatedScreens });
+    const clonedDraft = { ...partnerDraft, screens: updatedScreens };
+    updatePartnerDraft(clonedDraft);
+    setHasUnsavedChanges(true);
   };
 
   // Select a field to edit in FieldSidebar
@@ -55,12 +65,31 @@ const DataCollectionFormBuilderPage = ({ globalSettings }) => {
   // Save a configured field to the current screen in the draft
   const handleSaveField = (fieldAttributes) => {
     const updatedScreens = [...(partnerDraft.screens || [])];
-    updatedScreens[activeScreenIndex].fields.push({
-      ...selectedField,
-      attributes: fieldAttributes,
-    });
+    const updatedFields = [
+      ...(updatedScreens[activeScreenIndex].fields || []),
+      {
+        ...selectedField,
+        attributes: fieldAttributes,
+      },
+    ];
+    updatedScreens[activeScreenIndex] = {
+      ...updatedScreens[activeScreenIndex],
+      fields: updatedFields,
+    };
     handleScreenUpdate(updatedScreens);
     setSelectedField(null);
+  };
+
+  // Save changes
+  const handleSave = () => {
+    updateScreens();
+    setHasUnsavedChanges(false);
+  };
+
+  // Discard changes
+  const handleDiscard = () => {
+    updatePartnerDraft(JSON.parse(JSON.stringify(partnerData)));
+    setHasUnsavedChanges(false);
   };
 
   // Toggle Data Collection with confirmation modal
@@ -96,27 +125,31 @@ const DataCollectionFormBuilderPage = ({ globalSettings }) => {
             confirmToggleDataCollection={confirmToggleDataCollection} 
             handleDataCollectionToggle={handleDataCollectionToggle}
           />
-          <Flex gap={3}>
-            <Button onClick={updateScreens} colorScheme="teal"> {/* <-- Updated this line */}
-              Save
-            </Button>
-            <Button onClick={discardPartnerDraft} colorScheme="red">
-              Discard
-            </Button>
-          </Flex>
+          {hasUnsavedChanges && (
+            <Flex gap={3}>
+              <Button onClick={handleSave} colorScheme="teal">
+                Save
+              </Button>
+              <Button onClick={handleDiscard} colorScheme="red">
+                Discard
+              </Button>
+            </Flex>
+          )}
         </Flex>
        
-       {
-        partnerDraft?.screens &&  <ScreenSettings screens={partnerDraft?.screens} activeScreenIndex={activeScreenIndex} onUpdateScreen={handleScreenUpdate} />
-       }
+       {partnerDraft?.screens && (
+         <ScreenSettings
+           screens={partnerDraft.screens}
+           activeScreenIndex={activeScreenIndex}
+           onUpdateScreen={handleScreenUpdate}
+         />
+       )}
 
-       {
-        partnerDraft?.screens &&   
+       {partnerDraft?.screens && (
         <Flex flex="1">
-          {/* Canvas with a border and padding for visual separation */}
           <Box flex="1" p={4} border="1px solid" borderColor="gray.300" m={4}>
             <Canvas
-              screens={partnerDraft?.screens}
+              screens={partnerDraft.screens}
               activeScreenIndex={activeScreenIndex}
               globalSettings={globalSettings}
             />
@@ -129,18 +162,16 @@ const DataCollectionFormBuilderPage = ({ globalSettings }) => {
             onCancel={() => setSelectedField(null)}
           />
         </Flex>
-       }
+       )}
 
-       
-       {
-        partnerDraft?.screens &&  <BottomTabs
-          screens={partnerDraft?.screens}
-          setScreens={handleScreenUpdate}
-          activeScreenIndex={activeScreenIndex}
-          setActiveScreenIndex={setActiveScreenIndex}
-        />
-       }
-
+       {partnerDraft?.screens && (
+         <BottomTabs
+           screens={partnerDraft.screens}
+           setScreens={handleScreenUpdate}
+           activeScreenIndex={activeScreenIndex}
+           setActiveScreenIndex={setActiveScreenIndex}
+         />
+       )}
       </Flex>
 
       <ConfirmationModal

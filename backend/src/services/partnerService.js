@@ -1,9 +1,5 @@
 
 const prisma = require('../db');
-const { toCamelCase, toUnderscoreCase } = require('../utils/caseConversion');
-
-
-
 
 async function getPartnerByName(name, version = null) {
   try {
@@ -146,77 +142,112 @@ async function getScreens(partnerId) {
 
 
 async function saveScreens(partnerId, configurationVersionString, categoryName, screens) {
+  const configurationVersion = parseInt(configurationVersionString, 10);
+
+  // Step 1: Validate partner and partnerConfig
+  const partner = await prisma.partner.findUnique({
+    where: { id: partnerId },
+  });
+
+  if (!partner) {
+    throw new Error(`Partner with id ${partnerId} does not exist.`);
+  }
+
+  const partnerConfig = await prisma.partnerConfig.findFirst({
+    where: {
+      partner_id: partnerId,
+      version: configurationVersion,
+    },
+  });
+
+  if (!partnerConfig) {
+    throw new Error(
+      `PartnerConfig for partner ${partnerId} and version ${configurationVersion} not found.`
+    );
+  }
+
+  // Step 2: Process screens within a transaction
   return await prisma.$transaction(async (prisma) => {
-    // Ensure the category exists
-    // await createCategoryIfNotExists(partnerId, categoryName);
+    const screenIds = []; // List to collect screen IDs in order
 
-    const createScreensData = [];
-    const updateScreenPromises = [];
+    // Fetch existing screen IDs for this partner, category, and configuration version
+    const existingScreens = await prisma.screen.findMany({
+      where: {
+        partner_id: partnerId,
+        category_name: categoryName,
+        configuration_version: configurationVersion,
+      },
+      select: { id: true },
+    });
+    const existingScreenIds = existingScreens.map((screen) => screen.id);
 
-    const configurationVersion = parseInt(configurationVersionString);
-
-    for (const screen of screens) {
+    for (let i = 0; i < screens.length; i++) {
+      const screen = screens[i];
       const { id, screen_config } = screen;
 
       if (id) {
         // Update existing screen
-        updateScreenPromises.push(
-          prisma.screen.update({
-            where: { id },
-            data: {
-              screen_config: screen_config || {},
-              is_active: true,
-              configuration_version: configurationVersion,
-            },
-          })
-        );
-      } else {
-        // Prepare data for batch creation
-        createScreensData.push({
-          partner_id: partnerId,
-          category_name: categoryName,
-          screen_config: screen_config || {},
-          is_active: true,
-          configuration_version: configurationVersion,
+        await prisma.screen.update({
+          where: { id },
+          data: {
+            screen_config: screen_config || {},
+            is_active: true,
+            configuration_version: configurationVersion,
+          },
         });
+        screenIds.push(id);
+      } else {
+        // Create new screen and get its assigned ID
+        const createdScreen = await prisma.screen.create({
+          data: {
+            partner_id: partnerId,
+            category_name: categoryName,
+            screen_config: screen_config || {},
+            is_active: true,
+            configuration_version: configurationVersion,
+          },
+        });
+        screenIds.push(createdScreen.id);
       }
     }
 
-    // Create new screens if any
-    if (createScreensData.length > 0) {
-      await prisma.screen.createMany({
-        data: createScreensData,
+    // Delete screens not in the new screenIds (hard delete)
+    const screensToDelete = existingScreenIds.filter((id) => !screenIds.includes(id));
+    if (screensToDelete.length > 0) {
+      await prisma.screen.deleteMany({
+        where: {
+          id: { in: screensToDelete },
+        },
       });
     }
 
-    // Update existing screens
-    if (updateScreenPromises.length > 0) {
-      await Promise.all(updateScreenPromises);
-    }
-
-    // Deactivate screens not included in the incoming data
-    const incomingScreenIds = screens.filter((s) => s.id).map((s) => s.id);
-    await prisma.screen.updateMany({
+    // Update partnerConfig.screen_ids
+    await prisma.partnerConfig.update({
       where: {
-        partner_id: partnerId,
-        category_name: categoryName,
-        configuration_version: configurationVersion,
-        id: { notIn: incomingScreenIds },
-        is_active: true,
+        id: partnerConfig.id,
       },
-      data: { is_active: false },
+      data: {
+        screen_ids: screenIds,
+      },
     });
 
     // Fetch and return the updated list of screens
-    return await prisma.screen.findMany({
+    const updatedScreensList = await prisma.screen.findMany({
       where: {
-        partner_id: partnerId,
-        category_name: categoryName,
-        configuration_version: configurationVersion,
-        is_active: true,
+        id: { in: screenIds },
       },
       include: { fields: true },
     });
+
+    // Ensure the screens are returned in the correct order
+    const orderedScreens = screenIds.map((id) =>
+      updatedScreensList.find((screen) => screen.id === id)
+    );
+
+    return {
+      screens: orderedScreens,
+      screen_ids: screenIds,
+    };
   });
 }
 

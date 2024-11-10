@@ -77,12 +77,12 @@ async function updateCategoryStatus(req, res)  {
 };
 
 async function saveScreens (req, res)  {
-  const { partnerName, configVersion, categoryName } = req.params;
+  const { partnerId, configVersion, categoryName } = req.params;
   const { screens } = req.body;
 
   try {
-    const result = await partnerService.saveScreens(partnerName, configVersion, categoryName, screens);
-    res.status(200).json({ success: true, screens: result });
+    const result = await partnerService.saveScreens(partnerId, configVersion, categoryName, screens);
+    res.status(200).json({ success: true, data: result });
   } catch (error) {
     console.error('Error saving screens:', error);
     res.status(500).json({ success: false, error: error.message });
