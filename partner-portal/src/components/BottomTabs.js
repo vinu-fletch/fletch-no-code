@@ -54,9 +54,11 @@ const BottomTabs = ({
   // Clone a screen by index
   const cloneScreen = (index) => {
     const screenToClone = screens[index];
+    const screenName = screenToClone.name || getDefaultScreenName(index);
+    const { id, ...restOfScreen } = screenToClone; // Exclude 'id' to avoid duplication
     const clonedScreen = {
-      ...screenToClone,
-      name: `${screenToClone.name} (Copy)`,
+      ...restOfScreen,
+      name: `${screenName} (Copy)`,
     };
     const updatedScreens = [
       ...screens.slice(0, index + 1),
