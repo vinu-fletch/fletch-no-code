@@ -1,3 +1,5 @@
+// pages/DataCollectionFormBuilderPage.js
+
 import { useState, useEffect } from "react";
 import {
   Flex,
@@ -10,10 +12,10 @@ import Canvas from "../components/Canvas";
 import BottomTabs from "../components/BottomTabs";
 import Layout from "../components/Layout";
 import Head from "next/head";
-import { usePartnerStore } from "../store"; 
+import { usePartnerStore } from "../store";
 import { ConfirmationModal } from "../components/modal/ConfirmationModal";
 import { ScreenSettings } from "@/components/ScreenSettings";
-import { DataCollectionToggle } from "@/components/data-collection/Toggle";
+import { CategoryToggle } from "../components/CategoryToggle"; // Updated import
 
 const DataCollectionFormBuilderPage = ({ globalSettings }) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
@@ -28,8 +30,10 @@ const DataCollectionFormBuilderPage = ({ globalSettings }) => {
 
   const [activeScreenIndex, setActiveScreenIndex] = useState(0);
   const [selectedField, setSelectedField] = useState(null);
-  const [dataCollectionEnabled, setDataCollectionEnabled] = useState(true);
+  const [categoryEnabled, setCategoryEnabled] = useState(true); // Renamed state
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
+
+  const categoryName = "Data Collection"; // Set the category name
 
   // Initialize partnerDraft as a deep copy of partnerData
   useEffect(() => {
@@ -38,17 +42,17 @@ const DataCollectionFormBuilderPage = ({ globalSettings }) => {
     }
   }, [partnerData]);
 
-  // Find the Data Collection category in the store
-  const dataCollectionCategory = partnerData?.categories?.find(
-    (category) => category.name === "Data Collection"
+  // Find the category in the store
+  const category = partnerData?.categories?.find(
+    (category) => category.name === categoryName
   );
 
-  // Sync data collection state with category
+  // Sync category enabled state with category
   useEffect(() => {
-    if (dataCollectionCategory) {
-      setDataCollectionEnabled(dataCollectionCategory.is_active);
+    if (category) {
+      setCategoryEnabled(category.is_active);
     }
-  }, [dataCollectionCategory]);
+  }, [category]);
 
   // Update the draft screens state
   const handleScreenUpdate = (updatedScreens) => {
@@ -92,17 +96,17 @@ const DataCollectionFormBuilderPage = ({ globalSettings }) => {
     setHasUnsavedChanges(false);
   };
 
-  // Toggle Data Collection with confirmation modal
-  const handleDataCollectionToggle = (value) => {
+  // Toggle category with confirmation modal
+  const handleCategoryToggle = (value) => {
     const newValue = value === "enable";
-    if (newValue !== dataCollectionEnabled) {
+    if (newValue !== categoryEnabled) {
       onOpen();
     }
   };
 
-  const confirmToggleDataCollection = () => {
-    updateCategoryStatus(partnerData.id, "Data Collection", !dataCollectionEnabled);
-    setDataCollectionEnabled(!dataCollectionEnabled);
+  const confirmToggleCategory = () => {
+    updateCategoryStatus(partnerData.id, categoryName, !categoryEnabled);
+    setCategoryEnabled(!categoryEnabled);
     onClose();
   };
 
@@ -119,11 +123,17 @@ const DataCollectionFormBuilderPage = ({ globalSettings }) => {
       </Head>
 
       <Flex direction="column" minHeight="100vh">
-        <Flex justify="space-between" align="center" bg="primary.300" color="text.primary" p={4}>
-          <DataCollectionToggle 
-            dataCollectionEnabled={dataCollectionEnabled} 
-            confirmToggleDataCollection={confirmToggleDataCollection} 
-            handleDataCollectionToggle={handleDataCollectionToggle}
+        <Flex
+          justify="space-between"
+          align="center"
+          bg="primary.300"
+          color="text.primary"
+          p={4}
+        >
+          <CategoryToggle
+            title={categoryName}
+            isEnabled={categoryEnabled}
+            onToggle={handleCategoryToggle}
           />
           {hasUnsavedChanges && (
             <Flex gap={3}>
@@ -136,52 +146,58 @@ const DataCollectionFormBuilderPage = ({ globalSettings }) => {
             </Flex>
           )}
         </Flex>
-       
-       {partnerDraft?.screens && (
-         <ScreenSettings
-           screens={partnerDraft.screens}
-           activeScreenIndex={activeScreenIndex}
-           onUpdateScreen={handleScreenUpdate}
-         />
-       )}
 
-       {partnerDraft?.screens && (
-        <Flex flex="1">
-          <Box flex="1" p={4} border="1px solid" borderColor="gray.300" m={4}>
-            <Canvas
-              screens={partnerDraft.screens}
-              activeScreenIndex={activeScreenIndex}
-              globalSettings={globalSettings}
-            />
-          </Box>
-
-          <FieldSidebar
-            selectedField={selectedField}
-            onFieldSelect={handleFieldSelect}
-            onSaveField={handleSaveField}
-            onCancel={() => setSelectedField(null)}
+        {partnerDraft?.screens && (
+          <ScreenSettings
+            screens={partnerDraft.screens}
+            activeScreenIndex={activeScreenIndex}
+            onUpdateScreen={handleScreenUpdate}
           />
-        </Flex>
-       )}
+        )}
 
-       {partnerDraft?.screens && (
-         <BottomTabs
-           screens={partnerDraft.screens}
-           setScreens={handleScreenUpdate}
-           activeScreenIndex={activeScreenIndex}
-           setActiveScreenIndex={setActiveScreenIndex}
-         />
-       )}
+        {partnerDraft?.screens && (
+          <Flex flex="1">
+            <Box
+              flex="1"
+              p={4}
+              border="1px solid"
+              borderColor="gray.300"
+              m={4}
+            >
+              <Canvas
+                screens={partnerDraft.screens}
+                activeScreenIndex={activeScreenIndex}
+                globalSettings={globalSettings}
+              />
+            </Box>
+
+            <FieldSidebar
+              selectedField={selectedField}
+              onFieldSelect={handleFieldSelect}
+              onSaveField={handleSaveField}
+              onCancel={() => setSelectedField(null)}
+            />
+          </Flex>
+        )}
+
+        {partnerDraft?.screens && (
+          <BottomTabs
+            screens={partnerDraft.screens}
+            setScreens={handleScreenUpdate}
+            activeScreenIndex={activeScreenIndex}
+            setActiveScreenIndex={setActiveScreenIndex}
+          />
+        )}
       </Flex>
 
       <ConfirmationModal
         isOpen={isOpen}
         onClose={onClose}
-        onConfirm={confirmToggleDataCollection}
+        onConfirm={confirmToggleCategory}
         title="Confirm Action"
         description={`Are you sure you want to ${
-          dataCollectionEnabled ? "disable" : "enable"
-        } Data Collection?`}
+          categoryEnabled ? "disable" : "enable"
+        } ${categoryName}?`}
       />
     </Layout>
   );
