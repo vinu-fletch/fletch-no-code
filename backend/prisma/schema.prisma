@@ -20,6 +20,8 @@ model Partner {
   fields     Field[]
   categories Category[]
 
+  @@unique([name])
+
   @@map("partner") // Map to the "partner" table in the DB
 }
 

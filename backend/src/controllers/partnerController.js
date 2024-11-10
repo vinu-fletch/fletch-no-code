@@ -99,11 +99,23 @@ async function deleteScreen(req, res) {
   }
 }
 
+async function getPartnerConfigurations(req, res) {
+    const { name } = req.params;
+    try {
+      const configurations = await partnerService.getPartnerConfigurations(name);
+      res.json(configurations);
+    } catch (error) {
+      console.error('Error fetching partner configurations:', error);
+      res.status(500).json({ error: 'Internal Server Error' });
+    }
+}
+
 module.exports = {
   getPartnerByName,
   updatePartnerConfig,
   deletePartner,
   updateCategoryStatus,
   saveScreens,
-  deleteScreen
+  deleteScreen,
+  getPartnerConfigurations
 };

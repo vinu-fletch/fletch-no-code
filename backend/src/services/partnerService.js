@@ -259,6 +259,33 @@ async function deleteScreen(screenId) {
   });
 }
 
+ async function getPartnerConfigurations (partnerName) {
+    // Fetch the partner by name to get the partner ID
+    const partner = await prisma.partner.findUnique({
+      where: { name: partnerName },
+      select: { id: true },
+    });
+
+    if (!partner) {
+      throw new Error(`Partner with name ${partnerName} not found`);
+    }
+
+    // Fetch the last 10 configurations, ordered by version descending
+    const configurations = await prisma.partnerConfig.findMany({
+      where: { partner_id: partner.id },
+      orderBy: { version: 'desc' },
+      take: 10,
+      select: {
+        version: true,
+        created_at: true,
+        // Include any other fields you need
+      },
+    });
+
+    return configurations;
+  }
+
+
 module.exports = {
   getPartnerByName,
   updateOrCreatePartnerConfig,
@@ -267,5 +294,5 @@ module.exports = {
   getScreens,
   saveScreens,
   deleteScreen,
-
+  getPartnerConfigurations,
 };

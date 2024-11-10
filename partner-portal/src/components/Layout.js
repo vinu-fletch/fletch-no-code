@@ -1,13 +1,11 @@
-// components/Layout.js
-
 import {
   Box,
   Flex,
   VStack,
   Button,
   Text,
-  HStack,
   Spacer,
+  Select,
 } from "@chakra-ui/react";
 import { useRouter } from "next/router";
 import { useState, useEffect } from "react";
@@ -16,30 +14,41 @@ import { usePartnerStore } from "../store";
 const Layout = ({ children }) => {
   const router = useRouter();
   const [activeView, setActiveView] = useState(router.pathname);
-  const setPartnerData = usePartnerStore((state) => state.setPartnerData);
+
   const partnerData = usePartnerStore((state) => state.partnerData);
+  const versions = usePartnerStore((state) => state.versions);
+  const fetchPartnerData = usePartnerStore((state) => state.fetchPartnerData);
+  const fetchVersions = usePartnerStore((state) => state.fetchVersions);
+
+  const [selectedVersion, setSelectedVersion] = useState(null);
 
   useEffect(() => {
     setActiveView(router.pathname);
   }, [router.pathname]);
 
   useEffect(() => {
-    async function fetchPartnerData() {
-      try {
-        const response = await fetch("http://localhost:3000/partners/medlife");
-        const data = await response.json();
-        console.log("Partner data:", data);
-        setPartnerData(data);
-      } catch (error) {
-        console.error("Failed to fetch partner data:", error);
-      }
-    }
+    // Fetch versions on initial load
+    fetchVersions("medlife");
+    // Fetch partner data for the latest version
+    fetchPartnerData("medlife");
+  }, []); // Empty dependency array
 
-    fetchPartnerData();
-  }, [setPartnerData]);
+  useEffect(() => {
+    if (partnerData?.config?.version) {
+      setSelectedVersion(partnerData.config.version);
+    }
+  }, [partnerData]);
 
   const handleNavigation = (path) => {
     router.push(path);
+  };
+
+  const handleVersionChange = async (event) => {
+    const version = parseInt(event.target.value, 10);
+    setSelectedVersion(version);
+
+    // Fetch the partner data for the selected version
+    await fetchPartnerData("medlife", version);
   };
 
   return (
@@ -47,11 +56,25 @@ const Layout = ({ children }) => {
       {/* Top Navigation */}
       <Box bg="background.dark" p={4} color="text.primary" width="100%">
         <Flex alignItems="center" maxWidth="1200px" mx="auto">
-          <Text fontWeight="bold">{partnerData?.name || "Partner Name"}</Text>
-          <Spacer />
-          <Text fontSize="sm" color="text.secondary" ml={4}>
-            Version: {partnerData?.config?.version || "N/A"}
+          <Text fontWeight="bold">
+            {partnerData?.name?.toUpperCase() || "Partner Name"}
           </Text>
+          <Spacer />
+          <Text fontSize="sm" color="text.secondary" ml={4} mr={2}>
+            Version:
+          </Text>
+          <Select
+            value={selectedVersion || ""}
+            onChange={handleVersionChange}
+            width="150px"
+            size="sm"
+          >
+            {versions?.map(({ version }) => (
+              <option key={version} value={version}>
+                Version {version}
+              </option>
+            ))}
+          </Select>
         </Flex>
       </Box>
 
