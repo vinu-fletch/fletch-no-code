@@ -24,8 +24,6 @@ const FieldSidebar = ({
 
   const [showModal, setShowModal] = useState(showFieldModal || false);
 
-  console.log("Selected field", selectedField);
-  console.log("showFieldModal", showFieldModal);
 
   const handleSaveField = (fieldAttributes, fieldRules = []) => {
     const currentScreen = partnerDraft.screens[activeScreenIndex];
@@ -78,10 +76,30 @@ const FieldSidebar = ({
     onSaveField(fieldData);
   };
 
+  const handleDrag = (fields) => {
+    const currentScreen = partnerDraft.screens[activeScreenIndex];
+    if (!currentScreen) {
+      return;
+    }
+
+    const updatedScreens = partnerDraft.screens.map((screen, idx) =>
+      idx === activeScreenIndex
+        ? {
+            ...screen,
+            fields,
+          }
+        : screen
+    );
+
+    // Update partnerDraft with updated screens
+    updatePartnerDraft({ screens: updatedScreens });
+  }
+
   if (selectedField && selectedField.type === "pincode") {
     return (
       <PincodeFieldConfig
         onSave={handleSaveField}
+        onDrag={handleDrag}
         onCancel={onCancel}
         showModal={showModal}
         fieldData={selectedField}
