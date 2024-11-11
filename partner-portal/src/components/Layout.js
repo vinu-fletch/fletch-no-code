@@ -1,3 +1,5 @@
+// components/Layout.js
+
 import {
   Box,
   Flex,
@@ -8,40 +10,32 @@ import {
   Select,
 } from "@chakra-ui/react";
 import { useRouter } from "next/router";
-import { useState, useEffect } from "react";
-import { usePartnerStore } from "../store";
+import { useEffect } from "react";
+import { usePartnerStore } from "../store"; // Adjust the import path if necessary
 
 const Layout = ({ children }) => {
   const router = useRouter();
-  const [activeView, setActiveView] = useState(router.pathname);
+  const activeView = router.pathname;
 
   const partnerData = usePartnerStore((state) => state.partnerData);
   const versions = usePartnerStore((state) => state.versions);
+  const selectedVersion = usePartnerStore((state) => state.selectedVersion);
   const fetchPartnerData = usePartnerStore((state) => state.fetchPartnerData);
   const fetchVersions = usePartnerStore((state) => state.fetchVersions);
-
-  const [selectedVersion, setSelectedVersion] = useState(null);
-
-  useEffect(() => {
-    setActiveView(router.pathname);
-  }, [router.pathname]);
+  const setSelectedVersion = usePartnerStore((state) => state.setSelectedVersion);
 
   useEffect(() => {
     // Fetch versions on initial load
     fetchVersions("medlife");
     // Fetch partner data for the latest version
     fetchPartnerData("medlife");
-  }, []); // Empty dependency array
-
-  useEffect(() => {
-    if (partnerData?.config?.version) {
-      setSelectedVersion(partnerData.config.version);
-    }
-  }, [partnerData]);
+  }, []); // Empty dependency array to run only once on mount
 
   const handleNavigation = (path) => {
     router.push(path);
   };
+
+  console.log("Versions is", versions)
 
   const handleVersionChange = async (event) => {
     const version = parseInt(event.target.value, 10);

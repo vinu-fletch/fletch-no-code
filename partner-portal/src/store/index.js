@@ -3,10 +3,11 @@
 import { create } from "zustand";
 import { merge } from "lodash";
 
-
 export const usePartnerStore = create((set, get) => ({
-  partnerData: null, // Data fetched from the backend
-  partnerDraft: null, // Local draft for unsaved changes
+  partnerData: null,       // Data fetched from the backend
+  partnerDraft: null,      // Local draft for unsaved changes
+  versions: [],            // Available versions
+  selectedVersion: null,   // Selected version
 
   setPartnerData: (data) =>
     set({
@@ -14,7 +15,7 @@ export const usePartnerStore = create((set, get) => ({
       partnerDraft: { ...data }, // Initialize the draft with the fetched data
     }),
 
-   updatePartnerDraft: (updates) =>
+  updatePartnerDraft: (updates) =>
     set((state) => {
       const newDraft = merge({}, state.partnerDraft, updates);
       return {
@@ -62,13 +63,16 @@ export const usePartnerStore = create((set, get) => ({
 
   updateCategoryStatus: async (partnerId, categoryName, isActive) => {
     try {
-      const response = await fetch(`http://localhost:3000/partners/category/${categoryName}`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ partnerId, isActive }),
-      });
+      const response = await fetch(
+        `http://localhost:3000/partners/category/${categoryName}`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ partnerId, isActive }),
+        }
+      );
       const result = await response.json();
       if (result.success) {
         set((state) => ({
@@ -99,6 +103,7 @@ export const usePartnerStore = create((set, get) => ({
       set({
         partnerData: data,
         partnerDraft: { ...data },
+        selectedVersion: data.config.version, // Update selectedVersion
       });
 
       // Generate the list of versions based on the current version
@@ -107,7 +112,7 @@ export const usePartnerStore = create((set, get) => ({
       for (let i = currentVersion; i >= Math.max(1, currentVersion - 9); i--) {
         versions.push(i);
       }
-      set({ configurations: versions });
+      set({configurations: versions }); // Update versions in the store
     } catch (error) {
       console.error("Failed to fetch partner data:", error);
     }
@@ -118,7 +123,7 @@ export const usePartnerStore = create((set, get) => ({
       partnerDraft: { ...state.partnerData },
     })),
 
-    //  Function to update screens of any category
+  // Function to update screens of any category
   updateScreens: async () => {
     const state = get();
     const { partnerDraft, partnerData } = state;
@@ -127,7 +132,6 @@ export const usePartnerStore = create((set, get) => ({
     const configVersion = partnerData.config.version;
     const categoryName = 'Data Collection'; // Replace with actual category name if needed
     const screens = partnerDraft.screens;
-
 
     try {
       const response = await fetch(
@@ -165,7 +169,9 @@ export const usePartnerStore = create((set, get) => ({
   fetchVersions: async (partnerName) => {
     try {
       // Fetch the list of versions from the backend
-      const response = await fetch(`http://localhost:3000/partners/${partnerName}/versions`);
+      const response = await fetch(
+        `http://localhost:3000/partners/${partnerName}/versions`
+      );
       const versionsData = await response.json();
 
       // Update the versions in the store
@@ -174,5 +180,8 @@ export const usePartnerStore = create((set, get) => ({
       console.error("Failed to fetch versions:", error);
     }
   },
-  
+
+  // Action to set the selected version
+  setSelectedVersion: (version) => set({ selectedVersion: version }),
+
 }));
