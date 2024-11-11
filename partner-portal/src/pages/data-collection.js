@@ -66,6 +66,7 @@ const DataCollectionFormBuilderPage = ({ globalSettings }) => {
   // Select a field to edit in FieldSidebar
   const handleFieldSelect = (field) => {
     setSelectedField(field);
+
   };
 
 
@@ -166,6 +167,7 @@ const DataCollectionFormBuilderPage = ({ globalSettings }) => {
               activeScreenIndex={activeScreenIndex}
               onSaveField={handleSaveField}
               onCancel={() => setSelectedField(null)}
+              showFieldModal={selectedField !== null}
             />
           </Flex>
         )}

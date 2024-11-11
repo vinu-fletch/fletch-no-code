@@ -1,5 +1,5 @@
 // components/FieldSidebar.js
-
+import React, { useState } from "react";
 import { Box, Heading, Button } from "@chakra-ui/react";
 import PincodeFieldConfig from "./fields/pincode-form";
 import { usePartnerStore } from "../store";
@@ -15,11 +15,14 @@ const FieldSidebar = ({
   onSaveField,
   onCancel,
   activeScreenIndex,
+  showFieldModal
 }) => {
   const partnerDraft = usePartnerStore((state) => state.partnerDraft);
   const updatePartnerDraft = usePartnerStore(
     (state) => state.updatePartnerDraft
   );
+
+  const [showModal, setShowModal] = useState(showFieldModal || false);
 
   const handleSaveField = (fieldAttributes, fieldRules = []) => {
     const currentScreen = partnerDraft.screens[activeScreenIndex];
@@ -44,8 +47,6 @@ const FieldSidebar = ({
 
     const updatedFields = [...currentScreen.fields];
 
-    console.log({updatedFields, existingFieldIndex, fieldData, fieldAttributes})
-
     if (existingFieldIndex !== -1) {
       // Update existing field
       updatedFields[existingFieldIndex] = fieldData;
@@ -54,7 +55,6 @@ const FieldSidebar = ({
       updatedFields.push(fieldData);
     }
 
-    console.log("Partner draft screens before update", partnerDraft.screens);
 
 
     // Create a new screens array with updated fields for the active screen
@@ -67,7 +67,6 @@ const FieldSidebar = ({
         : screen
     );
 
-    console.log("Partner draft screens after update", updatedScreens);
 
     // Update partnerDraft with updated screens
     updatePartnerDraft({ screens: updatedScreens });
@@ -81,6 +80,7 @@ const FieldSidebar = ({
       <PincodeFieldConfig
         onSave={handleSaveField}
         onCancel={onCancel}
+        showModal={showModal}
       />
     );
   }
