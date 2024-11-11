@@ -24,6 +24,9 @@ const FieldSidebar = ({
 
   const [showModal, setShowModal] = useState(showFieldModal || false);
 
+  console.log("Selected field", selectedField);
+  console.log("showFieldModal", showFieldModal);
+
   const handleSaveField = (fieldAttributes, fieldRules = []) => {
     const currentScreen = partnerDraft.screens[activeScreenIndex];
     if (!currentScreen) {
@@ -81,6 +84,7 @@ const FieldSidebar = ({
         onSave={handleSaveField}
         onCancel={onCancel}
         showModal={showModal}
+        fieldData={selectedField}
       />
     );
   }

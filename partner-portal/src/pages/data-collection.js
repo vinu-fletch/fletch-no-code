@@ -15,7 +15,7 @@ import Head from "next/head";
 import { usePartnerStore } from "../store";
 import { ConfirmationModal } from "../components/modal/ConfirmationModal";
 import { ScreenSettings } from "@/components/ScreenSettings";
-import { CategoryToggle } from "../components/CategoryToggle"; // Updated import
+import { CategoryToggle } from "../components/CategoryToggle";
 
 const DataCollectionFormBuilderPage = ({ globalSettings }) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
@@ -30,12 +30,12 @@ const DataCollectionFormBuilderPage = ({ globalSettings }) => {
 
   const [activeScreenIndex, setActiveScreenIndex] = useState(0);
   const [selectedField, setSelectedField] = useState(null);
-  const [categoryEnabled, setCategoryEnabled] = useState(true); // Renamed state
+  const [categoryEnabled, setCategoryEnabled] = useState(true);
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
 
-  const categoryName = "Data Collection"; // Set the category name
+  const categoryName = "Data Collection";
 
-  console.log("Partner draft is", partnerDraft)
+  console.log("Partner draft is", partnerDraft);
 
   // Initialize partnerDraft as a deep copy of partnerData
   useEffect(() => {
@@ -66,14 +66,13 @@ const DataCollectionFormBuilderPage = ({ globalSettings }) => {
   // Select a field to edit in FieldSidebar
   const handleFieldSelect = (field) => {
     setSelectedField(field);
-
   };
 
-
+  // Handle save field action in FieldSidebar
   const handleSaveField = () => {
-  setSelectedField(null);
-  setHasUnsavedChanges(true);
-};
+    setSelectedField(null);
+    setHasUnsavedChanges(true);
+  };
 
   // Save changes
   const handleSave = () => {
@@ -99,6 +98,11 @@ const DataCollectionFormBuilderPage = ({ globalSettings }) => {
     updateCategoryStatus(partnerData.id, categoryName, !categoryEnabled);
     setCategoryEnabled(!categoryEnabled);
     onClose();
+  };
+
+  // Handle edit action from Canvas component
+  const handleEditField = (field) => {
+    setSelectedField(field);
   };
 
   return (
@@ -158,6 +162,7 @@ const DataCollectionFormBuilderPage = ({ globalSettings }) => {
               <Canvas
                 screens={partnerDraft.screens}
                 activeScreenIndex={activeScreenIndex}
+                onEditField={handleEditField} // Pass handleEditField to Canvas
               />
             </Box>
 
@@ -167,7 +172,7 @@ const DataCollectionFormBuilderPage = ({ globalSettings }) => {
               activeScreenIndex={activeScreenIndex}
               onSaveField={handleSaveField}
               onCancel={() => setSelectedField(null)}
-              showFieldModal={selectedField !== null}
+              showFieldModal={selectedField !== null} // Open modal if a field is selected
             />
           </Flex>
         )}

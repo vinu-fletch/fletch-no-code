@@ -1,8 +1,8 @@
 import { Box, Heading, Text, IconButton, HStack } from "@chakra-ui/react";
-import { DeleteIcon } from "@chakra-ui/icons";
+import { DeleteIcon, EditIcon } from "@chakra-ui/icons";
 import { usePartnerStore } from "../store"; // Import your store
 
-const Canvas = ({ screens, activeScreenIndex, globalSettings }) => {
+const Canvas = ({ screens, activeScreenIndex, onEditField }) => {
   const currentScreen = screens[activeScreenIndex];
   const updatePartnerDraft = usePartnerStore((state) => state.updatePartnerDraft);
 
@@ -58,12 +58,21 @@ const Canvas = ({ screens, activeScreenIndex, globalSettings }) => {
             <Text fontSize="lg" fontWeight="bold">
               {field?.field_config?.attributes?.label || `Field ${index + 1}`}
             </Text>
+            <Box>
+             <IconButton
+             mr="4"
+              icon={<EditIcon />}
+              aria-label="Edit field"
+              colorScheme="teal"
+              onClick={() => onEditField(field)}
+            />
             <IconButton
               icon={<DeleteIcon />}
               aria-label="Delete field"
               colorScheme="red"
-              onClick={() => handleDeleteField(field.id)}
+              onClick={() => handleDeleteField(field)}
             />
+            </Box>
           </HStack>
         ))
       )}

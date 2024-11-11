@@ -30,6 +30,7 @@ import { AddIcon, EditIcon, DeleteIcon } from "@chakra-ui/icons";
 import RuleConfig from "../rules/rules-config";
 
 const PincodeFieldConfig = ({ showModal, onSave, onCancel, fieldData = {} }) => {
+  console.log("Field data is", fieldData)
   const { isOpen, onOpen, onClose } = useDisclosure({ defaultIsOpen: showModal || true });
 
   const [fieldAttributes, setFieldAttributes] = useState({});
