@@ -1,5 +1,3 @@
-// components/GlobalCustomization.js
-
 import {
   Box,
   Input,
@@ -33,25 +31,16 @@ const GlobalCustomization = () => {
   const savePartnerDraft = usePartnerStore((state) => state.savePartnerDraft);
   const discardPartnerDraft = usePartnerStore((state) => state.discardPartnerDraft);
 
-  // Ensure partnerDraft.config exists
   const config = partnerDraft?.config || {};
 
-  // Header Config State
   const [logoLink, setLogoLink] = useState("");
   const [logoWidth, setLogoWidth] = useState("");
   const [logoHeight, setLogoHeight] = useState("");
   const [logoAlignment, setLogoAlignment] = useState("center");
-
-  // Footer Config State
   const [footerText, setFooterText] = useState("");
-
-  // Layout Config State
   const [layoutPercentage, setLayoutPercentage] = useState(60);
-
-  // Global Settings State
   const [fontFamily, setFontFamily] = useState("");
 
-  // Populate state variables with values from partnerDraft when it changes
   useEffect(() => {
     if (partnerDraft && partnerDraft.config) {
       const config = partnerDraft.config;
@@ -60,17 +49,13 @@ const GlobalCustomization = () => {
       setLogoWidth(config.header_config?.logo_width || "");
       setLogoHeight(config.header_config?.logo_height || "");
       setLogoAlignment(config.header_config?.logo_alignment || "center");
-
       setFooterText(config.footer_config?.footer_text || "");
       setLayoutPercentage(config.layout_config?.layout_percentage || 60);
-
       setFontFamily(config.global_config?.font_family || "Arial");
     }
   }, [partnerData]);
 
-  // Check if there are unsaved changes
-  const hasUnsavedChanges =
-    JSON.stringify(partnerData) !== JSON.stringify(partnerDraft);
+  const hasUnsavedChanges = JSON.stringify(partnerData) !== JSON.stringify(partnerDraft);
 
   return (
     <Box p={8} bg="black" minHeight="100vh">
@@ -111,9 +96,11 @@ const GlobalCustomization = () => {
                       const value = e.target.value;
                       setFontFamily(value);
                       updatePartnerDraft({
-                        globalConfig: {
-                          ...config.globalConfig,
-                          font_family: value,
+                        config: {
+                          global_config: {
+                            ...config.global_config,
+                            font_family: value,
+                          },
                         },
                       });
                     }}
@@ -123,7 +110,6 @@ const GlobalCustomization = () => {
                     <option value="Open Sans">Open Sans</option>
                     <option value="Lato">Lato</option>
                     <option value="Montserrat">Montserrat</option>
-                    {/* Add more fonts as needed */}
                   </Select>
                 </FormControl>
               </VStack>
@@ -149,9 +135,11 @@ const GlobalCustomization = () => {
                       const value = e.target.value;
                       setLogoLink(value);
                       updatePartnerDraft({
-                        header_config: {
-                          ...config.header_config,
-                          logo_link: value,
+                        config: {
+                          header_config: {
+                            ...config.header_config,
+                            logo_link: value,
+                          },
                         },
                       });
                     }}
@@ -167,9 +155,11 @@ const GlobalCustomization = () => {
                         const value = e.target.value;
                         setLogoWidth(value);
                         updatePartnerDraft({
-                          header_config: {
-                            ...config.header_config,
-                            logo_width: value,
+                          config: {
+                            header_config: {
+                              ...config.header_config,
+                              logo_width: value,
+                            },
                           },
                         });
                       }}
@@ -184,9 +174,11 @@ const GlobalCustomization = () => {
                         const value = e.target.value;
                         setLogoHeight(value);
                         updatePartnerDraft({
-                          header_config: {
-                            ...config.header_config,
-                            logo_height: value,
+                          config: {
+                            header_config: {
+                              ...config.header_config,
+                              logo_height: value,
+                            },
                           },
                         });
                       }}
@@ -201,9 +193,11 @@ const GlobalCustomization = () => {
                       const value = e.target.value;
                       setLogoAlignment(value);
                       updatePartnerDraft({
-                        header_config: {
-                          ...config.header_config,
-                          logo_alignment: value,
+                        config: {
+                          header_config: {
+                            ...config.header_config,
+                            logo_alignment: value,
+                          },
                         },
                       });
                     }}
@@ -233,9 +227,11 @@ const GlobalCustomization = () => {
                     const value = e.target.value;
                     setFooterText(value);
                     updatePartnerDraft({
-                      footer_config: {
-                        ...config.footer_config,
-                        footer_text: value,
+                      config: {
+                        footer_config: {
+                          ...config.footer_config,
+                          footer_text: value,
+                        },
                       },
                     });
                   }}
@@ -264,9 +260,11 @@ const GlobalCustomization = () => {
                   onChange={(val) => {
                     setLayoutPercentage(val);
                     updatePartnerDraft({
-                      layoutConfig: {
-                        ...config.layoutConfig,
-                        layout_percentage: val,
+                      config: {
+                        layout_config: {
+                          ...config.layout_config,
+                          layout_percentage: val,
+                        },
                       },
                     });
                   }}

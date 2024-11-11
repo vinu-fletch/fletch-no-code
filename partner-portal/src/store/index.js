@@ -1,6 +1,8 @@
 // stores/partnerStore.js
 
 import { create } from "zustand";
+import { merge } from "lodash";
+
 
 export const usePartnerStore = create((set, get) => ({
   partnerData: null, // Data fetched from the backend
@@ -12,13 +14,10 @@ export const usePartnerStore = create((set, get) => ({
       partnerDraft: { ...data }, // Initialize the draft with the fetched data
     }),
 
-  updatePartnerDraft: (updates) =>
+   updatePartnerDraft: (updates) =>
     set((state) => {
-      const newDraft = {
-        ...state.partnerDraft,
-        ...updates,
-      };
-
+      console.log("updates", updates, state.partnerDraft);
+      const newDraft = merge({}, state.partnerDraft, updates);
       return {
         partnerDraft: newDraft,
       };
