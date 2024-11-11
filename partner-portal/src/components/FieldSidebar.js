@@ -6,7 +6,6 @@ import PincodeFieldConfig from "./fields/pincode-form";
 const fields = [
   { id: "ssn", label: "SSN", type: "ssn" },
   { id: "pincode", label: "Pincode", type: "pincode" },
-  // Add more fields as needed
 ];
 
 const FieldSidebar = ({
@@ -31,7 +30,7 @@ const FieldSidebar = ({
 
   // Default view when no field is selected
   return (
-    <Box width="300px" p={4} bg="background.gray" color="text.primary">
+    <Box height="100vh" py={4} width="300px" overflowY="auto" p={4} bg="background.gray" color="text.primary">
       <Heading size="md" mb={4}>
         Add Field
       </Heading>

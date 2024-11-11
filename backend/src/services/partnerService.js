@@ -166,7 +166,7 @@ async function saveScreens(partnerId, configurationVersionString, categoryName, 
     );
   }
 
-  // Step 2: Process screens within a transaction
+  // Step 2: Process screens and fields within a transaction
   return await prisma.$transaction(async (prisma) => {
     const screenIds = []; // List to collect screen IDs in order
 
@@ -183,7 +183,9 @@ async function saveScreens(partnerId, configurationVersionString, categoryName, 
 
     for (let i = 0; i < screens.length; i++) {
       const screen = screens[i];
-      const { id, screen_config } = screen;
+      const { id, screen_config, fields } = screen;
+
+      let screenId;
 
       if (id) {
         // Update existing screen
@@ -195,7 +197,8 @@ async function saveScreens(partnerId, configurationVersionString, categoryName, 
             configuration_version: configurationVersion,
           },
         });
-        screenIds.push(id);
+        screenId = id;
+        screenIds.push(screenId);
       } else {
         // Create new screen and get its assigned ID
         const createdScreen = await prisma.screen.create({
@@ -207,13 +210,74 @@ async function saveScreens(partnerId, configurationVersionString, categoryName, 
             configuration_version: configurationVersion,
           },
         });
-        screenIds.push(createdScreen.id);
+        screenId = createdScreen.id;
+        screenIds.push(screenId);
+      }
+
+      // Process fields for this screen
+      const inputFields = fields || [];
+
+      // Fetch existing field IDs for this screen
+      const existingFields = await prisma.field.findMany({
+        where: {
+          screen_id: screenId,
+        },
+        select: { id: true },
+      });
+      const existingFieldIds = existingFields.map((field) => field.id);
+
+      const fieldIds = []; // To keep track of field IDs for this screen
+
+      for (let j = 0; j < inputFields.length; j++) {
+        const field = inputFields[j];
+        const { id: fieldId, type, field_config } = field;
+
+        if (fieldId) {
+          // Update existing field
+          await prisma.field.update({
+            where: { id: fieldId },
+            data: {
+              type: type || undefined,
+              field_config: field_config || {},
+              is_active: true,
+            },
+          });
+          fieldIds.push(fieldId);
+        } else {
+          // Create new field
+          const createdField = await prisma.field.create({
+            data: {
+              screen_id: screenId,
+              type: type,
+              field_config: field_config || {},
+              is_active: true,
+            },
+          });
+          fieldIds.push(createdField.id);
+        }
+      }
+
+      // Delete fields not in the new fieldIds (hard delete)
+      const fieldsToDelete = existingFieldIds.filter((id) => !fieldIds.includes(id));
+      if (fieldsToDelete.length > 0) {
+        await prisma.field.deleteMany({
+          where: {
+            id: { in: fieldsToDelete },
+          },
+        });
       }
     }
 
     // Delete screens not in the new screenIds (hard delete)
     const screensToDelete = existingScreenIds.filter((id) => !screenIds.includes(id));
     if (screensToDelete.length > 0) {
+      // Also delete fields associated with these screens
+      await prisma.field.deleteMany({
+        where: {
+          screen_id: { in: screensToDelete },
+        },
+      });
+
       await prisma.screen.deleteMany({
         where: {
           id: { in: screensToDelete },
@@ -231,7 +295,7 @@ async function saveScreens(partnerId, configurationVersionString, categoryName, 
       },
     });
 
-    // Fetch and return the updated list of screens
+    // Fetch and return the updated list of screens with fields
     const updatedScreensList = await prisma.screen.findMany({
       where: {
         id: { in: screenIds },

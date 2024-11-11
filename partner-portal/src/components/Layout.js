@@ -71,7 +71,7 @@ const Layout = ({ children }) => {
           >
             {versions?.map(({ version }) => (
               <option key={version} value={version}>
-                Version {version}
+                {version}
               </option>
             ))}
           </Select>

@@ -1,5 +1,3 @@
-// components/PincodeRuleConfig.js
-
 import { useState, useEffect } from "react";
 import {
   Box,
@@ -12,10 +10,9 @@ import {
   VStack,
   Textarea,
   HStack,
-
 } from "@chakra-ui/react";
 
-const PincodeRuleConfig = ({ onSave, onCancel, initialRule }) => {
+const RuleConfig = ({ onSave, onCancel, initialRule }) => {
   const [rule, setRule] = useState({
     type: "lengthCheck",
     trigger: "onBlur",
@@ -149,7 +146,7 @@ const PincodeRuleConfig = ({ onSave, onCancel, initialRule }) => {
                 name="url"
                 value={rule.config.url || ""}
                 onChange={handleConfigChange}
-                placeholder="e.g., https://api.example.com/validatePincode"
+                placeholder="e.g., https://api.example.com/validate"
                 bg="background.dark"
                 color="text.primary"
               />
@@ -178,14 +175,9 @@ const PincodeRuleConfig = ({ onSave, onCancel, initialRule }) => {
                     : ""
                 }
                 onChange={(e) => {
-                  try {
-                    const headers = JSON.parse(e.target.value);
-                    handleConfigChange({
-                      target: { name: "headers", value: headers },
-                    });
-                  } catch {
-                    // Handle JSON parse error if needed
-                  }
+                  handleConfigChange({
+                    target: { name: "headers", value: e.target.value },
+                  });
                 }}
                 placeholder='e.g., { "Content-Type": "application/json" }'
                 bg="background.dark"
@@ -203,16 +195,11 @@ const PincodeRuleConfig = ({ onSave, onCancel, initialRule }) => {
                     : ""
                 }
                 onChange={(e) => {
-                  try {
-                    const body = JSON.parse(e.target.value);
-                    handleConfigChange({
-                      target: { name: "body", value: body },
-                    });
-                  } catch {
-                    // Handle JSON parse error if needed
-                  }
+                  handleConfigChange({
+                    target: { name: "body", value: e.target.value },
+                  });
                 }}
-                placeholder='e.g., { "pincode": "{{this_field_value}}" }'
+                placeholder='e.g., { "value": "{{this_field_value}}" }'
                 bg="background.dark"
                 color="text.primary"
                 rows={4}
@@ -257,4 +244,4 @@ const PincodeRuleConfig = ({ onSave, onCancel, initialRule }) => {
   );
 };
 
-export default PincodeRuleConfig;
+export default RuleConfig;

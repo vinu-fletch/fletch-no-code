@@ -77,10 +77,9 @@ model Field {
   id                    String   @id @default(uuid())
   screen_id             String
   screen                Screen   @relation(fields: [screen_id], references: [id], onDelete: Cascade)
-  configuration_version Int // Added field
   type                  String
   field_config          Json
-  is_active              Boolean  @default(true)
+  is_active             Boolean  @default(true)
   created_at            DateTime @default(now())
   updated_at            DateTime @updatedAt
   Partner               Partner? @relation(fields: [partnerId], references: [id])
