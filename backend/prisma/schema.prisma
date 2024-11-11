@@ -68,6 +68,7 @@ model Screen {
   screen_config         Json
   created_at            DateTime @default(now())
   updated_at            DateTime @updatedAt
+  field_ids    Json?
 
   // Relationships
   fields Field[]
@@ -80,8 +81,9 @@ model Field {
   type                  String
   field_config          Json
   is_active             Boolean  @default(true)
+  configuration_version Int
   created_at            DateTime @default(now())
   updated_at            DateTime @updatedAt
-  Partner               Partner? @relation(fields: [partnerId], references: [id])
-  partnerId             String?
+  Partner               Partner? @relation(fields: [partner_id], references: [id])
+  partner_id             String?
 }

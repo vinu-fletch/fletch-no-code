@@ -12,15 +12,18 @@ async function getPartnerByName(name, version = null) {
             : { orderBy: { version: 'desc' }, take: 1 }),    // Otherwise, retrieve the latest version
         },
         categories: true,
-        screens: true,                                      
-        fields: false,                                        
+        screens: {
+          include: {
+            fields: true,  // Include fields related to each screen
+          },
+        },
       }
     });
 
     if (partner) {
       const config = partner.configs[0] || null; 
       
-      // If no screens exist, initialize with a default screen structure
+      // Ensure screens structure includes fields for each screen
       const screens = partner.screens.length ? partner.screens : [{
         name: "Screen 1",
         backgroundColor: "",
@@ -49,8 +52,10 @@ async function getPartnerByName(name, version = null) {
           created_at: config.created_at,
           updated_at: config.updated_at
         } : null,
-        screens: screens,
-        fields: partner.fields,
+        screens: screens.map(screen => ({
+          ...screen,
+          fields: screen.fields || [],  // Ensure each screen has a fields property
+        })),
         categories: partner.categories,
       };
     }
@@ -231,6 +236,7 @@ async function saveScreens(partnerId, configurationVersionString, categoryName, 
       for (let j = 0; j < inputFields.length; j++) {
         const field = inputFields[j];
         const { id: fieldId, type, field_config } = field;
+        const { attributes, rules } = field_config || {};
 
         if (fieldId) {
           // Update existing field
@@ -238,7 +244,10 @@ async function saveScreens(partnerId, configurationVersionString, categoryName, 
             where: { id: fieldId },
             data: {
               type: type || undefined,
-              field_config: field_config || {},
+              field_config: {
+                attributes: attributes || {},
+                rules: rules || {},
+              },
               is_active: true,
             },
           });
@@ -249,8 +258,12 @@ async function saveScreens(partnerId, configurationVersionString, categoryName, 
             data: {
               screen_id: screenId,
               type: type,
-              field_config: field_config || {},
+              field_config: {
+                attributes: attributes || {},
+                rules: rules || {},
+              },
               is_active: true,
+              configuration_version: configurationVersion,
             },
           });
           fieldIds.push(createdField.id);
@@ -266,6 +279,12 @@ async function saveScreens(partnerId, configurationVersionString, categoryName, 
           },
         });
       }
+
+      // Update screen with ordered field_ids
+      await prisma.screen.update({
+        where: { id: screenId },
+        data: { field_ids: fieldIds },
+      });
     }
 
     // Delete screens not in the new screenIds (hard delete)

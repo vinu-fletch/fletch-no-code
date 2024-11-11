@@ -67,22 +67,27 @@ const DataCollectionFormBuilderPage = ({ globalSettings }) => {
   };
 
   // Save a configured field to the current screen in the draft
-  const handleSaveField = (fieldAttributes) => {
-    const updatedScreens = [...(partnerDraft.screens || [])];
-    const updatedFields = [
-      ...(updatedScreens[activeScreenIndex].fields || []),
-      {
-        ...selectedField,
-        attributes: fieldAttributes,
-      },
-    ];
-    updatedScreens[activeScreenIndex] = {
-      ...updatedScreens[activeScreenIndex],
-      fields: updatedFields,
-    };
-    handleScreenUpdate(updatedScreens);
-    setSelectedField(null);
-  };
+  // const handleSaveField = (fieldAttributes) => {
+  //   const updatedScreens = [...(partnerDraft.screens || [])];
+  //   const updatedFields = [
+  //     ...(updatedScreens[activeScreenIndex].fields || []),
+  //     {
+  //       ...selectedField,
+  //       attributes: fieldAttributes,
+  //     },
+  //   ];
+  //   updatedScreens[activeScreenIndex] = {
+  //     ...updatedScreens[activeScreenIndex],
+  //     fields: updatedFields,
+  //   };
+  //   handleScreenUpdate(updatedScreens);
+  //   setSelectedField(null);
+  // };
+
+  const handleSaveField = () => {
+  setSelectedField(null);
+  setHasUnsavedChanges(true);
+};
 
   // Save changes
   const handleSave = () => {
@@ -174,6 +179,7 @@ const DataCollectionFormBuilderPage = ({ globalSettings }) => {
             <FieldSidebar
               selectedField={selectedField}
               onFieldSelect={handleFieldSelect}
+              activeScreenIndex={activeScreenIndex}
               onSaveField={handleSaveField}
               onCancel={() => setSelectedField(null)}
             />

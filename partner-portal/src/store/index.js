@@ -16,7 +16,6 @@ export const usePartnerStore = create((set, get) => ({
 
    updatePartnerDraft: (updates) =>
     set((state) => {
-      console.log("updates", updates, state.partnerDraft);
       const newDraft = merge({}, state.partnerDraft, updates);
       return {
         partnerDraft: newDraft,
@@ -26,6 +25,8 @@ export const usePartnerStore = create((set, get) => ({
   savePartnerDraft: async (createNewVersion = false) => {
     const state = get();
     const { partnerDraft, partnerData } = state;
+
+    console.log("Partner draft before saving:", partnerDraft);
 
     try {
       const response = await fetch(
@@ -126,6 +127,7 @@ export const usePartnerStore = create((set, get) => ({
     const configVersion = partnerData.config.version;
     const categoryName = 'Data Collection'; // Replace with actual category name if needed
     const screens = partnerDraft.screens;
+
 
     try {
       const response = await fetch(

@@ -37,7 +37,7 @@ const Canvas = ({ screens, activeScreenIndex, globalSettings }) => {
             borderColor="primary.200"
           >
             <Text fontSize="lg" fontWeight="bold">
-              {field.attributes.label || field.label}
+              {field?.field_config?.attributes?.label || `Field ${index + 1}`}
             </Text>
             {/* Display additional field attributes if needed */}
           </Box>

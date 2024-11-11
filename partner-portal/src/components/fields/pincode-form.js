@@ -88,11 +88,7 @@ const PincodeFieldConfig = ({ onSave, onCancel }) => {
   };
 
   const handleSave = () => {
-    const fieldConfig = {
-      attributes: fieldAttributes,
-      rules: rules,
-    };
-    onSave(fieldConfig);
+    onSave(fieldAttributes, rules);
   };
 
   return (
