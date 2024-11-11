@@ -1,7 +1,7 @@
 // stores/partnerStore.js
 
 import { create } from "zustand";
-import { merge } from "lodash";
+import { mergeWith } from "lodash";
 
 export const usePartnerStore = create((set, get) => ({
   partnerData: null,       // Data fetched from the backend
@@ -17,7 +17,11 @@ export const usePartnerStore = create((set, get) => ({
 
   updatePartnerDraft: (updates) =>
     set((state) => {
-      const newDraft = merge({}, state.partnerDraft, updates);
+      const newDraft = mergeWith({}, state.partnerDraft, updates, (objValue, srcValue) => {
+        if (Array.isArray(objValue)) {
+          return srcValue; // Replace arrays entirely instead of merging element by element
+        }
+      });
       return {
         partnerDraft: newDraft,
       };

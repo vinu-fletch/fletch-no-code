@@ -35,7 +35,6 @@ const Layout = ({ children }) => {
     router.push(path);
   };
 
-  console.log("Versions is", versions)
 
   const handleVersionChange = async (event) => {
     const version = parseInt(event.target.value, 10);

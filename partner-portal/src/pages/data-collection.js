@@ -35,6 +35,8 @@ const DataCollectionFormBuilderPage = ({ globalSettings }) => {
 
   const categoryName = "Data Collection"; // Set the category name
 
+  console.log("Partner draft is", partnerDraft)
+
   // Initialize partnerDraft as a deep copy of partnerData
   useEffect(() => {
     if (partnerData) {
@@ -66,23 +68,6 @@ const DataCollectionFormBuilderPage = ({ globalSettings }) => {
     setSelectedField(field);
   };
 
-  // Save a configured field to the current screen in the draft
-  // const handleSaveField = (fieldAttributes) => {
-  //   const updatedScreens = [...(partnerDraft.screens || [])];
-  //   const updatedFields = [
-  //     ...(updatedScreens[activeScreenIndex].fields || []),
-  //     {
-  //       ...selectedField,
-  //       attributes: fieldAttributes,
-  //     },
-  //   ];
-  //   updatedScreens[activeScreenIndex] = {
-  //     ...updatedScreens[activeScreenIndex],
-  //     fields: updatedFields,
-  //   };
-  //   handleScreenUpdate(updatedScreens);
-  //   setSelectedField(null);
-  // };
 
   const handleSaveField = () => {
   setSelectedField(null);
@@ -172,7 +157,6 @@ const DataCollectionFormBuilderPage = ({ globalSettings }) => {
               <Canvas
                 screens={partnerDraft.screens}
                 activeScreenIndex={activeScreenIndex}
-                globalSettings={globalSettings}
               />
             </Box>
 
