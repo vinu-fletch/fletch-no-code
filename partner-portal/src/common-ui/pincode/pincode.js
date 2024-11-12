@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import {
   Box,
   FormControl,
@@ -97,17 +97,12 @@ const Pincode = ({
 
   const handlePincodeChange = (e) => {
     setPincode(e.target.value);
-    setError("");
+    setError(""); // Clear error when value changes
   };
 
   const hasOnBlurRule = rules.some(rule => rule.trigger === "onBlur");
   const hasOnFocusRule = rules.some(rule => rule.trigger === "onFocus");
   const hasOnKeyPressRule = rules.some(rule => rule.trigger === "onKeyPress");
-
-  // Trigger onValidate callback whenever the error state changes
-  useEffect(() => {
-    if (onValidate) onValidate(!error);
-  }, [error, onValidate]);
 
   return (
     <FormControl isRequired={required} mb={4}>
