@@ -4,6 +4,7 @@ import {
   FormControl,
   FormLabel,
   Input,
+  HStack,
   Text,
 } from "@chakra-ui/react";
 
@@ -11,37 +12,26 @@ const SSNField = ({
   label,
   required = false,
   borderColor = "gray.300",
-  fieldHeight = "auto",
+  boxHeight = "40px",
   borderRadius = "md",
   backgroundColor = "white",
   errorColor = "red.500",
   rules = [],
   onValidate,
 }) => {
-  const [ssn, setSSN] = useState("");
+  const [ssn, setSSN] = useState(Array(9).fill("")); // Initialize an array for 9 SSN digits
   const [error, setError] = useState("");
 
-  // Format input as XXX-XX-XXXX without user needing to type dashes
-  const formatSSN = (value) => {
-    const rawValue = value.replace(/\D/g, ""); // Remove non-numeric characters
-    const formattedSSN = rawValue
-      .replace(/^(\d{3})(\d{2})(\d{0,4})$/, "$1-$2-$3") // Format as XXX-XX-XXXX
-      .substring(0, 11); // Limit to 11 characters, including dashes
-    return formattedSSN;
-  };
-
-  // Validation logic, e.g., length check, based on rules
-  const validateSSN = (event) => {
+  const validateSSN = () => {
     let validationError = "";
 
     for (const rule of rules) {
-      if (rule.trigger === event) {
+      if (rule.trigger === "onBlur") {
         if (rule.type === "lengthCheck") {
-          const numericSSN = ssn.replace(/\D/g, ""); // Ignore dashes
           const { minLength, maxLength, errorMessage } = rule.config;
           if (
-            (minLength && numericSSN.length < minLength) ||
-            (maxLength && numericSSN.length > maxLength)
+            (minLength && ssn.join("").length < minLength) ||
+            (maxLength && ssn.join("").length > maxLength)
           ) {
             validationError = errorMessage;
           }
@@ -55,18 +45,34 @@ const SSNField = ({
     return !validationError;
   };
 
+  const handleSSNChange = (index, value) => {
+    if (/^\d?$/.test(value)) { // Only allow digits
+      const newSSN = [...ssn];
+      newSSN[index] = value;
+      setSSN(newSSN);
+      setError(""); // Clear error on input change
+
+      // Automatically move focus to the next input if a digit is entered
+      if (value && index < 8) {
+        document.getElementById(`ssn-box-${index + 1}`).focus();
+      }
+
+      // Run validation if it's the last box
+      if (index === 8) {
+        validateSSN();
+      }
+    }
+  };
+
+  const handleKeyDown = (index, e) => {
+    if (e.key === "Backspace" && !ssn[index] && index > 0) {
+      // Move focus to the previous input if backspace is pressed on an empty box
+      document.getElementById(`ssn-box-${index - 1}`).focus();
+    }
+  };
+
   const handleBlur = () => {
-    validateSSN("onBlur");
-  };
-
-  const handleFocus = () => {
-    setError("");
-  };
-
-  const handleSSNChange = (e) => {
-    const formattedSSN = formatSSN(e.target.value); // Auto-format input
-    setSSN(formattedSSN);
-    setError(""); // Clear error on input change
+    validateSSN();
   };
 
   return (
@@ -76,20 +82,33 @@ const SSNField = ({
           {label}
         </FormLabel>
       )}
-      <Input
-        type="text"
-        value={ssn}
-        onChange={handleSSNChange}
-        onBlur={handleBlur}
-        onFocus={handleFocus}
-        placeholder="XXX-XX-XXXX"
-        maxLength={11} // Max length considering dashes
-        height={fieldHeight}
-        borderColor={borderColor}
-        backgroundColor={backgroundColor}
-        borderRadius={borderRadius}
-        _placeholder={{ color: "gray.500" }}
-      />
+      <HStack spacing={2}>
+        {ssn.map((digit, index) => (
+          <React.Fragment key={index}>
+            <Input
+              id={`ssn-box-${index}`}
+              type="text"
+              value={digit}
+              onChange={(e) => handleSSNChange(index, e.target.value)}
+              onKeyDown={(e) => handleKeyDown(index, e)}
+              onBlur={handleBlur}
+              maxLength={1}
+              textAlign="center"
+              height={boxHeight}
+              width="40px"
+              borderColor={borderColor}
+              backgroundColor={backgroundColor}
+              borderRadius={borderRadius}
+            />
+            {/* Add dashes after the 3rd and 5th boxes */}
+            {(index === 2 || index === 4) && (
+              <Text fontSize="lg" color="black">
+                -
+              </Text>
+            )}
+          </React.Fragment>
+        ))}
+      </HStack>
       {error && (
         <Text fontSize="sm" color={errorColor} mt={1}>
           {error}
