@@ -23,6 +23,7 @@ import {
 } from "@chakra-ui/react";
 import { useState, useEffect } from "react";
 import { usePartnerStore } from "../store";
+import { ChromePicker } from "react-color";
 
 const GlobalCustomization = () => {
   const partnerDraft = usePartnerStore((state) => state.partnerDraft);
@@ -33,18 +34,40 @@ const GlobalCustomization = () => {
 
   const config = partnerDraft?.config || {};
 
+  // Existing field states
   const [logoLink, setLogoLink] = useState("");
   const [logoWidth, setLogoWidth] = useState("");
   const [logoHeight, setLogoHeight] = useState("");
   const [logoAlignment, setLogoAlignment] = useState("center");
   const [footerText, setFooterText] = useState("");
   const [layoutPercentage, setLayoutPercentage] = useState(60);
-  const [fontFamily, setFontFamily] = useState("");
+  const [fontFamily, setFontFamily] = useState("Arial");
+
+  // New fields
+  const [formCompletionHeading, setFormCompletionHeading] = useState("");
+  const [formCompletionParagraph, setFormCompletionParagraph] = useState("");
+  const [primaryColor, setPrimaryColor] = useState("#333");
+  const [secondaryColor, setSecondaryColor] = useState("#555");
+  const [bgColor, setBgColor] = useState("#fff");
+  const [secondaryBgColor, setSecondaryBgColor] = useState("#f5f5f5");
+  const [textPrimaryColor, setTextPrimaryColor] = useState("#000");
+  const [textSecondaryColor, setTextSecondaryColor] = useState("#666");
+  const [showColorPicker, setShowColorPicker] = useState({
+    primaryColor: false,
+    secondaryColor: false,
+    bgColor: false,
+    secondaryBgColor: false,
+    textPrimaryColor: false,
+    textSecondaryColor: false,
+  });
+  const [spacingBetweenFields, setSpacingBetweenFields] = useState(4);
+  const [isResponsive, setIsResponsive] = useState(true);
 
   useEffect(() => {
     if (partnerDraft && partnerDraft.config) {
       const config = partnerDraft.config;
 
+      // Load existing config
       setLogoLink(config.header_config?.logo_link || "");
       setLogoWidth(config.header_config?.logo_width || "");
       setLogoHeight(config.header_config?.logo_height || "");
@@ -52,8 +75,50 @@ const GlobalCustomization = () => {
       setFooterText(config.footer_config?.footer_text || "");
       setLayoutPercentage(config.layout_config?.layout_percentage || 60);
       setFontFamily(config.global_config?.font_family || "Arial");
+
+      // Load new fields
+      setFormCompletionHeading(config.global_config?.form_completion_heading || "");
+      setFormCompletionParagraph(config.global_config?.form_completion_paragraph || "");
+      setPrimaryColor(config.global_config?.primary_color || "#333");
+      setSecondaryColor(config.global_config?.secondary_color || "#555");
+      setBgColor(config.global_config?.background_color || "#fff");
+      setSecondaryBgColor(config.global_config?.secondary_background_color || "#f5f5f5");
+      setTextPrimaryColor(config.global_config?.text_primary_color || "#000");
+      setTextSecondaryColor(config.global_config?.text_secondary_color || "#666");
     }
+
+    // Close color pickers when clicking outside
+    const handleClickOutside = (event) => {
+      if (!event.target.closest(".color-picker")) {
+        setShowColorPicker({
+          primaryColor: false,
+          secondaryColor: false,
+          bgColor: false,
+          secondaryBgColor: false,
+          textPrimaryColor: false,
+          textSecondaryColor: false,
+        });
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [partnerData]);
+
+  const handleColorChange = (color, setColor, configKey) => {
+  setColor(color.hex);
+  updatePartnerDraft({
+    config: {
+      global_config: {
+        ...config.global_config,
+        [configKey]: color.hex,
+      },
+    },
+  });
+};
+
+  const toggleColorPicker = (key) => {
+    setShowColorPicker((prev) => ({ ...prev, [key]: !prev[key] }));
+  };
 
   const hasUnsavedChanges = JSON.stringify(partnerData) !== JSON.stringify(partnerDraft);
 
@@ -79,7 +144,7 @@ const GlobalCustomization = () => {
       <Box bg="black" p={6} rounded="md" shadow="md">
         <Accordion allowMultiple>
           {/* Global Settings */}
-          <AccordionItem size="lg">
+          <AccordionItem isExpanded={true}>
             <AccordionButton>
               <Box flex="1" textAlign="left" fontWeight="bold">
                 Global Settings
@@ -112,12 +177,83 @@ const GlobalCustomization = () => {
                     <option value="Montserrat">Montserrat</option>
                   </Select>
                 </FormControl>
+
+                <HStack spacing={4}>
+                  {[
+                    { label: "Primary Color", color: primaryColor, key: "primary_color", setColor: setPrimaryColor },
+                    { label: "Secondary Color", color: secondaryColor, key: "secondary_color", setColor: setSecondaryColor },
+                    { label: "Primary Background Color", color: bgColor, key: "background_color", setColor: setBgColor },
+                    { label: "Secondary Background Color", color: secondaryBgColor, key: "secondary_background_color", setColor: setSecondaryBgColor },
+                    { label: "Text Primary Color", color: textPrimaryColor, key: "text_primary_color", setColor: setTextPrimaryColor },
+                    { label: "Text Secondary Color", color: textSecondaryColor, key: "text_secondary_color", setColor: setTextSecondaryColor },
+                  ].map(({ label, color, key, setColor }) => (
+                    <Box key={key}>
+                      <FormLabel>{label}</FormLabel>
+                      <Box
+                        className="color-picker"
+                        bg={color}
+                        width="24px"
+                        height="24px"
+                        borderRadius="50%"
+                        cursor="pointer"
+                        onClick={() => toggleColorPicker(key)}
+                      />
+                      {showColorPicker[key] && (
+                        <ChromePicker
+                          id={key}
+                          className="color-picker"
+                          color={color}
+                          onChange={(updatedColor) => handleColorChange(updatedColor, setColor, key)}
+                          onClose={() => toggleColorPicker(key)}
+                        />
+                      )}
+                    </Box>
+                  ))}
+                </HStack>
+
+                {/* Form Completion Message */}
+                <FormControl>
+                  <FormLabel>Form Completion Heading</FormLabel>
+                  <Input
+                    value={formCompletionHeading}
+                    onChange={(e) => {
+                      const value = e.target.value;
+                      setFormCompletionHeading(value);
+                      updatePartnerDraft({
+                        config: {
+                          global_config: {
+                            ...config.global_config,
+                            form_completion_heading: value,
+                          },
+                        },
+                      });
+                    }}
+                  />
+                </FormControl>
+                <FormControl>
+                  <FormLabel>Form Completion Paragraph</FormLabel>
+                  <Textarea
+                    value={formCompletionParagraph}
+                    onChange={(e) => {
+                      const value = e.target.value;
+                      setFormCompletionParagraph(value);
+                      updatePartnerDraft({
+                        config: {
+                          global_config: {
+                            ...config.global_config,
+                            form_completion_paragraph: value,
+                          },
+                        },
+                      });
+                    }}
+                  />
+                </FormControl>
               </VStack>
             </AccordionPanel>
           </AccordionItem>
 
-          {/* Header Config */}
-          <AccordionItem mt={4}>
+          {/* Header Configuration */}
+          <AccordionItem>
             <AccordionButton>
               <Box flex="1" textAlign="left" fontWeight="bold">
                 Header Configuration
@@ -210,8 +346,8 @@ const GlobalCustomization = () => {
             </AccordionPanel>
           </AccordionItem>
 
-          {/* Footer Config */}
-          <AccordionItem mt={4}>
+          {/* Footer Configuration */}
+          <AccordionItem>
             <AccordionButton>
               <Box flex="1" textAlign="left" fontWeight="bold">
                 Footer Configuration
@@ -232,17 +368,17 @@ const GlobalCustomization = () => {
                           ...config.footer_config,
                           footer_text: value,
                         },
-                      },
-                    });
+                      }
+                      });
+                      
                   }}
-                  placeholder="Enter footer HTML"
                 />
               </FormControl>
             </AccordionPanel>
           </AccordionItem>
 
-          {/* Layout Config */}
-          <AccordionItem mt={4}>
+          {/* Layout Configuration */}
+          <AccordionItem>
             <AccordionButton>
               <Box flex="1" textAlign="left" fontWeight="bold">
                 Layout Configuration
@@ -265,8 +401,8 @@ const GlobalCustomization = () => {
                           ...config.layout_config,
                           layout_percentage: val,
                         },
-                      },
-                    });
+                      }
+                      });
                   }}
                 >
                   <SliderTrack bg="gray.200">
@@ -277,6 +413,51 @@ const GlobalCustomization = () => {
                   </SliderThumb>
                 </Slider>
                 <Text mt={2}>{layoutPercentage}%</Text>
+              </FormControl>
+
+              <FormControl mt={4}>
+                <FormLabel>Spacing Between Fields</FormLabel>
+                <Select
+                  value={spacingBetweenFields}
+                  onChange={(e) => {
+                    const value = parseInt(e.target.value, 10);
+                    setSpacingBetweenFields(value);
+                    updatePartnerDraft({
+                      config: {
+                        layout_config: {
+                          ...config.layout_config,
+                          spacing_between_fields: value,
+                        },
+                      }
+                      });
+                  }}
+                >
+                  <option value={4}>Small</option>
+                  <option value={8}>Medium</option>
+                  <option value={12}>Large</option>
+                </Select>
+              </FormControl>
+
+              <FormControl mt={4}>
+                <FormLabel>Mobile Responsiveness</FormLabel>
+                <Select
+                  value={isResponsive ? "responsive" : "fixed"}
+                  onChange={(e) => {
+                    const value = e.target.value === "responsive";
+                    setIsResponsive(value);
+                    updatePartnerDraft({
+                      config: {
+                        layout_config: {
+                          ...config.layout_config,
+                          mobile_responsiveness: value,
+                        },
+                      }
+                      });
+                  }}
+                >
+                  <option value="responsive">Responsive (Stacked)</option>
+                  <option value="fixed">Fixed Layout (Side-by-Side)</option>
+                </Select>
               </FormControl>
             </AccordionPanel>
           </AccordionItem>
