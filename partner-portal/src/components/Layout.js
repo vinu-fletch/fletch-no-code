@@ -26,9 +26,9 @@ const Layout = ({ children }) => {
 
   useEffect(() => {
     // Fetch versions on initial load
-    fetchVersions("medlife");
+    fetchVersions("metlife");
     // Fetch partner data for the latest version
-    fetchPartnerData("medlife");
+    fetchPartnerData("metlife");
   }, []); // Empty dependency array to run only once on mount
 
   const handleNavigation = (path) => {
@@ -41,7 +41,7 @@ const Layout = ({ children }) => {
     setSelectedVersion(version);
 
     // Fetch the partner data for the selected version
-    await fetchPartnerData("medlife", version);
+    await fetchPartnerData("metlife", version);
   };
 
   return (
@@ -102,6 +102,13 @@ const Layout = ({ children }) => {
               onClick={() => handleNavigation("/payment")}
             >
               Payment
+            </Button>
+            <Button
+              variant={activeView === "/preview" ? "outline" : "solid"}
+              colorScheme="primary"
+              onClick={() => handleNavigation("/preview")}
+            >
+              Preview
             </Button>
           </VStack>
         </Box>
