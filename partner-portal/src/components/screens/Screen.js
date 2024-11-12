@@ -3,6 +3,7 @@
 import React from "react";
 import { Box, Text, VStack, Flex } from "@chakra-ui/react";
 import Button from "@/common-ui/button/button";
+import Pincode from "@/common-ui/pincode/pincode";
 
 // Map screen settings font sizes to Chakra UI font sizes
 const fontSizeMapping = {
@@ -40,6 +41,8 @@ const Screen = ({ screen, globalConfig, onContinue, onBack, isFirstScreen, isLas
     }
   };
 
+  console.log("Screen fields", screen?.fields);
+
   return (
     <Flex direction="column" minHeight="100vh" p={6} maxWidth="600px" margin="0 auto">
       {/* Content Section */}
@@ -64,7 +67,24 @@ const Screen = ({ screen, globalConfig, onContinue, onBack, isFirstScreen, isLas
         <VStack spacing={4} align="stretch">
           {screen?.fields?.map((field, index) => (
             <Box key={index} p={4} border="1px solid" borderColor="gray.300" borderRadius="md">
-              {field.field_name || `Field ${index + 1}`}
+              {field.type === "pincode" ? (
+                <Pincode
+                  label={field.field_config?.attributes?.label || "Pincode"}
+                  placeholder={field.field_config?.attributes?.placeholder || "Enter Pincode"}
+                  required={field.field_config?.attributes?.required || false}
+                  backgroundColor={field.field_config?.attributes?.style?.backgroundColor || globalConfig.primary_background_color}
+                  textColor={field.field_config?.attributes?.style?.textColor || globalConfig.primary_text_color}
+                  borderColor={field.field_config?.attributes?.style?.borderColor || globalConfig.border_color}
+                  width={field.field_config?.attributes?.style?.width || "100%"}
+                  borderRadius={field.field_config?.attributes?.style?.borderRadius || globalConfig.default_border_radius}
+                  fontSize={fontSizeMapping[field.field_config?.attributes?.style?.fontSize] || globalConfig.default_font_size}
+                  fontWeight={field.field_config?.attributes?.style?.fontWeight || globalConfig.default_font_weight}
+                  errorMessage={field.field_config?.attributes?.errorMessage || ""}
+                />
+              ) : (
+                // Fallback for other field types (for example purposes)
+                <Text>{field.field_name || `Field ${index + 1}`}</Text>
+              )}
             </Box>
           ))}
         </VStack>
