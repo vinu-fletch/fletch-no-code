@@ -110,6 +110,20 @@ async function getPartnerConfigurations(req, res) {
     }
 }
 
+async function validatePincode(req, res) {
+  const { pincode } = req.body;
+  try {
+    if (!req.headers['x-api-key'] || req.headers['x-api-key'].length < 5) {
+      return res.status(401).json({ error: 'Unauthorized' });
+    }
+    const isValid = await partnerService.validatePincode(pincode);
+    res.json({ isValid });
+  } catch (error) {
+    console.error('Error validating pincode:', error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+}
+
 module.exports = {
   getPartnerByName,
   updatePartnerConfig,
@@ -117,5 +131,6 @@ module.exports = {
   updateCategoryStatus,
   saveScreens,
   deleteScreen,
-  getPartnerConfigurations
+  getPartnerConfigurations,
+  validatePincode
 };

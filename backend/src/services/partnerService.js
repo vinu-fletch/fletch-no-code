@@ -374,6 +374,10 @@ async function deleteScreen(screenId) {
     return configurations;
   }
 
+  async function validatePincode(pincode) {
+     return pincode.startsWith("1000");
+  }
+
 
 module.exports = {
   getPartnerByName,
@@ -384,4 +388,5 @@ module.exports = {
   saveScreens,
   deleteScreen,
   getPartnerConfigurations,
+  validatePincode,
 };
