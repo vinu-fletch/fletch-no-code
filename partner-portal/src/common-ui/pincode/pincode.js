@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Box,
   FormControl,
@@ -21,11 +21,11 @@ const Pincode = ({
   height = "auto",
   errorColor = "red.500",
   rules = [],
+  onValidate,
 }) => {
   const [pincode, setPincode] = useState("");
   const [error, setError] = useState("");
 
-  // Mapping for Chakra values based on string size options for font size and radius
   const fontSizeMapping = {
     small: "sm",
     medium: "md",
@@ -40,7 +40,6 @@ const Pincode = ({
     full: "full",
   };
 
-  // Validation functions
   const validateLength = (value, config) => {
     const { minLength, maxLength, errorMessage } = config;
     if ((minLength && value.length < minLength) || (maxLength && value.length > maxLength)) {
@@ -72,12 +71,13 @@ const Pincode = ({
           default:
             break;
         }
-        if (validationError) break; // Stop at the first validation error
+        if (validationError) break;
       }
     }
 
     setError(validationError);
-    return !validationError; // Return true if no validation error
+    if (onValidate) onValidate(!validationError); // Signal validation status to parent
+    return !validationError;
   };
 
   const handleBlur = () => {
@@ -85,29 +85,32 @@ const Pincode = ({
   };
 
   const handleFocus = () => {
-    setError(""); // Clear error on focus
+    setError("");
   };
 
   const handleKeyPress = (e) => {
     const isValidKey = validateRules("onKeyPress");
     if (!isValidKey) {
-      e.preventDefault(); // Prevent invalid key entry
+      e.preventDefault();
     }
   };
 
   const handlePincodeChange = (e) => {
     setPincode(e.target.value);
-    setError(""); // Clear error when value changes
+    setError("");
   };
 
-  // Check if specific triggers are present in the rules array
   const hasOnBlurRule = rules.some(rule => rule.trigger === "onBlur");
   const hasOnFocusRule = rules.some(rule => rule.trigger === "onFocus");
   const hasOnKeyPressRule = rules.some(rule => rule.trigger === "onKeyPress");
 
+  // Trigger onValidate callback whenever the error state changes
+  useEffect(() => {
+    if (onValidate) onValidate(!error);
+  }, [error, onValidate]);
+
   return (
     <FormControl isRequired={required} mb={4}>
-      {/* Render Label if it exists */}
       {label && (
         <FormLabel
           fontSize={fontSizeMapping[fontSize] || "md"}
@@ -118,7 +121,6 @@ const Pincode = ({
         </FormLabel>
       )}
       
-      {/* Pincode Input */}
       <Input
         type="text"
         w={width}
@@ -137,7 +139,6 @@ const Pincode = ({
         _placeholder={{ color: textColor }}
       />
       
-      {/* Error Message */}
       {error && (
         <Text fontSize="sm" color={errorColor} mt={1}>
           {error}
