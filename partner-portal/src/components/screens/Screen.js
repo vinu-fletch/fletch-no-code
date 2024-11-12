@@ -31,48 +31,57 @@ const Screen = ({ screen, globalConfig, onContinue, onBack, isFirstScreen, isLas
   console.log("Screen Fields:", screen?.fields);
 
   const handleApiCall = async (rule, fieldValue) => {
-    const { url, method, headers, body, responseDataPath, expectedValue, expectedValueType, errorMessage } = rule.config;
+  const { url, method, headers, body, responseDataPath, expectedValue, expectedValueType, errorMessage } = rule.config;
 
-    // Parse and replace dynamic values in headers and body
-    const parsedHeaders = headers ? JSON.parse(headers.replace(/\[\[field_value\]\]/g, fieldValue)) : {};
-    const parsedBody = body ? JSON.parse(body.replace(/\[\[field_value\]\]/g, fieldValue)) : {};
-    alert(method)
-    try {
-      const response = await axios({
-        method: method || "POST",
-        url,
-        headers: parsedHeaders,
-        data: method === "POST" ? parsedBody : null,
-      });
+  // Parse and replace dynamic values in headers and body
+  const parsedHeaders = headers ? JSON.parse(headers.replace(/\[\[field_value\]\]/g, fieldValue)) : {};
+  const parsedBody = body ? JSON.parse(body.replace(/\[\[field_value\]\]/g, fieldValue)) : {};
 
-      // Traverse the response to find the expected value path
-      const actualValue = responseDataPath.split('.').reduce((acc, key) => acc[key], response.data);
+  try {
+    // Construct fetch options
+    const options = {
+      method: method || 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        ...parsedHeaders
+      },
+      body: method === 'POST' || method === 'PUT' ? JSON.stringify(parsedBody) : undefined
+    };
 
-      // Type conversion based on expectedValueType
-      let expectedTypedValue;
-      switch (expectedValueType) {
-        case "boolean":
-          expectedTypedValue = expectedValue === "true";
-          break;
-        case "number":
-          expectedTypedValue = Number(expectedValue);
-          break;
-        default:
-          expectedTypedValue = expectedValue;
-      }
 
-      if (actualValue !== expectedTypedValue) {
-        setFormError(errorMessage);
-        return false;
-      }
-    } catch (error) {
-      console.error("API Call Error:", error);
-      setFormError("An error occurred during validation.");
-      return false;
+    console.log("API Call Options:", options);
+    // Make the API call
+    const response = await fetch(url, options);
+    const responseData = await response.json();
+
+    // Traverse the response to find the expected value path
+    const actualValue = responseDataPath.split('.').reduce((acc, key) => acc[key], responseData);
+
+    // Type conversion based on expectedValueType
+    let expectedTypedValue;
+    switch (expectedValueType) {
+      case "boolean":
+        expectedTypedValue = expectedValue === "true";
+        break;
+      case "number":
+        expectedTypedValue = Number(expectedValue);
+        break;
+      default:
+        expectedTypedValue = expectedValue;
     }
 
-    return true;
-  };
+    if (actualValue !== expectedTypedValue) {
+      setFormError(errorMessage);
+      return false;
+    }
+  } catch (error) {
+    console.error("API Call Error:", error);
+    setFormError("An error occurred during validation.");
+    return false;
+  }
+
+  return true;
+};
 
   const handleContinue = async () => {
     // Check if there are onSubmit rules that need to be validated
