@@ -20,6 +20,13 @@ const ScreensManager = () => {
     }
   };
 
+  // Function to go back to the previous screen
+  const goToPreviousScreen = () => {
+    if (currentScreenIndex > 0) {
+      setCurrentScreenIndex((prevIndex) => prevIndex - 1);
+    }
+  };
+
   return (
     <Box minHeight="100vh" display="flex" flexDirection="column" justifyContent="space-between">
       {/* Render the current screen */}
@@ -27,6 +34,8 @@ const ScreensManager = () => {
         screen={screens[currentScreenIndex]}
         globalConfig={globalConfig}
         onContinue={goToNextScreen}
+        onBack={goToPreviousScreen}
+        isFirstScreen={currentScreenIndex === 0}
         isLastScreen={currentScreenIndex === screens.length - 1}
       />
     </Box>
