@@ -109,6 +109,7 @@ const RuleConfig = ({ onSave, onCancel, initialRule }) => {
                 color="text.primary"
               />
             </FormControl>
+
           </>
         )}
 
@@ -125,16 +126,7 @@ const RuleConfig = ({ onSave, onCancel, initialRule }) => {
                 color="text.primary"
               />
             </FormControl>
-            <FormControl>
-              <FormLabel>Error Message</FormLabel>
-              <Input
-                name="errorMessage"
-                value={rule.config.errorMessage || ""}
-                onChange={handleConfigChange}
-                bg="background.dark"
-                color="text.primary"
-              />
-            </FormControl>
+          
           </>
         )}
 
@@ -229,6 +221,17 @@ const RuleConfig = ({ onSave, onCancel, initialRule }) => {
             </FormControl>
           </>
         )}
+
+        <FormControl>
+              <FormLabel>Error Message</FormLabel>
+              <Input
+                name="errorMessage"
+                value={rule.config.errorMessage || ""}
+                onChange={handleConfigChange}
+                bg="background.dark"
+                color="text.primary"
+              />
+        </FormControl>
 
         {/* Save and Cancel Buttons */}
         <HStack spacing={2} mt={4}>

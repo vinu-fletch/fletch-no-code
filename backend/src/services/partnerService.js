@@ -21,10 +21,11 @@ async function getPartnerByName(name, version = null) {
     });
 
     if (partner) {
-      const config = partner.configs[0] || null; 
-      
+      const config = partner.configs[0] || null;
+      const screenIdsOrder = config?.screen_ids || [];
+
       // Ensure screens structure includes fields for each screen
-      const screens = partner.screens.length ? partner.screens : [{
+      let screens = partner.screens.length ? partner.screens : [{
         name: "Screen 1",
         backgroundColor: "",
         heading: "",
@@ -33,6 +34,11 @@ async function getPartnerByName(name, version = null) {
         is_active: true,
         screen_config: {},
       }];
+
+      // Sort screens based on the screen_ids in config
+      screens = screens
+        .filter(screen => screenIdsOrder.includes(screen.id))  // Include only screens listed in screen_ids
+        .sort((a, b) => screenIdsOrder.indexOf(a.id) - screenIdsOrder.indexOf(b.id)); // Sort by screen_ids order
 
       return {
         id: partner.id,

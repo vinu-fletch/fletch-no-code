@@ -80,6 +80,7 @@ const Screen = ({ screen, globalConfig, onContinue, onBack, isFirstScreen, isLas
                   fontSize={fontSizeMapping[field.field_config?.attributes?.style?.fontSize] || globalConfig.default_font_size}
                   fontWeight={field.field_config?.attributes?.style?.fontWeight || globalConfig.default_font_weight}
                   errorMessage={field.field_config?.attributes?.errorMessage || ""}
+                  rules={field.field_config?.rules || []}
                 />
               ) : (
                 // Fallback for other field types (for example purposes)
