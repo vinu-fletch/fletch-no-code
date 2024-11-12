@@ -3,6 +3,7 @@ import React, { useState } from "react";
 import { Box, Heading, Button } from "@chakra-ui/react";
 import PincodeFieldConfig from "./fields/pincode-form";
 import { usePartnerStore } from "../store";
+import SocialSecurityNumberConfig from "./fields/social-security-number-form";
 
 const fields = [
   { label: "SSN", type: "ssn" },
@@ -105,6 +106,18 @@ const FieldSidebar = ({
         fieldData={selectedField}
       />
     );
+  }
+
+  if (selectedField?.type === "ssn") {
+    return (
+      <SocialSecurityNumberConfig
+        onSave={handleSaveField}
+        onDrag={handleDrag}
+        onCancel={onCancel}
+        showModal={showModal}
+        fieldData={selectedField}
+      />
+    )
   }
 
   // Default view when no field is selected

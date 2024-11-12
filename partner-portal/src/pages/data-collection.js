@@ -1,6 +1,6 @@
 // pages/DataCollectionFormBuilderPage.js
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import {
   Flex,
   Box,
@@ -31,7 +31,6 @@ const DataCollectionFormBuilderPage = ({ globalSettings }) => {
   const [activeScreenIndex, setActiveScreenIndex] = useState(0);
   const [selectedField, setSelectedField] = useState(null);
   const [categoryEnabled, setCategoryEnabled] = useState(true);
-  const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
 
   const categoryName = "Data Collection";
 
@@ -42,7 +41,7 @@ const DataCollectionFormBuilderPage = ({ globalSettings }) => {
     if (partnerData) {
       updatePartnerDraft(JSON.parse(JSON.stringify(partnerData)));
     }
-  }, [partnerData]);
+  }, [partnerData, updatePartnerDraft]);
 
   // Find the category in the store
   const category = partnerData?.categories?.find(
@@ -60,7 +59,7 @@ const DataCollectionFormBuilderPage = ({ globalSettings }) => {
   const handleScreenUpdate = (updatedScreens) => {
     const clonedDraft = { ...partnerDraft, screens: updatedScreens };
     updatePartnerDraft(clonedDraft);
-    setHasUnsavedChanges(true);
+    // No need to set hasUnsavedChanges manually
   };
 
   // Select a field to edit in FieldSidebar
@@ -71,19 +70,19 @@ const DataCollectionFormBuilderPage = ({ globalSettings }) => {
   // Handle save field action in FieldSidebar
   const handleSaveField = () => {
     setSelectedField(null);
-    setHasUnsavedChanges(true);
+    // No need to set hasUnsavedChanges manually
   };
 
   // Save changes
   const handleSave = () => {
     updateScreens();
-    setHasUnsavedChanges(false);
+    // No need to set hasUnsavedChanges manually
   };
 
   // Discard changes
   const handleDiscard = () => {
     updatePartnerDraft(JSON.parse(JSON.stringify(partnerData)));
-    setHasUnsavedChanges(false);
+    // No need to set hasUnsavedChanges manually
   };
 
   // Toggle category with confirmation modal
@@ -104,6 +103,11 @@ const DataCollectionFormBuilderPage = ({ globalSettings }) => {
   const handleEditField = (field) => {
     setSelectedField(field);
   };
+
+  // Detect unsaved changes by comparing partnerDraft and partnerData using JSON.stringify
+  const hasUnsavedChanges = useMemo(() => {
+    return JSON.stringify(partnerDraft) !== JSON.stringify(partnerData);
+  }, [partnerDraft, partnerData]);
 
   return (
     <Layout>
@@ -162,7 +166,7 @@ const DataCollectionFormBuilderPage = ({ globalSettings }) => {
               <Canvas
                 screens={partnerDraft.screens}
                 activeScreenIndex={activeScreenIndex}
-                onEditField={handleEditField} // Pass handleEditField to Canvas
+                onEditField={handleEditField}
               />
             </Box>
 
@@ -172,7 +176,7 @@ const DataCollectionFormBuilderPage = ({ globalSettings }) => {
               activeScreenIndex={activeScreenIndex}
               onSaveField={handleSaveField}
               onCancel={() => setSelectedField(null)}
-              showFieldModal={selectedField !== null} // Open modal if a field is selected
+              showFieldModal={selectedField !== null}
             />
           </Flex>
         )}
