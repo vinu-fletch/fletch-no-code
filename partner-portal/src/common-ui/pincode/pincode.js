@@ -9,6 +9,7 @@ import {
 
 const Pincode = ({
   label,
+  id,
   placeholder,
   required = false,
   backgroundColor = "white",
@@ -118,6 +119,7 @@ const Pincode = ({
       
       <Input
         type="text"
+        id={id}
         w={width}
         placeholder={placeholder}
         value={pincode}

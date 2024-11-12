@@ -43,24 +43,14 @@ const RuleConfig = ({ onSave, onCancel, initialRule }) => {
   };
 
   const handleJsonConfigChange = (e) => {
-    try {
-      const parsedValue = JSON.parse(e.target.value);
-      setRule({
-        ...rule,
-        config: {
-          ...rule.config,
-          [e.target.name]: parsedValue,
-        },
-      });
-    } catch {
-      setRule({
-        ...rule,
-        config: {
-          ...rule.config,
-          [e.target.name]: e.target.value,
-        },
-      });
-    }
+    // Simply store the raw value as is
+    setRule({
+      ...rule,
+      config: {
+        ...rule.config,
+        [e.target.name]: e.target.value,
+      },
+    });
   };
 
   const handleDynamicValueChange = (e) => {
@@ -181,11 +171,7 @@ const RuleConfig = ({ onSave, onCancel, initialRule }) => {
               <FormLabel>Headers (JSON)</FormLabel>
               <Textarea
                 name="headers"
-                value={
-                  rule.config.headers
-                    ? JSON.stringify(rule.config.headers, null, 2)
-                    : ""
-                }
+                value={rule.config.headers || ""}
                 onChange={handleJsonConfigChange}
                 placeholder='e.g., { "Content-Type": "application/json" }'
                 bg="background.dark"
@@ -197,11 +183,7 @@ const RuleConfig = ({ onSave, onCancel, initialRule }) => {
               <FormLabel>Body (JSON)</FormLabel>
               <Textarea
                 name="body"
-                value={
-                  rule.config.body
-                    ? JSON.stringify(rule.config.body, null, 2)
-                    : ""
-                }
+                value={rule.config.body || ""}
                 onChange={handleDynamicValueChange}
                 placeholder='e.g., { "pincode": "{{field_value}}" }'
                 bg="background.dark"

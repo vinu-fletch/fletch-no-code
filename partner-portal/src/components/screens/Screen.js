@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { Box, Text, VStack, Flex } from "@chakra-ui/react";
 import Button from "@/common-ui/button/button";
 import Pincode from "@/common-ui/pincode/pincode";
+import axios from "axios";
 
 const fontSizeMapping = {
   small: "md",
@@ -18,11 +19,8 @@ const Screen = ({ screen, globalConfig, onContinue, onBack, isFirstScreen, isLas
   const descriptionColor = screenConfig.description_color || globalConfig.secondary_color || "#666";
   const continueButtonText = screenConfig.continue_button_text || "Continue";
 
-  const headingFontSize = fontSizeMapping[screenConfig.heading_font_size] || globalConfig.default_heading_font_size || "2xl";
-  const headingFontWeight = screenConfig.heading_font_weight || globalConfig.default_heading_font_weight || "bold";
-  const descriptionFontSize = fontSizeMapping[screenConfig.description_font_size] || globalConfig.default_description_font_size || "md";
-
   const [fieldErrors, setFieldErrors] = useState({});
+  const [formError, setFormError] = useState("");
 
   const handleFieldValidation = (fieldId, isValid) => {
     setFieldErrors((prevErrors) => ({ ...prevErrors, [fieldId]: !isValid }));
@@ -30,8 +28,70 @@ const Screen = ({ screen, globalConfig, onContinue, onBack, isFirstScreen, isLas
 
   const hasErrors = Object.values(fieldErrors).some((error) => error);
 
-  const handleContinue = () => {
-    if (!hasErrors) {
+  console.log("Screen Fields:", screen?.fields);
+
+  const handleApiCall = async (rule, fieldValue) => {
+    const { url, method, headers, body, responseDataPath, expectedValue, expectedValueType, errorMessage } = rule.config;
+
+    // Parse and replace dynamic values in headers and body
+    const parsedHeaders = headers ? JSON.parse(headers.replace(/\[\[field_value\]\]/g, fieldValue)) : {};
+    const parsedBody = body ? JSON.parse(body.replace(/\[\[field_value\]\]/g, fieldValue)) : {};
+    alert(method)
+    try {
+      const response = await axios({
+        method: method || "POST",
+        url,
+        headers: parsedHeaders,
+        data: method === "POST" ? parsedBody : null,
+      });
+
+      // Traverse the response to find the expected value path
+      const actualValue = responseDataPath.split('.').reduce((acc, key) => acc[key], response.data);
+
+      // Type conversion based on expectedValueType
+      let expectedTypedValue;
+      switch (expectedValueType) {
+        case "boolean":
+          expectedTypedValue = expectedValue === "true";
+          break;
+        case "number":
+          expectedTypedValue = Number(expectedValue);
+          break;
+        default:
+          expectedTypedValue = expectedValue;
+      }
+
+      if (actualValue !== expectedTypedValue) {
+        setFormError(errorMessage);
+        return false;
+      }
+    } catch (error) {
+      console.error("API Call Error:", error);
+      setFormError("An error occurred during validation.");
+      return false;
+    }
+
+    return true;
+  };
+
+  const handleContinue = async () => {
+    // Check if there are onSubmit rules that need to be validated
+    let isValid = true;
+
+    for (const field of screen.fields) {
+      const onSubmitRules = field.field_config.rules.filter(rule => rule.trigger === "onSubmit");
+
+      for (const rule of onSubmitRules) {
+        if (rule.type === "apiCall") {
+          const fieldValue = document.querySelector(`#field-${field.id}`).value; // Get current field value
+          isValid = await handleApiCall(rule, fieldValue);
+          if (!isValid) break;
+        }
+      }
+      if (!isValid) break;
+    }
+
+    if (isValid) {
       onContinue();
     } else {
       console.log("Validation failed. Please correct the errors.");
@@ -41,10 +101,10 @@ const Screen = ({ screen, globalConfig, onContinue, onBack, isFirstScreen, isLas
   return (
     <Flex direction="column" minHeight="100vh" p={6} maxWidth="600px" margin="0 auto">
       <Box flex="1" pb="16">
-        <Text fontSize={headingFontSize} fontWeight={headingFontWeight} color={headingColor} textAlign="center" mb={4}>
+        <Text fontSize={fontSizeMapping[screenConfig.heading_font_size] || "2xl"} fontWeight={screenConfig.heading_font_weight || "bold"} color={headingColor} textAlign="center" mb={4}>
           {heading}
         </Text>
-        <Text fontSize={descriptionFontSize} color={descriptionColor} textAlign="center" mb={8}>
+        <Text fontSize={fontSizeMapping[screenConfig.description_font_size] || "md"} color={descriptionColor} textAlign="center" mb={8}>
           {description}
         </Text>
         <VStack spacing={4} align="stretch">
@@ -52,6 +112,7 @@ const Screen = ({ screen, globalConfig, onContinue, onBack, isFirstScreen, isLas
             <Box key={field.id || index} p={4} border="1px solid" borderColor="gray.300" borderRadius="md">
               {field.type === "pincode" ? (
                 <Pincode
+                  id={`field-${field.id}`} // Attach an ID for querying
                   label={field.field_config?.attributes?.label || "Pincode"}
                   placeholder={field.field_config?.attributes?.placeholder || "Enter Pincode"}
                   required={field.field_config?.attributes?.required || false}
@@ -73,6 +134,11 @@ const Screen = ({ screen, globalConfig, onContinue, onBack, isFirstScreen, isLas
           ))}
         </VStack>
       </Box>
+      {formError && (
+        <Text color="red.500" mb={4} textAlign="center">
+          {formError}
+        </Text>
+      )}
       <Box mt="auto" pb={8} textAlign="center">
         <Flex justifyContent="center">
           {!isFirstScreen && (
