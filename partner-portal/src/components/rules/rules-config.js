@@ -42,6 +42,34 @@ const RuleConfig = ({ onSave, onCancel, initialRule }) => {
     });
   };
 
+  const handleJsonConfigChange = (e) => {
+    try {
+      const parsedValue = JSON.parse(e.target.value);
+      setRule({
+        ...rule,
+        config: {
+          ...rule.config,
+          [e.target.name]: parsedValue,
+        },
+      });
+    } catch {
+      setRule({
+        ...rule,
+        config: {
+          ...rule.config,
+          [e.target.name]: e.target.value,
+        },
+      });
+    }
+  };
+
+  const handleDynamicValueChange = (e) => {
+    const value = e.target.value.replace("{{field_value}}", rule.config.fieldValue || "");
+    handleConfigChange({
+      target: { name: e.target.name, value },
+    });
+  };
+
   const handleSave = () => {
     onSave(rule);
   };
@@ -64,7 +92,6 @@ const RuleConfig = ({ onSave, onCancel, initialRule }) => {
             <option value="lengthCheck">Length Check</option>
             <option value="regexValidation">Regex Validation</option>
             <option value="apiCall">API Call</option>
-            {/* Add more rule types as needed */}
           </Select>
         </FormControl>
 
@@ -80,11 +107,9 @@ const RuleConfig = ({ onSave, onCancel, initialRule }) => {
             <option value="onKeyUp">onKeyUp</option>
             <option value="onBlur">onBlur</option>
             <option value="onSubmit">onSubmit</option>
-            {/* Add more triggers as needed */}
           </Select>
         </FormControl>
 
-        {/* Rule-specific configuration */}
         {rule.type === "lengthCheck" && (
           <>
             <FormControl>
@@ -109,25 +134,21 @@ const RuleConfig = ({ onSave, onCancel, initialRule }) => {
                 color="text.primary"
               />
             </FormControl>
-
           </>
         )}
 
         {rule.type === "regexValidation" && (
-          <>
-            <FormControl>
-              <FormLabel>Regex Pattern</FormLabel>
-              <Input
-                name="pattern"
-                value={rule.config.pattern || ""}
-                onChange={handleConfigChange}
-                placeholder="e.g., ^[0-9]{6}$"
-                bg="background.dark"
-                color="text.primary"
-              />
-            </FormControl>
-          
-          </>
+          <FormControl>
+            <FormLabel>Regex Pattern</FormLabel>
+            <Input
+              name="pattern"
+              value={rule.config.pattern || ""}
+              onChange={handleConfigChange}
+              placeholder="e.g., ^[0-9]{6}$"
+              bg="background.dark"
+              color="text.primary"
+            />
+          </FormControl>
         )}
 
         {rule.type === "apiCall" && (
@@ -154,7 +175,6 @@ const RuleConfig = ({ onSave, onCancel, initialRule }) => {
               >
                 <option value="GET">GET</option>
                 <option value="POST">POST</option>
-                {/* Add more methods as needed */}
               </Select>
             </FormControl>
             <FormControl>
@@ -166,11 +186,7 @@ const RuleConfig = ({ onSave, onCancel, initialRule }) => {
                     ? JSON.stringify(rule.config.headers, null, 2)
                     : ""
                 }
-                onChange={(e) => {
-                  handleConfigChange({
-                    target: { name: "headers", value: e.target.value },
-                  });
-                }}
+                onChange={handleJsonConfigChange}
                 placeholder='e.g., { "Content-Type": "application/json" }'
                 bg="background.dark"
                 color="text.primary"
@@ -186,12 +202,8 @@ const RuleConfig = ({ onSave, onCancel, initialRule }) => {
                     ? JSON.stringify(rule.config.body, null, 2)
                     : ""
                 }
-                onChange={(e) => {
-                  handleConfigChange({
-                    target: { name: "body", value: e.target.value },
-                  });
-                }}
-                placeholder='e.g., { "value": "{{this_field_value}}" }'
+                onChange={handleDynamicValueChange}
+                placeholder='e.g., { "pincode": "{{field_value}}" }'
                 bg="background.dark"
                 color="text.primary"
                 rows={4}
@@ -219,21 +231,51 @@ const RuleConfig = ({ onSave, onCancel, initialRule }) => {
                 color="text.primary"
               />
             </FormControl>
+            <FormControl>
+              <FormLabel>Condition</FormLabel>
+              <Select
+                name="condition"
+                value={rule.config.condition || "eq"}
+                onChange={handleConfigChange}
+                bg="background.dark"
+                color="text.primary"
+              >
+                <option value="eq">Equal to</option>
+                <option value="gt">Greater than</option>
+                <option value="lt">Less than</option>
+                <option value="includes">Includes</option>
+                <option value="starts_with">Starts With</option>
+                <option value="ends_with">Ends With</option>
+              </Select>
+            </FormControl>
+            <FormControl>
+              <FormLabel>Expected Value Type</FormLabel>
+              <Select
+                name="expectedValueType"
+                value={rule.config.expectedValueType || "string"}
+                onChange={handleConfigChange}
+                bg="background.dark"
+                color="text.primary"
+              >
+                <option value="string">String</option>
+                <option value="number">Number</option>
+                <option value="boolean">Boolean</option>
+              </Select>
+            </FormControl>
           </>
         )}
 
         <FormControl>
-              <FormLabel>Error Message</FormLabel>
-              <Input
-                name="errorMessage"
-                value={rule.config.errorMessage || ""}
-                onChange={handleConfigChange}
-                bg="background.dark"
-                color="text.primary"
-              />
+          <FormLabel>Error Message</FormLabel>
+          <Input
+            name="errorMessage"
+            value={rule.config.errorMessage || ""}
+            onChange={handleConfigChange}
+            bg="background.dark"
+            color="text.primary"
+          />
         </FormControl>
 
-        {/* Save and Cancel Buttons */}
         <HStack spacing={2} mt={4}>
           <Button colorScheme="primary" onClick={handleSave}>
             Save Rule
