@@ -49,20 +49,25 @@ const Pincode = ({
     return "";
   };
 
-  const handleBlur = () => {
+  const validateRegex = (value, config) => {
+    const { pattern, errorMessage } = config;
+    if (!new RegExp(pattern).test(value)) {
+      return errorMessage;
+    }
+    return "";
+  };
+
+  const validateRules = (event) => {
     let validationError = "";
 
-    // Iterate over rules and apply validation for onBlur trigger
     for (const rule of rules) {
-      if (rule.trigger === "onBlur") {
+      if (rule.trigger === event) {
         switch (rule.type) {
           case "lengthCheck":
             validationError = validateLength(pincode, rule.config);
             break;
-          case "regexCheck":
-            if (!new RegExp(rule.config.pattern).test(pincode)) {
-              validationError = rule.config.errorMessage;
-            }
+          case "regexValidation":
+            validationError = validateRegex(pincode, rule.config);
             break;
           default:
             break;
@@ -70,7 +75,13 @@ const Pincode = ({
         if (validationError) break; // Stop at the first validation error
       }
     }
+
     setError(validationError);
+    return !validationError; // Return true if no validation error
+  };
+
+  const handleBlur = () => {
+    validateRules("onBlur");
   };
 
   const handleFocus = () => {
@@ -78,16 +89,9 @@ const Pincode = ({
   };
 
   const handleKeyPress = (e) => {
-    for (const rule of rules) {
-      if (rule.trigger === "onKeyPress" && rule.type === "regexCheck") {
-        const regex = new RegExp(rule.config.pattern);
-        if (!regex.test(e.key)) {
-          e.preventDefault(); // Block key press if it doesn't match regex
-          setError(rule.config.errorMessage);
-        } else {
-          setError(""); // Clear error if key is valid
-        }
-      }
+    const isValidKey = validateRules("onKeyPress");
+    if (!isValidKey) {
+      e.preventDefault(); // Prevent invalid key entry
     }
   };
 
