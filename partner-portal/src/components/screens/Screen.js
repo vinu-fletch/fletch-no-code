@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { Box, Text, VStack, Flex } from "@chakra-ui/react";
 import Button from "@/common-ui/button/button";
 import Pincode from "@/common-ui/pincode/pincode";
-import axios from "axios";
+import SSNField from "@/common-ui/ssn/ssn";  // Import the SSNField component
 
 const fontSizeMapping = {
   small: "md",
@@ -28,63 +28,52 @@ const Screen = ({ screen, globalConfig, onContinue, onBack, isFirstScreen, isLas
 
   const hasErrors = Object.values(fieldErrors).some((error) => error);
 
-  console.log("Screen Fields:", screen?.fields);
-
   const handleApiCall = async (rule, fieldValue) => {
-  const { url, method, headers, body, responseDataPath, expectedValue, expectedValueType, errorMessage } = rule.config;
+    const { url, method, headers, body, responseDataPath, expectedValue, expectedValueType, errorMessage } = rule.config;
 
-  // Parse and replace dynamic values in headers and body
-  const parsedHeaders = headers ? JSON.parse(headers.replace(/\[\[field_value\]\]/g, fieldValue)) : {};
-  const parsedBody = body ? JSON.parse(body.replace(/\[\[field_value\]\]/g, fieldValue)) : {};
+    const parsedHeaders = headers ? JSON.parse(headers.replace(/\[\[field_value\]\]/g, fieldValue)) : {};
+    const parsedBody = body ? JSON.parse(body.replace(/\[\[field_value\]\]/g, fieldValue)) : {};
 
-  try {
-    // Construct fetch options
-    const options = {
-      method: method || 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        ...parsedHeaders
-      },
-      body: method === 'POST' || method === 'PUT' ? JSON.stringify(parsedBody) : undefined
-    };
+    try {
+      const options = {
+        method: method || 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          ...parsedHeaders,
+        },
+        body: method === 'POST' || method === 'PUT' ? JSON.stringify(parsedBody) : undefined,
+      };
 
+      const response = await fetch(url, options);
+      const responseData = await response.json();
+      const actualValue = responseDataPath.split('.').reduce((acc, key) => acc[key], responseData);
 
-    console.log("API Call Options:", options);
-    // Make the API call
-    const response = await fetch(url, options);
-    const responseData = await response.json();
+      let expectedTypedValue;
+      switch (expectedValueType) {
+        case "boolean":
+          expectedTypedValue = expectedValue === "true";
+          break;
+        case "number":
+          expectedTypedValue = Number(expectedValue);
+          break;
+        default:
+          expectedTypedValue = expectedValue;
+      }
 
-    // Traverse the response to find the expected value path
-    const actualValue = responseDataPath.split('.').reduce((acc, key) => acc[key], responseData);
-
-    // Type conversion based on expectedValueType
-    let expectedTypedValue;
-    switch (expectedValueType) {
-      case "boolean":
-        expectedTypedValue = expectedValue === "true";
-        break;
-      case "number":
-        expectedTypedValue = Number(expectedValue);
-        break;
-      default:
-        expectedTypedValue = expectedValue;
-    }
-
-    if (actualValue !== expectedTypedValue) {
-      setFormError(errorMessage);
+      if (actualValue !== expectedTypedValue) {
+        setFormError(errorMessage);
+        return false;
+      }
+    } catch (error) {
+      console.error("API Call Error:", error);
+      setFormError("An error occurred during validation.");
       return false;
     }
-  } catch (error) {
-    console.error("API Call Error:", error);
-    setFormError("An error occurred during validation.");
-    return false;
-  }
 
-  return true;
-};
+    return true;
+  };
 
   const handleContinue = async () => {
-    // Check if there are onSubmit rules that need to be validated
     let isValid = true;
 
     for (const field of screen.fields) {
@@ -92,7 +81,7 @@ const Screen = ({ screen, globalConfig, onContinue, onBack, isFirstScreen, isLas
 
       for (const rule of onSubmitRules) {
         if (rule.type === "apiCall") {
-          const fieldValue = document.querySelector(`#field-${field.id}`).value; // Get current field value
+          const fieldValue = document.querySelector(`#field-${field.id}`).value; 
           isValid = await handleApiCall(rule, fieldValue);
           if (!isValid) break;
         }
@@ -121,7 +110,7 @@ const Screen = ({ screen, globalConfig, onContinue, onBack, isFirstScreen, isLas
             <Box key={field.id || index} p={4} border="1px solid" borderColor="gray.300" borderRadius="md">
               {field.type === "pincode" ? (
                 <Pincode
-                  id={`field-${field.id}`} // Attach an ID for querying
+                  id={`field-${field.id}`}
                   label={field.field_config?.attributes?.label || "Pincode"}
                   placeholder={field.field_config?.attributes?.placeholder || "Enter Pincode"}
                   required={field.field_config?.attributes?.required || false}
@@ -133,6 +122,19 @@ const Screen = ({ screen, globalConfig, onContinue, onBack, isFirstScreen, isLas
                   fontSize={fontSizeMapping[field.field_config?.attributes?.style?.fontSize] || globalConfig.default_font_size}
                   fontWeight={field.field_config?.attributes?.style?.fontWeight || globalConfig.default_font_weight}
                   errorMessage={field.field_config?.attributes?.errorMessage || ""}
+                  rules={field.field_config?.rules || []}
+                  onValidate={(isValid) => handleFieldValidation(field.id || index, isValid)}
+                />
+              ) : field.type === "ssn" ? (
+                <SSNField
+                  id={`field-${field.id}`}
+                  label={field.field_config?.attributes?.label || "Social Security Number"}
+                  required={field.field_config?.attributes?.required || false}
+                  borderColor={field.field_config?.attributes?.borderColor || globalConfig.border_color}
+                  fieldHeight={field.field_config?.attributes?.fieldHeight || "50px"}
+                  borderRadius={field.field_config?.attributes?.borderRadius || globalConfig.default_border_radius}
+                  backgroundColor={field.field_config?.attributes?.backgroundColor || globalConfig.primary_background_color}
+                  errorColor="red.500"
                   rules={field.field_config?.rules || []}
                   onValidate={(isValid) => handleFieldValidation(field.id || index, isValid)}
                 />
