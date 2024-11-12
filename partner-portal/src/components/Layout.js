@@ -35,6 +35,8 @@ const Layout = ({ children }) => {
     router.push(path);
   };
 
+  const isPreview = activeView === "/preview";
+
 
   const handleVersionChange = async (event) => {
     const version = parseInt(event.target.value, 10);
@@ -104,7 +106,7 @@ const Layout = ({ children }) => {
               Payment
             </Button>
             <Button
-              variant={activeView === "/preview" ? "outline" : "solid"}
+              variant={isPreview ? "outline" : "solid"}
               colorScheme="primary"
               onClick={() => handleNavigation("/preview")}
             >
@@ -114,9 +116,17 @@ const Layout = ({ children }) => {
         </Box>
 
         {/* Main Content */}
-        <Box flex="1" bg="background.light" color="text.primary" p={8}>
-          {children}
-        </Box>
+        {
+          isPreview ? (
+            <Box flex="1">
+              {children}
+            </Box>
+          ) : (
+            <Box flex="1" bg="background.light" color="text.primary" p={8}>
+              {children}
+            </Box>
+          )
+        }
       </Flex>
     </Flex>
   );
