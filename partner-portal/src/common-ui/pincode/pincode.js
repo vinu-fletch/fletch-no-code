@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useImperativeHandle, forwardRef } from "react";
 import {
   Box,
   FormControl,
@@ -7,7 +7,7 @@ import {
   Text,
 } from "@chakra-ui/react";
 
-const Pincode = ({
+const Pincode = forwardRef(({
   label,
   id,
   placeholder,
@@ -20,13 +20,13 @@ const Pincode = ({
   fontWeight,
   width,
   height,
-  placeholderPosition = "inside", // Prop control label position
+  placeholderPosition = "inside",
   rules = [],
   onValidate,
-}) => {
+}, ref) => {
   const [pincode, setPincode] = useState("");
   const [error, setError] = useState("");
-  const [isFocused, setIsFocused] = useState(false); 
+  const [isFocused, setIsFocused] = useState(false);
 
   const fontSizeMapping = {
     small: "sm",
@@ -100,6 +100,11 @@ const Pincode = ({
   const hasOnBlurRule = rules.some((rule) => rule.trigger === "onBlur");
   const hasOnFocusRule = rules.some((rule) => rule.trigger === "onFocus");
 
+  const beforeSubmit = () => validateRules("beforeSubmit");
+
+  useImperativeHandle(ref, () => ({
+    beforeSubmit,
+  }));
 
   const labelStyle =
     placeholderPosition === "onInput"
@@ -153,6 +158,6 @@ const Pincode = ({
       )}
     </FormControl>
   );
-};
+});
 
 export default Pincode;

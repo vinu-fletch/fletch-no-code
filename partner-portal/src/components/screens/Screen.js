@@ -1,8 +1,9 @@
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import { Box, Text, VStack, Flex } from "@chakra-ui/react";
 import Button from "@/common-ui/button/button";
 import Pincode from "@/common-ui/pincode/pincode";
-import SSNField from "@/common-ui/ssn/ssn";  // Import the SSNField component
+import SSNField from "@/common-ui/ssn/ssn";
+import { set } from "lodash";
 
 const fontSizeMapping = {
   small: "lg",
@@ -22,13 +23,13 @@ const Screen = ({ screen, globalConfig, onContinue, onBack, isFirstScreen, isLas
   const [fieldErrors, setFieldErrors] = useState({});
   const [formError, setFormError] = useState("");
 
+  const fieldRefs = useRef(screen.fields.map(() => React.createRef()));
+
   const handleFieldValidation = (fieldId, isValid) => {
     setFieldErrors((prevErrors) => ({ ...prevErrors, [fieldId]: !isValid }));
   };
 
   const hasErrors = Object.values(fieldErrors).some((error) => error);
-
-  console.log("Screen Fields:", screen);
 
   const handleApiCall = async (rule, fieldValue) => {
     const { url, method, headers, body, responseDataPath, expectedValue, expectedValueType, errorMessage } = rule.config;
@@ -77,6 +78,22 @@ const Screen = ({ screen, globalConfig, onContinue, onBack, isFirstScreen, isLas
 
   const handleContinue = async () => {
     let isValid = true;
+    setFormError("");
+
+     // Run beforeSubmit validation for each field using its ref
+    for (const ref of fieldRefs.current) {
+      if (ref.current && ref.current.validateBeforeSubmit) {
+        const fieldValid = ref.current.validateBeforeSubmit();
+        if (!fieldValid) {
+          isValid = false;
+        }
+      }
+    }
+
+  if (!isValid) {
+    console.log("Validation failed in beforeSubmit checks.");
+    return;
+  }
 
     for (const field of screen.fields) {
       const onSubmitRules = field.field_config.rules.filter(rule => rule.trigger === "onSubmit");
@@ -101,7 +118,7 @@ const Screen = ({ screen, globalConfig, onContinue, onBack, isFirstScreen, isLas
   return (
     <Flex direction="column" minHeight="80vh" p={6} maxWidth="600px" margin="0 auto">
       <Box flex="1" pb="16">
-        <Text fontSize={fontSizeMapping[screenConfig.heading_font_size] || "2xl"}  fontWeight={screenConfig.heading_font_weight || "bold"} color={headingColor || "text.primary"} textAlign="center" mb={4}>
+        <Text fontSize={fontSizeMapping[screenConfig.heading_font_size] || "2xl"} fontWeight={screenConfig.heading_font_weight || "bold"} color={headingColor || "text.primary"} textAlign="center" mb={4}>
           {heading}
         </Text>
         <Text fontSize={fontSizeMapping[screenConfig.description_font_size] || "md"} color={descriptionColor || "text.secondary"} textAlign="center" mb={8}>
@@ -112,6 +129,7 @@ const Screen = ({ screen, globalConfig, onContinue, onBack, isFirstScreen, isLas
             <Box key={field.id || index} p={4}>
               {field.type === "pincode" ? (
                 <Pincode
+                  ref={fieldRefs.current[index]}
                   id={`field-${field.id}`}
                   label={field.field_config?.attributes?.label || "Pincode"}
                   placeholder={field.field_config?.attributes?.placeholder || "Enter Pincode"}
@@ -130,6 +148,7 @@ const Screen = ({ screen, globalConfig, onContinue, onBack, isFirstScreen, isLas
                 />
               ) : field.type === "ssn" ? (
                 <SSNField
+                  ref={fieldRefs.current[index]}
                   id={`field-${field.id}`}
                   label={field.field_config?.attributes?.label || "Social Security Number"}
                   required={field.field_config?.attributes?.required || false}

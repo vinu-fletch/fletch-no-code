@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useImperativeHandle, forwardRef } from "react";
 import {
   Box,
   FormControl,
@@ -8,7 +8,7 @@ import {
   Text,
 } from "@chakra-ui/react";
 
-const SSNField = ({
+const SSNField = forwardRef(({
   label,
   required = false,
   borderColor,
@@ -18,15 +18,17 @@ const SSNField = ({
   backgroundColor,
   rules = [],
   onValidate,
-}) => {
-  const [ssn, setSSN] = useState(Array(9).fill("")); // Initialize an array for 9 SSN digits
+}, ref) => {
+  const [ssn, setSSN] = useState(Array(9).fill("")); 
   const [error, setError] = useState("");
 
-  const validateSSN = () => {
+  const validateSSN = (trigger) => {
     let validationError = "";
 
+    console.log("rules", rules, "trigger", trigger);
+
     for (const rule of rules) {
-      if (rule.trigger === "onBlur") {
+      if (rule.trigger === trigger) {
         if (rule.type === "lengthCheck") {
           const { minLength, maxLength, errorMessage } = rule.config;
           if (
@@ -35,44 +37,54 @@ const SSNField = ({
           ) {
             validationError = errorMessage;
           }
-        }
+        } else if (rule.type === "regexValidation") {
+          const { pattern, errorMessage } = rule.config;
+          const formattedSSN = `${ssn.slice(0, 3).join("")}-${ssn.slice(3, 5).join("")}-${ssn.slice(5, 9).join("")}`;
+
+          console.log("Applying pattern:", pattern, "to formatted SSN:", formattedSSN);
+
+          // Compile the regex to double-check pattern correctness
+          const regex = new RegExp(pattern);
+
+          if (!regex.test(formattedSSN)) {
+            console.log("Regex validation failed"); // Add this log
+            validationError = errorMessage || "SSN format is invalid.";
+          } else {
+            console.log("Regex validation passed");
+          }
+        } 
       }
       if (validationError) break;
     }
 
     setError(validationError);
-    if (onValidate) onValidate(!validationError); // Signal validation status to parent
+    if (onValidate) onValidate(!validationError);
     return !validationError;
   };
 
+  const validateBeforeSubmit = () => validateSSN("beforeSubmit");
+
+  useImperativeHandle(ref, () => ({
+    validateBeforeSubmit,
+  }));
+
   const handleSSNChange = (index, value) => {
-    if (/^\d?$/.test(value)) { // Only allow digits
+    if (/^\d?$/.test(value)) {
       const newSSN = [...ssn];
       newSSN[index] = value;
       setSSN(newSSN);
-      setError(""); // Clear error on input change
+      setError("");
 
-      // Automatically move focus to the next input if a digit is entered
       if (value && index < 8) {
         document.getElementById(`ssn-box-${index + 1}`).focus();
-      }
-
-      // Run validation if it's the last box
-      if (index === 8) {
-        validateSSN();
       }
     }
   };
 
   const handleKeyDown = (index, e) => {
     if (e.key === "Backspace" && !ssn[index] && index > 0) {
-      // Move focus to the previous input if backspace is pressed on an empty box
       document.getElementById(`ssn-box-${index - 1}`).focus();
     }
-  };
-
-  const handleBlur = () => {
-    validateSSN();
   };
 
   return (
@@ -91,7 +103,7 @@ const SSNField = ({
               value={digit}
               onChange={(e) => handleSSNChange(index, e.target.value)}
               onKeyDown={(e) => handleKeyDown(index, e)}
-              onBlur={handleBlur}
+              onBlur={() => validateSSN("onBlur")}
               maxLength={1}
               textAlign="center"
               height={boxHeight}
@@ -100,7 +112,6 @@ const SSNField = ({
               backgroundColor={backgroundColor || "background.field"}
               borderRadius={borderRadius}
             />
-            {/* Add dashes after the 3rd and 5th boxes */}
             {(index === 2 || index === 4) && (
               <Text fontSize="lg" color="text.primary">
                 -
@@ -116,6 +127,6 @@ const SSNField = ({
       )}
     </FormControl>
   );
-};
+});
 
 export default SSNField;
