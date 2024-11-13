@@ -50,6 +50,7 @@ export const Preview = ({ isOpen, onClose }) => {
         field: layout_config.padding_inside_fields === "small" ? "8px" :
                layout_config.padding_inside_fields === "large" ? "16px" : "12px",
         section: "16px",
+        button: layout_config.button_padding || "medium"
       },
       margin: {
         field: layout_config.margin_between_fields === "small" ? "4px" :

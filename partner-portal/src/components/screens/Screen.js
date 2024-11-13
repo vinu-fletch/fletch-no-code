@@ -155,8 +155,6 @@ const Screen = ({ screen, globalConfig, onContinue, onBack, isFirstScreen, isLas
           {!isFirstScreen && (
             <Button
               variant="secondary"
-              bg={globalConfig.secondary_color || "gray.500"}
-              color={globalConfig.primary_color || "white"}
               onClick={onBack}
               mr={4}
             >
@@ -165,8 +163,6 @@ const Screen = ({ screen, globalConfig, onContinue, onBack, isFirstScreen, isLas
           )}
           <Button
             variant="primary"
-            bg={globalConfig.primary_color || "blue.500"}
-            color={globalConfig.secondary_color || "white"}
             onClick={handleContinue}
             disabled={hasErrors}
           >
