@@ -117,6 +117,7 @@ const Screen = ({ screen, globalConfig, onContinue, onBack, isFirstScreen, isLas
                   placeholder={field.field_config?.attributes?.placeholder || "Enter Pincode"}
                   required={field.field_config?.attributes?.required || false}
                   backgroundColor={field.field_config?.attributes?.style?.backgroundColor || globalConfig.primary_background_color}
+                  placeholderPosition={field.field_config?.attributes?.style?.placeholderPosition}
                   textColor={field.field_config?.attributes?.style?.textColor || globalConfig.primary_text_color}
                   borderColor={field.field_config?.attributes?.style?.borderColor || globalConfig.border_color}
                   width={field.field_config?.attributes?.style?.width || "100%"}

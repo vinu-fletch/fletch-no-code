@@ -20,11 +20,13 @@ const Pincode = ({
   fontWeight,
   width,
   height,
+  placeholderPosition = "inside", // Prop control label position
   rules = [],
   onValidate,
 }) => {
   const [pincode, setPincode] = useState("");
   const [error, setError] = useState("");
+  const [isFocused, setIsFocused] = useState(false); 
 
   const fontSizeMapping = {
     small: "sm",
@@ -76,56 +78,66 @@ const Pincode = ({
     }
 
     setError(validationError);
-    if (onValidate) onValidate(!validationError); // Signal validation status to parent
+    if (onValidate) onValidate(!validationError);
     return !validationError;
   };
 
   const handleBlur = () => {
+    setIsFocused(false);
     validateRules("onBlur");
   };
 
   const handleFocus = () => {
+    setIsFocused(true);
     setError("");
-  };
-
-  const handleKeyPress = (e) => {
-    const isValidKey = validateRules("onKeyPress");
-    if (!isValidKey) {
-      e.preventDefault();
-    }
   };
 
   const handlePincodeChange = (e) => {
     setPincode(e.target.value);
-    setError(""); // Clear error when value changes
+    setError("");
   };
 
-  const hasOnBlurRule = rules.some(rule => rule.trigger === "onBlur");
-  const hasOnFocusRule = rules.some(rule => rule.trigger === "onFocus");
-  const hasOnKeyPressRule = rules.some(rule => rule.trigger === "onKeyPress");
+  const hasOnBlurRule = rules.some((rule) => rule.trigger === "onBlur");
+  const hasOnFocusRule = rules.some((rule) => rule.trigger === "onFocus");
+
+
+  const labelStyle =
+    placeholderPosition === "onInput"
+      ? {
+          position: "absolute",
+          top: isFocused || pincode ? "-25px" : "-10px",
+          left: "8px",
+          fontSize: isFocused || pincode ? "xs" : fontSizeMapping[fontSize] || "md",
+          color: isFocused ? "text.primary" : textColor || "text.secondary",
+          transition: "all 0.2s ease",
+          backgroundColor: backgroundColor || "bg.field",
+          zIndex: "100",
+          px: 1,
+        }
+      : {};
 
   return (
-    <FormControl isRequired={required} mb={4}>
+    <FormControl isRequired={required} mb={4} position="relative">
       {label && (
         <FormLabel
+          htmlFor={id}
           fontSize={fontSizeMapping[fontSize] || "md"}
           fontWeight={fontWeight}
           color={textColor || "text.secondary"}
+          {...labelStyle}
         >
           {label}
         </FormLabel>
       )}
-      
       <Input
         type="text"
         id={id}
         w={width}
-        placeholder={placeholder}
         value={pincode}
         onChange={handlePincodeChange}
-        {...(hasOnBlurRule && { onBlur: handleBlur })}
-        {...(hasOnFocusRule && { onFocus: handleFocus })}
-        {...(hasOnKeyPressRule && { onKeyPress: handleKeyPress })}
+        onBlur={handleBlur}
+        onFocus={handleFocus}
+        placeholder={placeholderPosition === "inside" ? placeholder : ""}
         bg={backgroundColor || "bg.field"}
         color={textColor}
         borderRadius={radiusMapping[borderRadius] || "md"}
@@ -134,7 +146,6 @@ const Pincode = ({
         borderColor={borderColor}
         _placeholder={{ color: "text.placeholder" }}
       />
-      
       {error && (
         <Text fontSize="sm" color="text.error" mt={1}>
           {error}
