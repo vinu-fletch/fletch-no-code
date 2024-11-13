@@ -46,22 +46,32 @@ const ScreensManager = () => {
 
       {/* Completion Modal */}
       <Modal isOpen={isSubmitted} onClose={handleClose} isCentered>
-        <ModalOverlay />
-        <ModalContent textAlign="center" bg={globalConfig.background_color || "white"} color={globalConfig.text_primary_color || "black"}>
-          <ModalCloseButton />
-          <ModalHeader p={6} display="flex" flexDirection="column" alignItems="center">
-            <Icon as={CheckCircleIcon} boxSize={10} color={globalConfig.primary_color || "green.500"} mb={4} />
-            <Text fontSize="lg" fontWeight="bold" fontFamily={globalConfig.font_family || "Arial"}>
-              {globalConfig.form_completion_heading || "Thank you for submitting your information"}
-            </Text>
-          </ModalHeader>
-          <ModalBody pb={6}>
-            <Text fontSize="md" fontFamily={globalConfig.font_family || "Arial"}>
-              {globalConfig.form_completion_paragraph || "We will get in touch with you shortly"}
-            </Text>
-          </ModalBody>
-        </ModalContent>
-      </Modal>
+          <ModalOverlay bg="rgba(0, 0, 0, 0.8)" /> 
+          <ModalContent
+            textAlign="center"
+            bg="bg.modal"
+            maxWidth="lg"  
+            p={8}          
+          >
+            <ModalCloseButton />
+            <ModalHeader
+              p={6}
+              display="flex"
+              flexDirection="column"
+              alignItems="center"
+            >
+              <Icon as={CheckCircleIcon} boxSize={12} color="primary" mb={4} /> {/* Larger icon */}
+              <Text fontSize="2xl" fontWeight="bold">
+                {globalConfig.form_completion_heading || "Thank you for submitting your information"}
+              </Text>
+            </ModalHeader>
+            <ModalBody pb={8}>
+              <Text color="text.secondary" fontSize="lg">
+                {globalConfig.form_completion_paragraph || "We will get in touch with you shortly"}
+              </Text>
+            </ModalBody>
+          </ModalContent>
+        </Modal>
     </Box>
   );
 };
