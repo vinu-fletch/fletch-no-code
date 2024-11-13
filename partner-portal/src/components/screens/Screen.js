@@ -97,7 +97,7 @@ const Screen = ({ screen, globalConfig, onContinue, onBack, isFirstScreen, isLas
   };
 
   return (
-    <Flex direction="column" minHeight="100vh" p={6} maxWidth="600px" margin="0 auto">
+    <Flex direction="column" minHeight="80vh" p={6} maxWidth="600px" margin="0 auto">
       <Box flex="1" pb="16">
         <Text fontSize={fontSizeMapping[screenConfig.heading_font_size] || "2xl"}  fontWeight={screenConfig.heading_font_weight || "bold"} color={headingColor || "text.primary"} textAlign="center" mb={4}>
           {heading}
