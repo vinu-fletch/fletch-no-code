@@ -50,8 +50,15 @@ const GlobalCustomization = () => {
   const [secondaryColor, setSecondaryColor] = useState("#555");
   const [bgColor, setBgColor] = useState("#fff");
   const [secondaryBgColor, setSecondaryBgColor] = useState("#f5f5f5");
+  const [fieldBgColor, setFieldBgColor] = useState("#f5f5f5");
+  const [modalBgColor, setModalBgColor] = useState("#f5f5f5");
   const [textPrimaryColor, setTextPrimaryColor] = useState("#000");
   const [textSecondaryColor, setTextSecondaryColor] = useState("#666");
+  const [textPlaceholderColor, setTextPlaceholderColor] = useState("#999");
+  const [textErrorColor, setTextErrorColor] = useState("#ff0000");
+  const [buttonPrimaryColor, setButtonPrimaryColor] = useState("#007bff");
+  const [buttonSecondaryColor, setButtonSecondaryColor] = useState("#6c757d");
+  const [fieldBorderColor, setFieldBorderColor] = useState("#ced4da");
   const [showColorPicker, setShowColorPicker] = useState({
     primaryColor: false,
     secondaryColor: false,
@@ -60,7 +67,9 @@ const GlobalCustomization = () => {
     textPrimaryColor: false,
     textSecondaryColor: false,
   });
-  const [spacingBetweenFields, setSpacingBetweenFields] = useState(4);
+  const [spacingBetweenFields, setSpacingBetweenFields] = useState("medium");
+  const [paddingInsideFields, setPaddingInsideFields] = useState("medium");
+  const [buttonPadding, setButtonPadding] = useState("medium");
   const [isResponsive, setIsResponsive] = useState(true);
 
   useEffect(() => {
@@ -81,10 +90,24 @@ const GlobalCustomization = () => {
       setFormCompletionParagraph(config.global_config?.form_completion_paragraph || "");
       setPrimaryColor(config.global_config?.primary_color || "#333");
       setSecondaryColor(config.global_config?.secondary_color || "#555");
-      setBgColor(config.global_config?.background_color || "#fff");
+      setBgColor(config.global_config?.primary_background_color || "#fff");
       setSecondaryBgColor(config.global_config?.secondary_background_color || "#f5f5f5");
+      setFieldBgColor(config.global_config?.field_background_color || "#f5f5f5");
+      setModalBgColor(config.global_config?.modal_background_color || "#f5f5f5");
+
       setTextPrimaryColor(config.global_config?.text_primary_color || "#000");
       setTextSecondaryColor(config.global_config?.text_secondary_color || "#666");
+      setTextPlaceholderColor(config.global_config?.text_placeholder_color || "#999");
+      setTextErrorColor(config.global_config?.text_error_color || "#ff0000");
+      setButtonPrimaryColor(config.global_config?.button_primary_color || "#007bff");
+      setButtonSecondaryColor(config.global_config?.button_secondary_color || "#6c757d");
+      setFieldBorderColor(config.global_config?.field_border_color || "#ced4da");
+
+      setSpacingBetweenFields(config.layout_config?.margin_between_fields || "medium");
+      setPaddingInsideFields(config.layout_config?.padding_inside_fields || "medium");
+      setButtonPadding(config.layout_config?.button_padding || "medium");
+      setIsResponsive(config.layout_config?.mobile_responsiveness || true);
+
     }
 
     // Close color pickers when clicking outside
@@ -178,14 +201,25 @@ const GlobalCustomization = () => {
                   </Select>
                 </FormControl>
 
-                <HStack spacing={4}>
+                <HStack flexWrap={"wrap"} spacing={4}>
                   {[
                     { label: "Primary Color", color: primaryColor, key: "primary_color", setColor: setPrimaryColor },
                     { label: "Secondary Color", color: secondaryColor, key: "secondary_color", setColor: setSecondaryColor },
-                    { label: "Primary Background Color", color: bgColor, key: "background_color", setColor: setBgColor },
+                    { label: "Primary Background Color", color: bgColor, key: "primary_background_color", setColor: setBgColor },
                     { label: "Secondary Background Color", color: secondaryBgColor, key: "secondary_background_color", setColor: setSecondaryBgColor },
+                    {
+                      label: "Field Background Color", color: fieldBgColor, key: "field_background_color", setColor: setFieldBgColor,
+                    },
+                    {
+                      label: "Modal Background Color", color: modalBgColor, key: "modal_background_color", setColor: setModalBgColor, 
+                    },
                     { label: "Text Primary Color", color: textPrimaryColor, key: "text_primary_color", setColor: setTextPrimaryColor },
                     { label: "Text Secondary Color", color: textSecondaryColor, key: "text_secondary_color", setColor: setTextSecondaryColor },
+                    {label:"Text Placeholder Color", color: textPlaceholderColor, key: "text_placeholder_color", setColor: setTextPlaceholderColor},
+                    {label: "Text Error Color", color: textErrorColor, key: "text_error_color", setColor: setTextErrorColor}, 
+                    {label: "Button Primary Color", color: buttonPrimaryColor, key: "button_primary_color", setColor: setButtonPrimaryColor},
+                    {label: "Button Secondary Color", color: buttonSecondaryColor, key: "button_secondary_color", setColor: setButtonSecondaryColor},
+                    {label: "Field Border Color", color: fieldBorderColor, key: "field_border_color", setColor: setFieldBorderColor},
                   ].map(({ label, color, key, setColor }) => (
                     <Box key={key}>
                       <FormLabel>{label}</FormLabel>
@@ -416,25 +450,71 @@ const GlobalCustomization = () => {
               </FormControl>
 
               <FormControl mt={4}>
-                <FormLabel>Spacing Between Fields</FormLabel>
+                <FormLabel>Margin Between Fields</FormLabel>
                 <Select
                   value={spacingBetweenFields}
                   onChange={(e) => {
-                    const value = parseInt(e.target.value, 10);
+                    const value = e.target.value
                     setSpacingBetweenFields(value);
                     updatePartnerDraft({
                       config: {
                         layout_config: {
                           ...config.layout_config,
-                          spacing_between_fields: value,
+                          margin_between_fields: value,
                         },
                       }
                       });
                   }}
                 >
-                  <option value={4}>Small</option>
-                  <option value={8}>Medium</option>
-                  <option value={12}>Large</option>
+                  <option value="small">Small</option>
+                  <option value="medium">Medium</option>
+                  <option value="large">Large</option>
+                </Select>
+              </FormControl>
+
+              <FormControl mt={4}>
+                <FormLabel>Padding inside Fields</FormLabel>
+                <Select
+                  value={paddingInsideFields}
+                  onChange={(e) => {
+                    const value = e.target.value
+                    setPaddingInsideFields(value);
+                    updatePartnerDraft({
+                      config: {
+                        layout_config: {
+                          ...config.layout_config,
+                          padding_inside_fields: value,
+                        },
+                      }
+                      });
+                  }}
+                >
+                  <option value="small">Small</option>
+                  <option value="medium">Medium</option>
+                  <option value="large">Large</option>
+                </Select>
+              </FormControl>
+
+              <FormControl mt={4}>
+                <FormLabel>Button Padding</FormLabel>
+                <Select
+                  value={buttonPadding}
+                  onChange={(e) => {
+                    const value = e.target.value
+                    setButtonPadding(value);
+                    updatePartnerDraft({
+                      config: {
+                        layout_config: {
+                          ...config.layout_config,
+                          button_padding: value,
+                        },
+                      }
+                      });
+                  }}
+                >
+                  <option value="small">Small</option>
+                  <option value="medium">Medium</option>
+                  <option value="large">Large</option>
                 </Select>
               </FormControl>
 
