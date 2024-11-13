@@ -5,9 +5,9 @@ import Pincode from "@/common-ui/pincode/pincode";
 import SSNField from "@/common-ui/ssn/ssn";  // Import the SSNField component
 
 const fontSizeMapping = {
-  small: "md",
-  medium: "lg",
-  large: "2xl",
+  small: "lg",
+  medium: "2xl",
+  large: "4xl",
 };
 
 const Screen = ({ screen, globalConfig, onContinue, onBack, isFirstScreen, isLastScreen }) => {
