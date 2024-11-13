@@ -1,4 +1,3 @@
-// theme.js
 import { extendTheme } from "@chakra-ui/react";
 
 const theme = extendTheme({
@@ -52,6 +51,22 @@ const theme = extendTheme({
     md: "4px",
     lg: "8px",
     full: "9999px",
+  },
+  components: {
+    Button: {
+      baseStyle: {
+        fontWeight: "bold",
+      },
+      variants: {
+        outline: {
+          borderColor: "primary.200",
+          color: "text.primary",
+          _hover: {
+            bg: "primary.100",
+          },
+        },
+      },
+    },
   },
 });
 

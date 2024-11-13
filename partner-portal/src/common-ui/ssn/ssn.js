@@ -41,7 +41,6 @@ const SSNField = forwardRef(({
           const { pattern, errorMessage } = rule.config;
           const formattedSSN = `${ssn.slice(0, 3).join("")}-${ssn.slice(3, 5).join("")}-${ssn.slice(5, 9).join("")}`;
 
-          console.log("Applying pattern:", pattern, "to formatted SSN:", formattedSSN);
 
           // Compile the regex to double-check pattern correctness
           const regex = new RegExp(pattern);
