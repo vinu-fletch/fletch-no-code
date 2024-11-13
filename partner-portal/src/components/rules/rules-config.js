@@ -94,9 +94,10 @@ const RuleConfig = ({ onSave, onCancel, initialRule }) => {
             bg="background.dark"
             color="text.primary"
           >
-            <option value="onKeyUp">onKeyUp</option>
-            <option value="onBlur">onBlur</option>
-            <option value="onSubmit">onSubmit</option>
+            <option value="onKeyUp">On Key Press</option>
+            <option value="onBlur">On Blur</option>
+            <option value="beforeSubmit">Before Button Submit</option>
+            <option value="onSubmit">After Button Submit</option>
           </Select>
         </FormControl>
 
