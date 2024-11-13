@@ -13,10 +13,10 @@ const fontSizeMapping = {
 const Screen = ({ screen, globalConfig, onContinue, onBack, isFirstScreen, isLastScreen }) => {
   const screenConfig = screen?.screen_config || {};
 
-  const heading = screenConfig.heading || globalConfig.default_heading || "Default Heading";
-  const headingColor = screenConfig.heading_color || globalConfig.primary_color || "#000";
-  const description = screenConfig.description || globalConfig.default_description || "Default description";
-  const descriptionColor = screenConfig.description_color || globalConfig.secondary_color || "#666";
+  const heading = screenConfig.heading;
+  const headingColor = screenConfig.heading_color;
+  const description = screenConfig.description;
+  const descriptionColor = screenConfig.description_color;
   const continueButtonText = screenConfig.continue_button_text || "Continue";
 
   const [fieldErrors, setFieldErrors] = useState({});
@@ -99,10 +99,10 @@ const Screen = ({ screen, globalConfig, onContinue, onBack, isFirstScreen, isLas
   return (
     <Flex direction="column" minHeight="100vh" p={6} maxWidth="600px" margin="0 auto">
       <Box flex="1" pb="16">
-        <Text fontSize={fontSizeMapping[screenConfig.heading_font_size] || "2xl"} fontWeight={screenConfig.heading_font_weight || "bold"} color={headingColor} textAlign="center" mb={4}>
+        <Text fontSize={fontSizeMapping[screenConfig.heading_font_size] || "2xl"}  fontWeight={screenConfig.heading_font_weight || "bold"} color={headingColor || "text.primary"} textAlign="center" mb={4}>
           {heading}
         </Text>
-        <Text fontSize={fontSizeMapping[screenConfig.description_font_size] || "md"} color={descriptionColor} textAlign="center" mb={8}>
+        <Text fontSize={fontSizeMapping[screenConfig.description_font_size] || "md"} color={descriptionColor || "text.secondary"} textAlign="center" mb={8}>
           {description}
         </Text>
         <VStack spacing={4} align="stretch">

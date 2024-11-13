@@ -107,7 +107,7 @@ export const ScreenSettings = ({ screens, activeScreenIndex, onUpdateScreen }) =
               <FormControl>
                 <FormLabel>Heading Font Size</FormLabel>
                 <Select
-                  value={screenConfig.heading_font_size || "medium"}
+                  value={screenConfig.heading_font_size || "large"}
                   onChange={(e) => {
                     const updatedScreens = [...screens];
                     updatedScreens[activeScreenIndex].screen_config = {
