@@ -90,10 +90,8 @@ async function updateCategoryStatus(partnerId, categoryName, isActive)  {
   }
 };
   
-// Main function to handle update or version creation
 async function updateOrCreatePartnerConfig(partnerId, configId, updates, createNewVersion) {
-  const underscoreUpdates = (updates); // Convert updates to underscore_case for DB
-  console.log("Config id", configId)
+  const underscoreUpdates = updates;
 
   if (createNewVersion) {
     const latestConfig = await prisma.partnerConfig.findFirst({
@@ -103,15 +101,68 @@ async function updateOrCreatePartnerConfig(partnerId, configId, updates, createN
 
     if (!latestConfig) throw new Error("No existing configuration found for this partner");
 
+    const newVersionNumber = latestConfig.version + 1;
+    const existingScreens = await prisma.screen.findMany({
+      where: {
+        id: { in: latestConfig.screen_ids },
+        configuration_version: latestConfig.version,
+      },
+      include: { fields: true },
+    });
+
+    const newScreenIds = [];
+
+    for (const screen of existingScreens) {
+      const { screen_config, fields, category_name } = screen;
+
+      // Step 1: Create screen without `field_ids`
+      const newScreen = await prisma.screen.create({
+        data: {
+          partner_id: partnerId,
+          category_name: category_name,
+          screen_config: screen_config,
+          is_active: screen.is_active,
+          configuration_version: newVersionNumber,
+        },
+      });
+      const newScreenId = newScreen.id;
+      newScreenIds.push(newScreenId);
+
+      const newFieldIds = [];
+
+      // Step 2: Clone each field and associate with the new screen
+      for (const field of fields) {
+        const newField = await prisma.field.create({
+          data: {
+            screen_id: newScreenId, // Link the cloned field to the newly created screen
+            type: field.type,
+            field_config: field.field_config,
+            is_active: field.is_active,
+            configuration_version: newVersionNumber,
+          },
+        });
+        newFieldIds.push(newField.id);
+      }
+
+      // Step 3: Update the screen with the new field IDs
+      await prisma.screen.update({
+        where: { id: newScreenId },
+        data: {
+          field_ids: newFieldIds,
+        },
+      });
+    }
+
+    // Step 4: Create the new partner configuration version with cloned screens
     return await prisma.partnerConfig.create({
       data: {
         partner_id: partnerId,
-        version: latestConfig.version + 1,
+        version: newVersionNumber,
         global_config: underscoreUpdates.global_config || latestConfig.global_config,
         header_config: underscoreUpdates.header_config || latestConfig.header_config,
         footer_config: underscoreUpdates.footer_config || latestConfig.footer_config,
         layout_config: underscoreUpdates.layout_config || latestConfig.layout_config,
-        screen_ids: latestConfig.screen_ids,
+        screen_ids: newScreenIds,
         created_at: new Date(),
         updated_at: new Date(),
       },

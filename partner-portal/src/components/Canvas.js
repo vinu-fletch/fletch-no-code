@@ -72,7 +72,7 @@ const Canvas = ({ screens, activeScreenIndex, onEditField }) => {
         <Text color="text.secondary">No fields added yet.</Text>
       ) : (
         <List
-          values={currentScreen.fields}
+          values={currentScreen?.fields}
           onChange={handleFieldOrderChange}
           renderList={({ children, props }) => (
             <VStack align="stretch" spacing={3} {...props}>

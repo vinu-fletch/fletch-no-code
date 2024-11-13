@@ -45,11 +45,11 @@ const ScreensManager = () => {
       />
 
       {/* Completion Modal */}
-      <Modal isOpen={isSubmitted} onClose={handleClose} isCentered>
+      <Modal bg="bg.modal" isOpen={isSubmitted} onClose={handleClose} isCentered>
           <ModalOverlay bg="rgba(0, 0, 0, 0.8)" /> 
           <ModalContent
             textAlign="center"
-            bg="bg.modal"
+            
             maxWidth="lg"  
             p={8}          
           >
