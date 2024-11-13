@@ -24,6 +24,7 @@ import {
 import { useState, useEffect } from "react";
 import { usePartnerStore } from "../store";
 import { ChromePicker } from "react-color";
+import { Preview } from "./preview/preview";
 
 const GlobalCustomization = () => {
   const partnerDraft = usePartnerStore((state) => state.partnerDraft);
@@ -42,6 +43,10 @@ const GlobalCustomization = () => {
   const [footerText, setFooterText] = useState("");
   const [layoutPercentage, setLayoutPercentage] = useState(60);
   const [fontFamily, setFontFamily] = useState("Arial");
+
+  // Preview
+    const [isPreviewOpen, setPreviewOpen] = useState(false);
+
 
   // New fields
   const [formCompletionHeading, setFormCompletionHeading] = useState("");
@@ -147,21 +152,28 @@ const GlobalCustomization = () => {
 
   return (
     <Box p={8} bg="black" minHeight="100vh">
-      <Flex justifyContent="space-between" alignItems="center" mb={6}>
-        <Heading>Global Customization</Heading>
+      <Flex justifyContent="start" alignItems="center" mb={6}>
+        <Heading mr={8}>Global Customization</Heading>
+        <HStack spacing={4}>
+          <Button colorScheme="yellow" onClick={() => setPreviewOpen(true)}>
+              Preview
+          </Button>
         {hasUnsavedChanges && (
-          <HStack spacing={4}>
-            <Button colorScheme="green" onClick={() => savePartnerDraft(false)}>
-              Save
-            </Button>
-            <Button colorScheme="blue" onClick={() => savePartnerDraft(true)}>
-              Save as New Version
-            </Button>
-            <Button colorScheme="red" onClick={discardPartnerDraft}>
-              Discard
-            </Button>
-          </HStack>
+            <>
+              
+              <Button colorScheme="green" onClick={() => savePartnerDraft(false)}>
+                Save
+              </Button>
+              <Button colorScheme="blue" onClick={() => savePartnerDraft(true)}>
+                Save as New Version
+              </Button>
+              <Button colorScheme="red" onClick={discardPartnerDraft}>
+                Discard
+              </Button>
+            </>
+         
         )}
+         </HStack>
       </Flex>
 
       <Box bg="black" p={6} rounded="md" shadow="md">
@@ -543,6 +555,11 @@ const GlobalCustomization = () => {
           </AccordionItem>
         </Accordion>
       </Box>
+      {/* Prevents overriding of theme */}
+      {
+        isPreviewOpen && <Preview isOpen={isPreviewOpen} onClose={() => setPreviewOpen(false)} />
+      }
+      
     </Box>
   );
 };

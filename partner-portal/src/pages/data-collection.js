@@ -16,6 +16,7 @@ import { usePartnerStore } from "../store";
 import { ConfirmationModal } from "../components/modal/ConfirmationModal";
 import { ScreenSettings } from "@/components/ScreenSettings";
 import { CategoryToggle } from "../components/CategoryToggle";
+import { Preview } from "@/components/preview/preview";
 
 const DataCollectionFormBuilderPage = ({ globalSettings }) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
@@ -34,8 +35,7 @@ const DataCollectionFormBuilderPage = ({ globalSettings }) => {
 
   const categoryName = "Data Collection";
 
-  console.log("Partner draft is", partnerDraft);
-
+  const [isPreviewOpen, setIsPreviewOpen] = useState(false);
   // Initialize partnerDraft as a deep copy of partnerData
   useEffect(() => {
     if (partnerData) {
@@ -123,7 +123,7 @@ const DataCollectionFormBuilderPage = ({ globalSettings }) => {
 
       <Flex direction="column" minHeight="100vh">
         <Flex
-          justify="space-between"
+          justify="start"
           align="center"
           bg="primary.300"
           color="text.primary"
@@ -134,16 +134,22 @@ const DataCollectionFormBuilderPage = ({ globalSettings }) => {
             isEnabled={categoryEnabled}
             onToggle={handleCategoryToggle}
           />
+          <Flex gap={3}>
+            <Button onClick={() => setIsPreviewOpen(true)} colorScheme="yellow">
+                Preview
+            </Button>
           {hasUnsavedChanges && (
-            <Flex gap={3}>
+              <>  
               <Button onClick={handleSave} colorScheme="teal">
                 Save
               </Button>
               <Button onClick={handleDiscard} colorScheme="red">
                 Discard
               </Button>
-            </Flex>
+              </>
+           
           )}
+           </Flex>
         </Flex>
 
         {partnerDraft?.screens && (
@@ -200,6 +206,10 @@ const DataCollectionFormBuilderPage = ({ globalSettings }) => {
           categoryEnabled ? "disable" : "enable"
         } ${categoryName}?`}
       />
+
+      {isPreviewOpen && (
+        <Preview isOpen={true} onClose={() => setIsPreviewOpen(false)} />
+      )}
     </Layout>
   );
 };

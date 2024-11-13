@@ -105,28 +105,16 @@ const Layout = ({ children }) => {
             >
               Payment
             </Button>
-            <Button
-              variant={isPreview ? "outline" : "solid"}
-              colorScheme="primary"
-              onClick={() => handleNavigation("/preview")}
-            >
-              Preview
-            </Button>
           </VStack>
         </Box>
 
         {/* Main Content */}
-        {
-          isPreview ? (
-            <Box flex="1">
-              {children}
-            </Box>
-          ) : (
+ 
             <Box flex="1" bg="background.light" color="text.primary" p={8}>
               {children}
             </Box>
-          )
-        }
+          
+        
       </Flex>
     </Flex>
   );

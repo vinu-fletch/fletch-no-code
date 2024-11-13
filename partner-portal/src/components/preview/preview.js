@@ -3,15 +3,16 @@
 import React from 'react';
 import { usePartnerStore } from '../../store';
 import Head from 'next/head';
-import { Box, ChakraProvider, extendTheme } from '@chakra-ui/react';
+import { Box, ChakraProvider, extendTheme, Modal, ModalOverlay, ModalContent, ModalHeader, ModalCloseButton, ModalBody, ModalFooter, Button } from '@chakra-ui/react';
 import Layout from '@/components/Layout';
 import Header from '@/common-ui/header/header';
 import Footer from '@/common-ui/footer/footer';
 import ScreensManager from '../../components/screens/ScreensManager';
 
-const Preview = () => {
+export const Preview = ({ isOpen, onClose }) => {
   const partnerDraft = usePartnerStore((state) => state.partnerDraft);
 
+  // Destructure necessary configurations from partnerDraft
   const {
     config: {
       global_config = {},
@@ -21,7 +22,6 @@ const Preview = () => {
     } = {},
   } = partnerDraft || {};
 
-  // Construct the theme object
   const theme = extendTheme({
     colors: {
       primary: global_config.primary_color || "#333",
@@ -37,7 +37,7 @@ const Preview = () => {
         secondary: global_config.text_secondary_color || "#666",
         placeholder: global_config.text_placeholder_color || "#888",
         error: global_config.text_error_color || "#ff0000",
-        success: "#5cb85c", // Define as default or optional field
+        success: "#5cb85c",
       },
       button: {
         primary: global_config.button_primary_color || "#007bff",
@@ -49,7 +49,7 @@ const Preview = () => {
       padding: {
         field: layout_config.padding_inside_fields === "small" ? "8px" :
                layout_config.padding_inside_fields === "large" ? "16px" : "12px",
-        section: "16px", // Fixed default or other based on config
+        section: "16px",
       },
       margin: {
         field: layout_config.margin_between_fields === "small" ? "4px" :
@@ -67,49 +67,54 @@ const Preview = () => {
 
   return (
     <ChakraProvider theme={theme}>
-      <Layout>
-        <Head>
-          <style>
-            {`
-              body {
-                font-family: '${global_config.font_family || "Arial"}', sans-serif;
-              }
-            `}
-          </style>
-        </Head>
+      <Modal isOpen={isOpen} onClose={onClose} size="full">
+        <ModalOverlay />
+        <ModalContent>
+          <ModalHeader>Preview</ModalHeader>
+          <ModalCloseButton />
+          <ModalBody p={0}>
+              <Head>
+                <style>
+                  {`
+                    body {
+                      font-family: '${global_config.font_family || "Arial"}', sans-serif;
+                    }
+                  `}
+                </style>
+              </Head>
 
-        <Box
-          bgColor={theme.colors.background.primary}
-          minHeight="100vh"
-          display="flex"
-          flexDirection="column"
-        >
-          {/* Header */}
-          <Header
-            logoLink={header_config.logo_link}
-            logoWidth={header_config.logo_width}
-            logoHeight={header_config.logo_height}
-            logoAlignment={header_config.logo_alignment}
-          />
+              <Box
+                bgColor={theme.colors.background.primary}
+                minHeight="100vh"
+                display="flex"
+                flexDirection="column"
+              >
+                {/* Header */}
+                <Header
+                  logoLink={header_config.logo_link}
+                  logoWidth={header_config.logo_width}
+                  logoHeight={header_config.logo_height}
+                  logoAlignment={header_config.logo_alignment}
+                />
 
-          {/* Main Content */}
-          <Box
-            flex="1"
-            fontFamily={theme.fonts.body}
-            color={theme.colors.text.primary}
-            maxWidth={`${layout_config.layout_percentage || 60}%`}
-            margin="0 auto"
-            p={theme.spacing.padding.section}
-          >
-            <ScreensManager />
-          </Box>
+                {/* Main Content */}
+                <Box
+                  flex="1"
+                  fontFamily={theme.fonts.body}
+                  color={theme.colors.text.primary}
+                  maxWidth={`${layout_config.layout_percentage || 60}%`}
+                  margin="0 auto"
+                  p={theme.spacing.padding.section}
+                >
+                  <ScreensManager />
+                </Box>
 
-          {/* Footer */}
-          <Footer footerText={footer_config.footer_text || "<div>Thank you for visiting!</div>"} color={theme.colors.text.primary} />
-        </Box>
-      </Layout>
+                {/* Footer */}
+                <Footer footerText={footer_config.footer_text || "<div>Thank you for visiting!</div>"} color={theme.colors.text.primary} />
+              </Box>
+          </ModalBody>
+        </ModalContent>
+      </Modal>
     </ChakraProvider>
   );
 };
-
-export default Preview;

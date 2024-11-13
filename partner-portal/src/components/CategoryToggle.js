@@ -16,7 +16,7 @@ export const CategoryToggle = ({ title, isEnabled, onToggle }) => {
     <Box bg="primary.300" color="text.primary" p={4}>
       <Flex alignItems="center" justifyContent="space-around">
         <Flex alignItems="center">
-          <Heading minW="400px" mr={12} size="lg">
+          <Heading minW="250px" mr={12} size="lg">
             {title}
           </Heading>
         </Flex>
