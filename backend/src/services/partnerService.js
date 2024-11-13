@@ -199,9 +199,9 @@ async function saveScreens(partnerId, configurationVersionString, categoryName, 
       let screenId;
 
       if (id) {
-        // Update existing screen
+        // Update existing screen with configuration version
         await prisma.screen.update({
-          where: { id },
+          where: { id, configuration_version: configurationVersion },
           data: {
             screen_config: screen_config || {},
             is_active: true,
@@ -228,10 +228,11 @@ async function saveScreens(partnerId, configurationVersionString, categoryName, 
       // Process fields for this screen
       const inputFields = fields || [];
 
-      // Fetch existing field IDs for this screen
+      // Fetch existing field IDs for this screen with the same configuration version
       const existingFields = await prisma.field.findMany({
         where: {
           screen_id: screenId,
+          configuration_version: configurationVersion,
         },
         select: { id: true },
       });
@@ -245,9 +246,9 @@ async function saveScreens(partnerId, configurationVersionString, categoryName, 
         const { attributes, rules } = field_config || {};
 
         if (fieldId) {
-          // Update existing field
+          // Update existing field with configuration version
           await prisma.field.update({
-            where: { id: fieldId },
+            where: { id: fieldId, configuration_version: configurationVersion },
             data: {
               type: type || undefined,
               field_config: {
@@ -276,36 +277,39 @@ async function saveScreens(partnerId, configurationVersionString, categoryName, 
         }
       }
 
-      // Delete fields not in the new fieldIds (hard delete)
+      // Delete fields not in the new fieldIds (hard delete) for this configuration version
       const fieldsToDelete = existingFieldIds.filter((id) => !fieldIds.includes(id));
       if (fieldsToDelete.length > 0) {
         await prisma.field.deleteMany({
           where: {
             id: { in: fieldsToDelete },
+            configuration_version: configurationVersion,
           },
         });
       }
 
-      // Update screen with ordered field_ids
+      // Update screen with ordered field_ids for this configuration version
       await prisma.screen.update({
-        where: { id: screenId },
+        where: { id: screenId, configuration_version: configurationVersion },
         data: { field_ids: fieldIds },
       });
     }
 
-    // Delete screens not in the new screenIds (hard delete)
+    // Delete screens not in the new screenIds (hard delete) for this configuration version
     const screensToDelete = existingScreenIds.filter((id) => !screenIds.includes(id));
     if (screensToDelete.length > 0) {
-      // Also delete fields associated with these screens
+      // Also delete fields associated with these screens for this configuration version
       await prisma.field.deleteMany({
         where: {
           screen_id: { in: screensToDelete },
+          configuration_version: configurationVersion,
         },
       });
 
       await prisma.screen.deleteMany({
         where: {
           id: { in: screensToDelete },
+          configuration_version: configurationVersion,
         },
       });
     }
@@ -320,10 +324,11 @@ async function saveScreens(partnerId, configurationVersionString, categoryName, 
       },
     });
 
-    // Fetch and return the updated list of screens with fields
+    // Fetch and return the updated list of screens with fields for this configuration version
     const updatedScreensList = await prisma.screen.findMany({
       where: {
         id: { in: screenIds },
+        configuration_version: configurationVersion,
       },
       include: { fields: true },
     });
