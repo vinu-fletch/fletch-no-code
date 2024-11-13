@@ -11,11 +11,11 @@ import {
 const SSNField = ({
   label,
   required = false,
-  borderColor = "gray.300",
+  borderColor,
   boxHeight = "40px",
+  boxWidth = "40px",
   borderRadius = "md",
-  backgroundColor = "white",
-  errorColor = "red.500",
+  backgroundColor,
   rules = [],
   onValidate,
 }) => {
@@ -95,14 +95,14 @@ const SSNField = ({
               maxLength={1}
               textAlign="center"
               height={boxHeight}
-              width="40px"
-              borderColor={borderColor}
-              backgroundColor={backgroundColor}
+              width={boxWidth}
+              borderColor={borderColor || "colors.fieldBorder"}
+              backgroundColor={backgroundColor || "background.field"}
               borderRadius={borderRadius}
             />
             {/* Add dashes after the 3rd and 5th boxes */}
             {(index === 2 || index === 4) && (
-              <Text fontSize="lg" color="black">
+              <Text fontSize="lg" color="text.primary">
                 -
               </Text>
             )}
@@ -110,7 +110,7 @@ const SSNField = ({
         ))}
       </HStack>
       {error && (
-        <Text fontSize="sm" color={errorColor} mt={1}>
+        <Text fontSize="sm" color="text.error" mt={1}>
           {error}
         </Text>
       )}

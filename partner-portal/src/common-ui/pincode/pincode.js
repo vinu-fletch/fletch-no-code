@@ -12,15 +12,14 @@ const Pincode = ({
   id,
   placeholder,
   required = false,
-  backgroundColor = "white",
-  textColor = "black",
-  borderColor = "gray.300",
-  borderRadius = "md",
-  fontSize = "md",
-  fontWeight = "normal",
-  width = "100%",
-  height = "auto",
-  errorColor = "red.500",
+  backgroundColor,
+  textColor,
+  borderColor,
+  borderRadius,
+  fontSize,
+  fontWeight,
+  width,
+  height,
   rules = [],
   onValidate,
 }) => {
@@ -111,7 +110,7 @@ const Pincode = ({
         <FormLabel
           fontSize={fontSizeMapping[fontSize] || "md"}
           fontWeight={fontWeight}
-          color={textColor}
+          color={textColor || "text.secondary"}
         >
           {label}
         </FormLabel>
@@ -127,17 +126,17 @@ const Pincode = ({
         {...(hasOnBlurRule && { onBlur: handleBlur })}
         {...(hasOnFocusRule && { onFocus: handleFocus })}
         {...(hasOnKeyPressRule && { onKeyPress: handleKeyPress })}
-        bg={backgroundColor}
+        bg={backgroundColor || "bg.field"}
         color={textColor}
         borderRadius={radiusMapping[borderRadius] || "md"}
         width={width}
         height={height}
         borderColor={borderColor}
-        _placeholder={{ color: textColor }}
+        _placeholder={{ color: "text.placeholder" }}
       />
       
       {error && (
-        <Text fontSize="sm" color={errorColor} mt={1}>
+        <Text fontSize="sm" color="text.error" mt={1}>
           {error}
         </Text>
       )}

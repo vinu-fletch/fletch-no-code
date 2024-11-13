@@ -28,6 +28,8 @@ const Screen = ({ screen, globalConfig, onContinue, onBack, isFirstScreen, isLas
 
   const hasErrors = Object.values(fieldErrors).some((error) => error);
 
+  console.log("Screen Fields:", screen);
+
   const handleApiCall = async (rule, fieldValue) => {
     const { url, method, headers, body, responseDataPath, expectedValue, expectedValueType, errorMessage } = rule.config;
 
@@ -107,7 +109,7 @@ const Screen = ({ screen, globalConfig, onContinue, onBack, isFirstScreen, isLas
         </Text>
         <VStack spacing={4} align="stretch">
           {screen?.fields?.map((field, index) => (
-            <Box key={field.id || index} p={4} border="1px solid" borderColor="gray.300" borderRadius="md">
+            <Box key={field.id || index} p={4}>
               {field.type === "pincode" ? (
                 <Pincode
                   id={`field-${field.id}`}
@@ -130,11 +132,11 @@ const Screen = ({ screen, globalConfig, onContinue, onBack, isFirstScreen, isLas
                   id={`field-${field.id}`}
                   label={field.field_config?.attributes?.label || "Social Security Number"}
                   required={field.field_config?.attributes?.required || false}
-                  borderColor={field.field_config?.attributes?.borderColor || globalConfig.border_color}
-                  fieldHeight={field.field_config?.attributes?.fieldHeight || "50px"}
-                  borderRadius={field.field_config?.attributes?.borderRadius || globalConfig.default_border_radius}
-                  backgroundColor={field.field_config?.attributes?.backgroundColor || globalConfig.primary_background_color}
-                  errorColor="red.500"
+                  borderColor={field.field_config?.attributes?.borderColor}
+                  boxHeight={field.field_config?.attributes?.fieldHeight}
+                  boxWidth={field.field_config?.attributes?.fieldWidth}
+                  borderRadius={field.field_config?.attributes?.borderRadius}
+                  backgroundColor={field.field_config?.attributes?.backgroundColor}
                   rules={field.field_config?.rules || []}
                   onValidate={(isValid) => handleFieldValidation(field.id || index, isValid)}
                 />

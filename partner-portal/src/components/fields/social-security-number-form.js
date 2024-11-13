@@ -170,6 +170,18 @@ const SocialSecurityNumberConfig = ({
                   </FormControl>
 
                   <FormControl>
+                    <FormLabel>Width of Individual Fields</FormLabel>
+                    <Input
+                      name="fieldWidth"
+                      value={fieldAttributes.fieldWidth || ""}
+                      onChange={handleInputChange}
+                      placeholder="e.g., 50px"
+                      bg="gray.700"
+                      color="white"
+                    />
+                  </FormControl>
+
+                  <FormControl>
                     <FormLabel>Border Radius</FormLabel>
                     <Input
                       name="borderRadius"
