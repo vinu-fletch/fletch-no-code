@@ -8,13 +8,13 @@ async function getPartnerByName(name, version = null) {
       include: {
         configs: {
           ...(version
-            ? { where: { version } }                         // Filter by specific version if provided
-            : { orderBy: { version: 'desc' }, take: 1 }),    // Otherwise, retrieve the latest version
+            ? { where: { version } }                         
+            : { orderBy: { version: 'desc' }, take: 1 }),    
         },
         categories: true,
         screens: {
           include: {
-            fields: true,  // Include fields related to each screen
+            fields: true,  
           },
         },
       }
@@ -24,7 +24,7 @@ async function getPartnerByName(name, version = null) {
       const config = partner.configs[0] || null;
       const screenIdsOrder = config?.screen_ids || [];
 
-      // Ensure screens structure includes fields for each screen
+      
       let screens = partner.screens.length ? partner.screens : [{
         name: "Screen 1",
         backgroundColor: "",
@@ -35,10 +35,10 @@ async function getPartnerByName(name, version = null) {
         screen_config: {},
       }];
 
-      // Sort screens based on the screen_ids in config
+      
       screens = screens
-        .filter(screen => screenIdsOrder.includes(screen.id))  // Include only screens listed in screen_ids
-        .sort((a, b) => screenIdsOrder.indexOf(a.id) - screenIdsOrder.indexOf(b.id)); // Sort by screen_ids order
+        .filter(screen => screenIdsOrder.includes(screen.id))  
+        .sort((a, b) => screenIdsOrder.indexOf(a.id) - screenIdsOrder.indexOf(b.id)); 
 
       return {
         id: partner.id,
@@ -60,7 +60,7 @@ async function getPartnerByName(name, version = null) {
         } : null,
         screens: screens.map(screen => ({
           ...screen,
-          fields: screen.fields || [],  // Ensure each screen has a fields property
+          fields: screen.fields || [],  
         })),
         categories: partner.categories,
       };
@@ -115,7 +115,7 @@ async function updateOrCreatePartnerConfig(partnerId, configId, updates, createN
     for (const screen of existingScreens) {
       const { screen_config, fields, category_name } = screen;
 
-      // Step 1: Create screen without `field_ids`
+      
       const newScreen = await prisma.screen.create({
         data: {
           partner_id: partnerId,
@@ -130,11 +130,11 @@ async function updateOrCreatePartnerConfig(partnerId, configId, updates, createN
 
       const newFieldIds = [];
 
-      // Step 2: Clone each field and associate with the new screen
+      
       for (const field of fields) {
         const newField = await prisma.field.create({
           data: {
-            screen_id: newScreenId, // Link the cloned field to the newly created screen
+            screen_id: newScreenId, 
             type: field.type,
             field_config: field.field_config,
             is_active: field.is_active,
@@ -144,7 +144,7 @@ async function updateOrCreatePartnerConfig(partnerId, configId, updates, createN
         newFieldIds.push(newField.id);
       }
 
-      // Step 3: Update the screen with the new field IDs
+      
       await prisma.screen.update({
         where: { id: newScreenId },
         data: {
@@ -153,7 +153,7 @@ async function updateOrCreatePartnerConfig(partnerId, configId, updates, createN
       });
     }
 
-    // Step 4: Create the new partner configuration version with cloned screens
+    
     return await prisma.partnerConfig.create({
       data: {
         partner_id: partnerId,
@@ -188,7 +188,7 @@ async function updateOrCreatePartnerConfig(partnerId, configId, updates, createN
 }
 
 
-// Service to delete a partner by ID
+
 async function deletePartner(id) {
   return await prisma.partner.delete({
     where: { id },
@@ -206,7 +206,7 @@ async function getScreens(partnerId) {
 async function saveScreens(partnerId, configurationVersionString, categoryName, screens) {
   const configurationVersion = parseInt(configurationVersionString, 10);
 
-  // Step 1: Validate partner and partnerConfig
+  
   const partner = await prisma.partner.findUnique({
     where: { id: partnerId },
   });
@@ -228,11 +228,11 @@ async function saveScreens(partnerId, configurationVersionString, categoryName, 
     );
   }
 
-  // Step 2: Process screens and fields within a transaction
+  
   return await prisma.$transaction(async (prisma) => {
-    const screenIds = []; // List to collect screen IDs in order
+    const screenIds = []; 
 
-    // Fetch existing screen IDs for this partner, category, and configuration version
+    
     const existingScreens = await prisma.screen.findMany({
       where: {
         partner_id: partnerId,
@@ -250,7 +250,7 @@ async function saveScreens(partnerId, configurationVersionString, categoryName, 
       let screenId;
 
       if (id) {
-        // Update existing screen with configuration version
+        
         await prisma.screen.update({
           where: { id, configuration_version: configurationVersion },
           data: {
@@ -262,7 +262,7 @@ async function saveScreens(partnerId, configurationVersionString, categoryName, 
         screenId = id;
         screenIds.push(screenId);
       } else {
-        // Create new screen and get its assigned ID
+        
         const createdScreen = await prisma.screen.create({
           data: {
             partner_id: partnerId,
@@ -276,10 +276,10 @@ async function saveScreens(partnerId, configurationVersionString, categoryName, 
         screenIds.push(screenId);
       }
 
-      // Process fields for this screen
+      
       const inputFields = fields || [];
 
-      // Fetch existing field IDs for this screen with the same configuration version
+      
       const existingFields = await prisma.field.findMany({
         where: {
           screen_id: screenId,
@@ -289,7 +289,7 @@ async function saveScreens(partnerId, configurationVersionString, categoryName, 
       });
       const existingFieldIds = existingFields.map((field) => field.id);
 
-      const fieldIds = []; // To keep track of field IDs for this screen
+      const fieldIds = []; 
 
       for (let j = 0; j < inputFields.length; j++) {
         const field = inputFields[j];
@@ -297,7 +297,7 @@ async function saveScreens(partnerId, configurationVersionString, categoryName, 
         const { attributes, rules } = field_config || {};
 
         if (fieldId) {
-          // Update existing field with configuration version
+          
           await prisma.field.update({
             where: { id: fieldId, configuration_version: configurationVersion },
             data: {
@@ -311,7 +311,7 @@ async function saveScreens(partnerId, configurationVersionString, categoryName, 
           });
           fieldIds.push(fieldId);
         } else {
-          // Create new field
+          
           const createdField = await prisma.field.create({
             data: {
               screen_id: screenId,
@@ -328,7 +328,7 @@ async function saveScreens(partnerId, configurationVersionString, categoryName, 
         }
       }
 
-      // Delete fields not in the new fieldIds (hard delete) for this configuration version
+      
       const fieldsToDelete = existingFieldIds.filter((id) => !fieldIds.includes(id));
       if (fieldsToDelete.length > 0) {
         await prisma.field.deleteMany({
@@ -339,17 +339,17 @@ async function saveScreens(partnerId, configurationVersionString, categoryName, 
         });
       }
 
-      // Update screen with ordered field_ids for this configuration version
+      
       await prisma.screen.update({
         where: { id: screenId, configuration_version: configurationVersion },
         data: { field_ids: fieldIds },
       });
     }
 
-    // Delete screens not in the new screenIds (hard delete) for this configuration version
+    
     const screensToDelete = existingScreenIds.filter((id) => !screenIds.includes(id));
     if (screensToDelete.length > 0) {
-      // Also delete fields associated with these screens for this configuration version
+      
       await prisma.field.deleteMany({
         where: {
           screen_id: { in: screensToDelete },
@@ -365,7 +365,7 @@ async function saveScreens(partnerId, configurationVersionString, categoryName, 
       });
     }
 
-    // Update partnerConfig.screen_ids
+    
     await prisma.partnerConfig.update({
       where: {
         id: partnerConfig.id,
@@ -375,7 +375,7 @@ async function saveScreens(partnerId, configurationVersionString, categoryName, 
       },
     });
 
-    // Fetch and return the updated list of screens with fields for this configuration version
+    
     const updatedScreensList = await prisma.screen.findMany({
       where: {
         id: { in: screenIds },
@@ -384,7 +384,7 @@ async function saveScreens(partnerId, configurationVersionString, categoryName, 
       include: { fields: true },
     });
 
-    // Ensure the screens are returned in the correct order
+    
     const orderedScreens = screenIds.map((id) =>
       updatedScreensList.find((screen) => screen.id === id)
     );
@@ -396,7 +396,7 @@ async function saveScreens(partnerId, configurationVersionString, categoryName, 
   });
 }
 
-// Delete a screen (soft delete by marking inactive)
+
 async function deleteScreen(screenId) {
   return await prisma.screen.update({
     where: { id: screenId },
@@ -405,7 +405,7 @@ async function deleteScreen(screenId) {
 }
 
  async function getPartnerConfigurations (partnerName) {
-    // Fetch the partner by name to get the partner ID
+    
     const partner = await prisma.partner.findUnique({
       where: { name: partnerName },
       select: { id: true },
@@ -415,7 +415,7 @@ async function deleteScreen(screenId) {
       throw new Error(`Partner with name ${partnerName} not found`);
     }
 
-    // Fetch the last 10 configurations, ordered by version descending
+    
     const configurations = await prisma.partnerConfig.findMany({
       where: { partner_id: partner.id },
       orderBy: { version: 'desc' },
@@ -423,7 +423,7 @@ async function deleteScreen(screenId) {
       select: {
         version: true,
         created_at: true,
-        // Include any other fields you need
+        
       },
     });
 

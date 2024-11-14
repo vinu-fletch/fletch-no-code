@@ -1,7 +1,7 @@
 const partnerService = require('../services/partnerService');
 
 
-// Controller to get a partner by name
+
 async function getPartnerByName(req, res) {
   try {
     const { name } = req.params;
@@ -18,22 +18,22 @@ async function getPartnerByName(req, res) {
   }
 }
 
-// Controller to update a partner by ID
+
 async function updatePartnerConfig(req, res) {
-  const { id } = req.params; // The `PartnerConfig` ID for updating
+  const { id } = req.params; 
   const {partnerId} = req.body;
   const { createNewVersion, config } = req.body;
   const { global_config, header_config, footer_config, layout_config } = config;
 
   try {
-    // Collect only provided fields in updates object
+    
     const updates = {};
     if (global_config) updates.global_config = global_config;
     if (header_config) updates.header_config = header_config;
     if (footer_config) updates.footer_config = footer_config;
     if (layout_config) updates.layout_config = layout_config;
 
-    // Call service to handle either update or new version creation
+    
     const updatedConfig = await partnerService.updateOrCreatePartnerConfig(
       partnerId,
       config.id,
@@ -41,7 +41,7 @@ async function updatePartnerConfig(req, res) {
       createNewVersion
     );
 
-    // Return 201 status for new version creation, 200 for update
+    
     res.status(createNewVersion ? 201 : 200).json(updatedConfig);
   } catch (error) {
     console.error("Error updating partner configuration:", error);
@@ -49,7 +49,7 @@ async function updatePartnerConfig(req, res) {
   }
 }
 
-// Controller to delete a partner by ID
+
 async function deletePartner(req, res) {
   try {
     await partnerService.deletePartner(req.params.id);
@@ -61,7 +61,7 @@ async function deletePartner(req, res) {
 
 async function updateCategoryStatus(req, res)  {
   const { categoryName } = req.params;
-  const { partnerId, isActive } = req.body; // partnerId and isActive will come from the request body
+  const { partnerId, isActive } = req.body; 
 
   try {
     const updatedCategory = await partnerService.updateCategoryStatus(partnerId, categoryName, isActive);
@@ -89,7 +89,7 @@ async function saveScreens (req, res)  {
   }
 };
 
-// Delete a screen
+
 async function deleteScreen(req, res) {
   try {
     await partnerService.deleteScreen(req.params.screenId);

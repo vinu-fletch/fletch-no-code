@@ -44,7 +44,7 @@ const PincodeFieldConfig = ({
   const [editingRuleIndex, setEditingRuleIndex] = useState(null);
   const [showRuleConfig, setShowRuleConfig] = useState(false);
 
-  // Initialize form fields with fieldData only once when fieldData changes
+  
   useEffect(() => {
     if (fieldData.field_config) {
       setFieldAttributes(fieldData.field_config.attributes || {});

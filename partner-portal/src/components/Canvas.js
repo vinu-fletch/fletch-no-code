@@ -25,14 +25,14 @@ const Canvas = ({ screens, activeScreenIndex, onEditField }) => {
       (id) => id !== fieldId
     );
 
-    // Create a new screens array with updated fields and field_ids for the active screen
+    
     const updatedScreens = screens.map((screen, idx) =>
       idx === activeScreenIndex
         ? { ...screen, fields: updatedFields, field_ids: updatedFieldIds }
         : screen
     );
 
-    // Update partnerDraft with updated screens
+    
     updatePartnerDraft({ screens: updatedScreens });
   };
 
@@ -40,14 +40,14 @@ const Canvas = ({ screens, activeScreenIndex, onEditField }) => {
     const updatedFields = arrayMove(currentScreen.fields, oldIndex, newIndex);
     const updatedFieldIds = updatedFields.map((field) => field.id);
 
-    // Create a new screens array with updated fields and field_ids for the active screen
+    
     const updatedScreens = screens.map((screen, idx) =>
       idx === activeScreenIndex
         ? { ...screen, fields: updatedFields, field_ids: updatedFieldIds }
         : screen
     );
 
-    // Update partnerDraft with updated screens
+    
     updatePartnerDraft({ screens: updatedScreens });
   };
 

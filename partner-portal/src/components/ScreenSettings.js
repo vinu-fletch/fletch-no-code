@@ -17,7 +17,7 @@ import { ChromePicker } from "react-color";
 export const ScreenSettings = ({ screens, activeScreenIndex, onUpdateScreen }) => {
   const [showColorPicker, setShowColorPicker] = useState({ background: false, heading: false, description: false });
 
-  // Extract screen_config from the active screen
+  
   const activeScreen = screens[activeScreenIndex];
   const screenConfig = activeScreen?.screen_config || {};
 

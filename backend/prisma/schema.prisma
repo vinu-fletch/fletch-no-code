@@ -22,7 +22,7 @@ model Partner {
 
   @@unique([name])
 
-  @@map("partner") // Map to the "partner" table in the DB
+  @@map("partner") 
 }
 
 model Category {
@@ -37,7 +37,7 @@ model Category {
   screens Screen[]
 
   @@unique([partner_id, name])
-  @@map("category") // Map to the "category" table in the DB
+  @@map("category") 
 }
 
 model PartnerConfig {
@@ -54,7 +54,7 @@ model PartnerConfig {
   created_at    DateTime @default(now())
   updated_at    DateTime @updatedAt
 
-  @@map("partnerconfig") // Map to the "partnerconfig" table in the DB
+  @@map("partnerconfig") 
 }
 
 model Screen {
@@ -63,14 +63,14 @@ model Screen {
   partner               Partner  @relation(fields: [partner_id], references: [id], onDelete: Cascade)
   category_name         String
   category              Category @relation(fields: [partner_id, category_name], references: [partner_id, name], onDelete: Cascade)
-  configuration_version Int // Added field
+  configuration_version Int 
   is_active              Boolean  @default(true)
   screen_config         Json
   created_at            DateTime @default(now())
   updated_at            DateTime @updatedAt
   field_ids    Json?
 
-  // Relationships
+  
   fields Field[]
 }
 

@@ -12,16 +12,16 @@ const ScreensManager = () => {
   const screens = partnerConfig?.screens || [];
   const globalConfig = partnerConfig?.config?.global_config || {};
 
-  // Function to proceed to the next screen
+  
   const goToNextScreen = () => {
     if (currentScreenIndex < screens.length - 1) {
       setCurrentScreenIndex((prevIndex) => prevIndex + 1);
     } else {
-      setIsSubmitted(true); // Show modal on the last screen submission
+      setIsSubmitted(true); 
     }
   };
 
-  // Function to go back to the previous screen
+  
   const goToPreviousScreen = () => {
     if (currentScreenIndex > 0) {
       setCurrentScreenIndex((prevIndex) => prevIndex - 1);
@@ -30,7 +30,7 @@ const ScreensManager = () => {
 
   const handleClose = () => {
     setIsSubmitted(false);
-    setCurrentScreenIndex(0); // Reset form if desired
+    setCurrentScreenIndex(0); 
   };
 
   return (

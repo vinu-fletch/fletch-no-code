@@ -1,4 +1,4 @@
-// screens/Preview.js
+
 
 import React from 'react';
 import { usePartnerStore } from '../../store';
@@ -12,7 +12,7 @@ import ScreensManager from '../../components/screens/ScreensManager';
 export const Preview = ({ isOpen, onClose }) => {
   const partnerDraft = usePartnerStore((state) => state.partnerDraft);
 
-  // Destructure necessary configurations from partnerDraft
+  
   const {
     config: {
       global_config = {},

@@ -1,4 +1,4 @@
-// pages/index.js
+
 
 import { useState, useEffect } from "react";
 import GlobalCustomization from "../components/GlobalCustomization";
@@ -6,7 +6,7 @@ import Layout from "../components/Layout";
 import Head from "next/head";
 
 const IndexPage = ({ setCustomTheme, globalSettings, setGlobalSettings }) => {
-  // Dynamic font loading
+  
   const fontLink = `https://fonts.googleapis.com/css2?family=${globalSettings.font?.replace(
     " ",
     "+"

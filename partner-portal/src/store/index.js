@@ -1,25 +1,25 @@
-// stores/partnerStore.js
+
 
 import { create } from "zustand";
 import { mergeWith } from "lodash";
 
 export const usePartnerStore = create((set, get) => ({
-  partnerData: null,       // Data fetched from the backend
-  partnerDraft: null,      // Local draft for unsaved changes
-  versions: [],            // Available versions
-  selectedVersion: null,   // Selected version
+  partnerData: null,       
+  partnerDraft: null,      
+  versions: [],            
+  selectedVersion: null,   
 
   setPartnerData: (data) =>
     set({
       partnerData: data,
-      partnerDraft: { ...data }, // Initialize the draft with the fetched data
+      partnerDraft: { ...data }, 
     }),
 
   updatePartnerDraft: (updates) =>
     set((state) => {
       const newDraft = mergeWith({}, state.partnerDraft, updates, (objValue, srcValue) => {
         if (Array.isArray(objValue)) {
-          return srcValue; // Replace arrays entirely instead of merging element by element
+          return srcValue; 
         }
       });
       return {
@@ -93,30 +93,30 @@ export const usePartnerStore = create((set, get) => ({
     }
   },
 
-  // Function to fetch partner data and configurations
+  
   fetchPartnerData: async (partnerName, version = null) => {
     try {
-      // Fetch the partner data for the specified version
+      
       const url = version
         ? `http://localhost:3000/partners/${partnerName}?version=${version}`
         : `http://localhost:3000/partners/${partnerName}`;
       const response = await fetch(url);
       const data = await response.json();
 
-      // Update the store with the fetched data
+      
       set({
         partnerData: data,
         partnerDraft: { ...data },
-        selectedVersion: data.config.version, // Update selectedVersion
+        selectedVersion: data.config.version, 
       });
 
-      // Generate the list of versions based on the current version
+      
       const currentVersion = data.config.version;
       const versions = [];
       for (let i = currentVersion; i >= Math.max(1, currentVersion - 9); i--) {
         versions.push(i);
       }
-      set({configurations: versions }); // Update versions in the store
+      set({configurations: versions }); 
     } catch (error) {
       console.error("Failed to fetch partner data:", error);
     }
@@ -127,14 +127,14 @@ export const usePartnerStore = create((set, get) => ({
       partnerDraft: { ...state.partnerData },
     })),
 
-  // Function to update screens of any category
+  
   updateScreens: async () => {
     const state = get();
     const { partnerDraft, partnerData } = state;
 
     const partnerName = partnerData.name;
     const configVersion = partnerData.config.version;
-    const categoryName = 'Data Collection'; // Replace with actual category name if needed
+    const categoryName = 'Data Collection'; 
     const screens = partnerDraft.screens;
 
     try {
@@ -153,7 +153,7 @@ export const usePartnerStore = create((set, get) => ({
       const result = await response.json();
 
       if (result.success) {
-        // Update partnerData and partnerDraft with the new screens
+        
         set({
           partnerData: {
             ...partnerData,
@@ -172,20 +172,20 @@ export const usePartnerStore = create((set, get) => ({
 
   fetchVersions: async (partnerName) => {
     try {
-      // Fetch the list of versions from the backend
+      
       const response = await fetch(
         `http://localhost:3000/partners/${partnerName}/versions`
       );
       const versionsData = await response.json();
 
-      // Update the versions in the store
+      
       set({ versions: versionsData });
     } catch (error) {
       console.error("Failed to fetch versions:", error);
     }
   },
 
-  // Action to set the selected version
+  
   setSelectedVersion: (version) => set({ selectedVersion: version }),
 
 }));

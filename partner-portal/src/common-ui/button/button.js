@@ -7,14 +7,14 @@ const Button = ({ variant = "primary", children, ...props }) => {
 
   const padding = theme.spacing.padding.button || "medium";
 
-  // Padding mapping for button sizes
+  
   const paddingMapping = {
     small: { px: 6, py: 4 },   
     medium: { px: 12, py: 6 },
     large: { px: 24, py: 8 },
   };
 
-  // Get padding size based on provided padding prop or default to medium
+  
   const buttonPadding = paddingMapping[padding] || paddingMapping.medium;
 
   const buttonStyles = {
@@ -24,7 +24,7 @@ const Button = ({ variant = "primary", children, ...props }) => {
       _hover: {
         bg: `${buttonColors.primary}CC`,
       },
-      borderRadius: "md",   // Set border radius for a rounded rectangular look
+      borderRadius: "md",   
       ...buttonPadding,
     },
     secondary: {
@@ -33,7 +33,7 @@ const Button = ({ variant = "primary", children, ...props }) => {
       _hover: {
         bg: `${buttonColors.secondary}CC`,
       },
-      borderRadius: "md",   // Consistent border radius for secondary
+      borderRadius: "md",   
       ...buttonPadding,
     },
   };

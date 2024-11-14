@@ -1,4 +1,4 @@
-// pages/DataCollectionFormBuilderPage.js
+
 
 import { useState, useEffect, useMemo } from "react";
 import {
@@ -21,7 +21,7 @@ import { Preview } from "@/components/preview/preview";
 const DataCollectionFormBuilderPage = ({ globalSettings }) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
 
-  // Zustand store hooks
+  
   const partnerData = usePartnerStore((state) => state.partnerData);
   const partnerDraft = usePartnerStore((state) => state.partnerDraft);
   const updatePartnerDraft = usePartnerStore((state) => state.updatePartnerDraft);
@@ -36,56 +36,56 @@ const DataCollectionFormBuilderPage = ({ globalSettings }) => {
   const categoryName = "Data Collection";
 
   const [isPreviewOpen, setIsPreviewOpen] = useState(false);
-  // Initialize partnerDraft as a deep copy of partnerData
+  
   useEffect(() => {
     if (partnerData) {
       updatePartnerDraft(JSON.parse(JSON.stringify(partnerData)));
     }
   }, [partnerData, updatePartnerDraft]);
 
-  // Find the category in the store
+  
   const category = partnerData?.categories?.find(
     (category) => category.name === categoryName
   );
 
-  // Sync category enabled state with category
+  
   useEffect(() => {
     if (category) {
       setCategoryEnabled(category.is_active);
     }
   }, [category]);
 
-  // Update the draft screens state
+  
   const handleScreenUpdate = (updatedScreens) => {
     const clonedDraft = { ...partnerDraft, screens: updatedScreens };
     updatePartnerDraft(clonedDraft);
-    // No need to set hasUnsavedChanges manually
+    
   };
 
-  // Select a field to edit in FieldSidebar
+  
   const handleFieldSelect = (field) => {
     setSelectedField(field);
   };
 
-  // Handle save field action in FieldSidebar
+  
   const handleSaveField = () => {
     setSelectedField(null);
-    // No need to set hasUnsavedChanges manually
+    
   };
 
-  // Save changes
+  
   const handleSave = () => {
     updateScreens();
-    // No need to set hasUnsavedChanges manually
+    
   };
 
-  // Discard changes
+  
   const handleDiscard = () => {
     updatePartnerDraft(JSON.parse(JSON.stringify(partnerData)));
-    // No need to set hasUnsavedChanges manually
+    
   };
 
-  // Toggle category with confirmation modal
+  
   const handleCategoryToggle = (value) => {
     const newValue = value === "enable";
     if (newValue !== categoryEnabled) {
@@ -99,12 +99,12 @@ const DataCollectionFormBuilderPage = ({ globalSettings }) => {
     onClose();
   };
 
-  // Handle edit action from Canvas component
+  
   const handleEditField = (field) => {
     setSelectedField(field);
   };
 
-  // Detect unsaved changes by comparing partnerDraft and partnerData using JSON.stringify
+  
   const hasUnsavedChanges = useMemo(() => {
     return JSON.stringify(partnerDraft) !== JSON.stringify(partnerData);
   }, [partnerDraft, partnerData]);

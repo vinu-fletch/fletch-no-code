@@ -1,4 +1,4 @@
-// components/FieldSidebar.js
+
 import React, { useState } from "react";
 import { Box, Heading, Button } from "@chakra-ui/react";
 import PincodeFieldConfig from "./fields/pincode-form";
@@ -32,7 +32,7 @@ const FieldSidebar = ({
       return;
     }
 
-    // Prepare field data to save, embedding attributes and rules inside `field_config`
+    
     const fieldData = {
       ...selectedField,
       field_config: {
@@ -42,7 +42,7 @@ const FieldSidebar = ({
     };
 
 
-    // Find the index of the existing field in the current screen
+    
     const existingFieldIndex = currentScreen.fields.findIndex(
       (field) => field.id === selectedField.id
     );
@@ -50,16 +50,16 @@ const FieldSidebar = ({
     const updatedFields = [...currentScreen.fields];
 
     if (existingFieldIndex !== -1) {
-      // Update existing field
+      
       updatedFields[existingFieldIndex] = fieldData;
     } else {
-      // Add new field if it doesn't exist
+      
       updatedFields.push(fieldData);
     }
 
 
 
-    // Create a new screens array with updated fields for the active screen
+    
     const updatedScreens = partnerDraft.screens.map((screen, idx) =>
       idx === activeScreenIndex
         ? {
@@ -70,10 +70,10 @@ const FieldSidebar = ({
     );
 
 
-    // Update partnerDraft with updated screens
+    
     updatePartnerDraft({ screens: updatedScreens });
 
-    // Call the onSaveField function passed as a prop
+    
     onSaveField(fieldData);
   };
 
@@ -92,7 +92,7 @@ const FieldSidebar = ({
         : screen
     );
 
-    // Update partnerDraft with updated screens
+    
     updatePartnerDraft({ screens: updatedScreens });
   }
 
@@ -120,7 +120,7 @@ const FieldSidebar = ({
     )
   }
 
-  // Default view when no field is selected
+  
   return (
     <Box
       height="100vh"

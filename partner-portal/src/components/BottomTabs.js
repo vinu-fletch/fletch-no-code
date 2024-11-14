@@ -16,10 +16,10 @@ const BottomTabs = ({
 }) => {
   const [contextMenuIndex, setContextMenuIndex] = useState(null);
 
-  // Ensure screens have default names based on their index
+  
   const getDefaultScreenName = (index) => `Screen ${index + 1}`;
 
-  // Add a new screen to the screens array
+  
   const addScreen = () => {
     const newScreen = {
       name: getDefaultScreenName(screens.length),
@@ -32,30 +32,30 @@ const BottomTabs = ({
     };
     const updatedScreens = [...screens, newScreen];
     setScreens(updatedScreens);
-    setActiveScreenIndex(updatedScreens.length - 1); // Set to the new screen
+    setActiveScreenIndex(updatedScreens.length - 1); 
   };
 
-  // Delete a screen by index
+  
   const deleteScreen = (index) => {
     if (screens.length > 1) {
       const updatedScreens = screens.filter((_, i) => i !== index);
       setScreens(updatedScreens);
 
-      // Adjust active screen index if the deleted screen was active or if it's the last screen
+      
       if (index === activeScreenIndex) {
         setActiveScreenIndex(Math.max(0, index - 1));
       } else if (index < activeScreenIndex) {
         setActiveScreenIndex(activeScreenIndex - 1);
       }
     }
-    setContextMenuIndex(null); // Close context menu
+    setContextMenuIndex(null); 
   };
 
-  // Clone a screen by index
+  
   const cloneScreen = (index) => {
     const screenToClone = screens[index];
     const screenName = screenToClone.name || getDefaultScreenName(index);
-    const { id, ...restOfScreen } = screenToClone; // Exclude 'id' to avoid duplication
+    const { id, ...restOfScreen } = screenToClone; 
     const clonedScreen = {
       ...restOfScreen,
       name: `${screenName} (Copy)`,
@@ -66,11 +66,11 @@ const BottomTabs = ({
       ...screens.slice(index + 1),
     ];
     setScreens(updatedScreens);
-    setActiveScreenIndex(index + 1); // Set focus on the cloned screen
-    setContextMenuIndex(null); // Close context menu
+    setActiveScreenIndex(index + 1); 
+    setContextMenuIndex(null); 
   };
 
-  // Open context menu on right-click
+  
   const handleContextMenu = (event, index) => {
     event.preventDefault();
     setContextMenuIndex(index);
@@ -105,7 +105,7 @@ const BottomTabs = ({
             bg="gray.800"
             color="white"
             borderColor="gray.600"
-            onMouseLeave={() => setContextMenuIndex(null)} // Close menu when mouse leaves
+            onMouseLeave={() => setContextMenuIndex(null)} 
             onClose={() => setContextMenuIndex(null)}
           >
             <MenuItem

@@ -1,4 +1,4 @@
-// components/ThemeSettings.js
+
 import { useState } from "react";
 import { Box, Input, Button } from "@chakra-ui/react";
 import { ChromePicker } from "react-color";

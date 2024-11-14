@@ -1,4 +1,4 @@
-// routes/partnerRoutes.js
+
 const express = require('express');
 const partnerController = require('../controllers/partnerController');
 const router = express.Router();

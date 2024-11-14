@@ -43,7 +43,7 @@ const RuleConfig = ({ onSave, onCancel, initialRule }) => {
   };
 
   const handleJsonConfigChange = (e) => {
-    // Simply store the raw value as is
+    
     setRule({
       ...rule,
       config: {

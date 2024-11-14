@@ -42,11 +42,11 @@ const SSNField = forwardRef(({
           const formattedSSN = `${ssn.slice(0, 3).join("")}-${ssn.slice(3, 5).join("")}-${ssn.slice(5, 9).join("")}`;
 
 
-          // Compile the regex to double-check pattern correctness
+          
           const regex = new RegExp(pattern);
 
           if (!regex.test(formattedSSN)) {
-            console.log("Regex validation failed"); // Add this log
+            console.log("Regex validation failed"); 
             validationError = errorMessage || "SSN format is invalid.";
           } else {
             console.log("Regex validation passed");

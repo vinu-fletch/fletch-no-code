@@ -1,4 +1,4 @@
-// pages/Offers.js
+
 
 import { useState, useEffect } from 'react';
 import { Flex, useDisclosure } from '@chakra-ui/react';
@@ -10,26 +10,26 @@ import { usePartnerStore } from '../../store';
 const OffersPage = () => {
   const { isOpen, onOpen, onClose } = useDisclosure();
 
-  // Zustand store hooks
+  
   const partnerData = usePartnerStore((state) => state.partnerData);
   const updateCategoryStatus = usePartnerStore((state) => state.updateCategoryStatus);
 
   const [categoryEnabled, setCategoryEnabled] = useState(true);
   const categoryName = 'Offers';
 
-  // Find the category in the store
+  
   const category = partnerData?.categories?.find(
     (category) => category.name === categoryName
   );
 
-  // Sync category enabled state with category
+  
   useEffect(() => {
     if (category) {
       setCategoryEnabled(category.is_active);
     }
   }, [category]);
 
-  // Toggle category with confirmation modal
+  
   const handleCategoryToggle = (value) => {
     const newValue = value === 'enable';
     if (newValue !== categoryEnabled) {

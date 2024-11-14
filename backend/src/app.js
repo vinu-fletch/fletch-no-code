@@ -1,14 +1,14 @@
-// app.js
+
 const express = require('express');
 const partnerRoutes = require('./routes/partnerRoutes');
-const { toCamelCase } = require('./utils/caseConversion'); // Import the utility function
+const { toCamelCase } = require('./utils/caseConversion'); 
 
 require('dotenv').config();
 
 const app = express();
 
-app.use(express.json()); // Parse JSON request bodies
-// Enable all cors requests
+app.use(express.json()); 
+
 app.use((req, res, next) => {
   res.header('Access-Control-Allow-Origin', '*');
   res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
@@ -16,9 +16,9 @@ app.use((req, res, next) => {
   next();
 });
 
-app.use('/partners', partnerRoutes); // Use the partner routes
+app.use('/partners', partnerRoutes); 
 
-// Middleware to camelCase all response bodies
+
 app.use((req, res, next) => {
   const oldJson = res.json.bind(res);
   res.json = (data) => {

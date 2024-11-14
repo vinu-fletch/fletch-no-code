@@ -35,7 +35,7 @@ const GlobalCustomization = () => {
 
   const config = partnerDraft?.config || {};
 
-  // Existing field states
+  
   const [logoLink, setLogoLink] = useState("");
   const [logoWidth, setLogoWidth] = useState("");
   const [logoHeight, setLogoHeight] = useState("");
@@ -44,11 +44,11 @@ const GlobalCustomization = () => {
   const [layoutPercentage, setLayoutPercentage] = useState(60);
   const [fontFamily, setFontFamily] = useState("Arial");
 
-  // Preview
+  
     const [isPreviewOpen, setPreviewOpen] = useState(false);
 
 
-  // New fields
+  
   const [formCompletionHeading, setFormCompletionHeading] = useState("");
   const [formCompletionParagraph, setFormCompletionParagraph] = useState("");
   const [primaryColor, setPrimaryColor] = useState("#333");
@@ -81,7 +81,7 @@ const GlobalCustomization = () => {
     if (partnerDraft && partnerDraft.config) {
       const config = partnerDraft.config;
 
-      // Load existing config
+      
       setLogoLink(config.header_config?.logo_link || "");
       setLogoWidth(config.header_config?.logo_width || "");
       setLogoHeight(config.header_config?.logo_height || "");
@@ -90,7 +90,7 @@ const GlobalCustomization = () => {
       setLayoutPercentage(config.layout_config?.layout_percentage || 60);
       setFontFamily(config.global_config?.font_family || "Arial");
 
-      // Load new fields
+      
       setFormCompletionHeading(config.global_config?.form_completion_heading || "");
       setFormCompletionParagraph(config.global_config?.form_completion_paragraph || "");
       setPrimaryColor(config.global_config?.primary_color || "#333");
@@ -115,7 +115,7 @@ const GlobalCustomization = () => {
 
     }
 
-    // Close color pickers when clicking outside
+    
     const handleClickOutside = (event) => {
       if (!event.target.closest(".color-picker")) {
         setShowColorPicker({

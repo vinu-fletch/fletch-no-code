@@ -80,7 +80,7 @@ const Screen = ({ screen, globalConfig, onContinue, onBack, isFirstScreen, isLas
     let isValid = true;
     setFormError("");
 
-     // Run beforeSubmit validation for each field using its ref
+     
     for (const ref of fieldRefs.current) {
       if (ref.current && ref.current.validateBeforeSubmit) {
         const fieldValid = ref.current.validateBeforeSubmit();

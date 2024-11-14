@@ -1,4 +1,4 @@
-// components/Layout.js
+
 
 import {
   Box,
@@ -11,7 +11,7 @@ import {
 } from "@chakra-ui/react";
 import { useRouter } from "next/router";
 import { useEffect } from "react";
-import { usePartnerStore } from "../store"; // Adjust the import path if necessary
+import { usePartnerStore } from "../store"; 
 
 const Layout = ({ children }) => {
   const router = useRouter();
@@ -25,11 +25,11 @@ const Layout = ({ children }) => {
   const setSelectedVersion = usePartnerStore((state) => state.setSelectedVersion);
 
   useEffect(() => {
-    // Fetch versions on initial load
+    
     fetchVersions("metlife");
-    // Fetch partner data for the latest version
+    
     fetchPartnerData("metlife");
-  }, []); // Empty dependency array to run only once on mount
+  }, []); 
 
   const handleNavigation = (path) => {
     router.push(path);
@@ -42,7 +42,7 @@ const Layout = ({ children }) => {
     const version = parseInt(event.target.value, 10);
     setSelectedVersion(version);
 
-    // Fetch the partner data for the selected version
+    
     await fetchPartnerData("metlife", version);
   };
 
