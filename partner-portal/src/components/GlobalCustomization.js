@@ -177,7 +177,7 @@ const GlobalCustomization = () => {
       </Flex>
 
       <Box bg="black" p={6} rounded="md" shadow="md">
-        <Accordion allowMultiple>
+        <Accordion defaultIndex={[0]} allowMultiple>
           {/* Global Settings */}
           <AccordionItem isExpanded={true}>
             <AccordionButton>
