@@ -93,7 +93,7 @@ const Canvas = ({ screens, activeScreenIndex, onEditField }) => {
               {...props}
             >
               <Text fontSize="lg" fontWeight="bold">
-                {value?.field_config?.attributes?.label || `Field ${index + 1}`}
+                {value?.field_config?.attributes?.label || value?.field_config?.attributes?.name || `Field ${index + 1}`}
               </Text>
               <Box>
                 <IconButton

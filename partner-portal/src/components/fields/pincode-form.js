@@ -134,6 +134,19 @@ const PincodeFieldConfig = ({
               </AccordionButton>
               <AccordionPanel pb={4}>
                 <VStack spacing={3} align="stretch">
+
+                  <FormControl isRequired>
+                    <FormLabel>Form Name</FormLabel>
+                    <Input
+                      name="name"
+                      value={fieldAttributes.name || ""}
+                      onChange={handleInputChange}
+                      bg="gray.700"
+                      color="white"
+                    />
+                  </FormControl>
+
+
                   <FormControl isRequired>
                     <FormLabel>Label</FormLabel>
                     <Input
