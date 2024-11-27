@@ -51,7 +51,6 @@ const Canvas = ({ screens, activeScreenIndex, onEditField }) => {
     updatePartnerDraft({ screens: updatedScreens });
   };
 
-
   return (
     <Box
       flex="1"
@@ -72,8 +71,17 @@ const Canvas = ({ screens, activeScreenIndex, onEditField }) => {
       {currentScreen?.fields?.length === 0 ? (
         <Text color="text.secondary">No fields added yet.</Text>
       ) : (
-
-            <VStack
+        <List
+          values={currentScreen?.fields}
+          onChange={handleFieldOrderChange}
+          renderList={({ children, props }) => (
+            <VStack align="stretch" spacing={3} {...props}>
+              {children}
+            </VStack>
+          )}
+          renderItem={({ value, index, props }) => (
+            <HStack
+              key={value.id}
               p={4}
               bg="background.dark"
               color="text.primary"
@@ -81,36 +89,31 @@ const Canvas = ({ screens, activeScreenIndex, onEditField }) => {
               borderRadius="md"
               borderWidth="1px"
               borderColor="primary.200"
-              justify="start"
+              justify="space-between"
+              {...props}
             >
-              {
-                currentScreen?.fields?.map((value, index) => (
-                   <>
-                   <Text fontSize="lg" fontWeight="bold">
-                     {value?.field_config?.attributes?.label || `Field ${index + 1}`}
-                   </Text>
-                    <Box>
-                      <IconButton
-                        mr="4"
-                        icon={<EditIcon />}
-                        aria-label="Edit field"
-                        colorScheme="teal"
-                        onClick={() => onEditField(value)}
-                      />
-                      <IconButton
-                        icon={<DeleteIcon />}
-                        aria-label="Delete field"
-                        colorScheme="red"
-                        onClick={() => handleDeleteField(value.id)}
-                      />
-                    </Box>
-                   </>
-                ))
-              }
-              
-            </VStack>
+              <Text fontSize="lg" fontWeight="bold">
+                {value?.field_config?.attributes?.label || `Field ${index + 1}`}
+              </Text>
+              <Box>
+                <IconButton
+                  mr="4"
+                  icon={<EditIcon />}
+                  aria-label="Edit field"
+                  colorScheme="teal"
+                  onClick={() => onEditField(value)}
+                />
+                <IconButton
+                  icon={<DeleteIcon />}
+                  aria-label="Delete field"
+                  colorScheme="red"
+                  onClick={() => handleDeleteField(value.id)}
+                />
+              </Box>
+            </HStack>
           )}
-
+        />
+      )}
     </Box>
   );
 };
