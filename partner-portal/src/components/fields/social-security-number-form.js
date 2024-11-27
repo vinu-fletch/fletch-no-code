@@ -37,6 +37,8 @@ const SocialSecurityNumberConfig = ({
   const { isOpen, onOpen, onClose } = useDisclosure({
     defaultIsOpen: showModal || true,
   });
+  
+  const [fieldName, setFieldName] = useState("");
 
   const [fieldAttributes, setFieldAttributes] = useState({});
   const [rules, setRules] = useState([]);

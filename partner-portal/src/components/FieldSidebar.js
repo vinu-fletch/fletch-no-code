@@ -2,6 +2,7 @@
 import React, { useState } from "react";
 import { Box, Heading, Button } from "@chakra-ui/react";
 import PincodeFieldConfig from "./fields/pincode-form";
+import HiddenFieldConfig from "./fields/hidden-form";
 import { usePartnerStore } from "../store";
 import SocialSecurityNumberConfig from "./fields/social-security-number-form";
 
