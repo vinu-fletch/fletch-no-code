@@ -7,7 +7,8 @@ import SocialSecurityNumberConfig from "./fields/social-security-number-form";
 
 const fields = [
   { label: "SSN", type: "ssn" },
-  {  label: "Pincode", type: "pincode" },
+  { label: "Pincode", type: "pincode" },
+  { label: "Hidden", type: "hidden" },
 ];
 
 const FieldSidebar = ({
@@ -118,6 +119,17 @@ const FieldSidebar = ({
         fieldData={selectedField}
       />
     )
+  }
+
+  if (selectedField?.type === "hidden") {
+    return (
+      <HiddenFieldConfig
+        onSave={handleSaveField}
+        onCancel={onCancel}
+        showModal={showModal}
+        fieldData={selectedField}
+      />
+    );
   }
 
   
