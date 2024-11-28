@@ -43,9 +43,13 @@ const Pincode = forwardRef(({
   };
 
   const validateLength = (value, config) => {
-    const { minLength, maxLength, errorMessage } = config;
-    if ((minLength && value.length < minLength) || (maxLength && value.length > maxLength)) {
-      return errorMessage;
+    const { minLength, maxLength, minLengthErrorMessage, maxLengthErrorMessage } = config;
+    console.log("Value", value, "config" ,config)
+    if (minLength && value.length < minLength) {
+      return minLengthErrorMessage;
+    }
+    if (maxLength && value.length > maxLength) {
+      return maxLengthErrorMessage;
     }
     return "";
   };
@@ -63,12 +67,13 @@ const Pincode = forwardRef(({
 
     for (const rule of rules) {
       if (rule.trigger === event) {
+        console.log("Rule is", rule)
         switch (rule.type) {
           case "lengthCheck":
-            validationError = validateLength(pincode, rule.config);
+            validationError = validateLength(pincode, rule.actions[0].config);
             break;
           case "regexValidation":
-            validationError = validateRegex(pincode, rule.config);
+            validationError = validateRegex(pincode, rule.actions[0].config);
             break;
           default:
             break;

@@ -137,22 +137,60 @@ const RuleConfig = ({ onSave, onCancel, initialRule }) => {
                 color="text.primary"
               />
             </FormControl>
+            {/* Min Length Error Message */}
+            <FormControl mt={3}>
+              <FormLabel>Min Length Error Message</FormLabel>
+              <Input
+                name="minLengthErrorMessage"
+                value={rule.actions[0]?.config?.minLengthErrorMessage || ""}
+                onChange={handleConfigChange}
+                placeholder="Error message when below min length"
+                bg="background.dark"
+                color="text.primary"
+              />
+            </FormControl>
+            {/* Max Length Error Message */}
+            <FormControl mt={3}>
+              <FormLabel>Max Length Error Message</FormLabel>
+              <Input
+                name="maxLengthErrorMessage"
+                value={rule.actions[0]?.config?.maxLengthErrorMessage || ""}
+                onChange={handleConfigChange}
+                placeholder="Error message when above max length"
+                bg="background.dark"
+                color="text.primary"
+              />
+            </FormControl>
           </>
         )}
 
         {/* Regex Validation */}
         {rule.type === "regexValidation" && (
-          <FormControl>
-            <FormLabel>Regex Pattern</FormLabel>
-            <Input
-              name="pattern"
-              value={rule.actions[0]?.config?.pattern || ""}
-              onChange={handleConfigChange}
-              placeholder="e.g., ^[0-9]{6}$"
-              bg="background.dark"
-              color="text.primary"
-            />
-          </FormControl>
+          <>
+            <FormControl>
+              <FormLabel>Regex Pattern</FormLabel>
+              <Input
+                name="pattern"
+                value={rule.actions[0]?.config?.pattern || ""}
+                onChange={handleConfigChange}
+                placeholder="e.g., ^[0-9]{6}$"
+                bg="background.dark"
+                color="text.primary"
+              />
+            </FormControl>
+            {/* Error Message */}
+            <FormControl mt={3}>
+              <FormLabel>Error Message</FormLabel>
+              <Input
+                name="errorMessage"
+                value={rule.actions[0]?.config?.errorMessage || ""}
+                onChange={handleConfigChange}
+                placeholder="Enter error message"
+                bg="background.dark"
+                color="text.primary"
+              />
+            </FormControl>
+          </>
         )}
 
         {/* API Call */}
@@ -383,6 +421,33 @@ const RuleConfig = ({ onSave, onCancel, initialRule }) => {
                           })
                         }
                         placeholder="e.g., true"
+                        bg="background.dark"
+                        color="text.primary"
+                      />
+                    </FormControl>
+                    {/* Error Message */}
+                    <FormControl mt={3}>
+                      <FormLabel>Error Message</FormLabel>
+                      <Input
+                        name="errorMessage"
+                        value={action.config.errorMessage || ""}
+                        onChange={(e) =>
+                          setRule({
+                            ...rule,
+                            actions: rule.actions.map((a, i) =>
+                              i === index
+                                ? {
+                                    ...a,
+                                    config: {
+                                      ...a.config,
+                                      errorMessage: e.target.value,
+                                    },
+                                  }
+                                : a
+                            ),
+                          })
+                        }
+                        placeholder="Error message to display"
                         bg="background.dark"
                         color="text.primary"
                       />

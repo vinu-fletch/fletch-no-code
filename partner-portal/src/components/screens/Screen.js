@@ -3,7 +3,7 @@ import { Box, Text, VStack, Flex } from "@chakra-ui/react";
 import Button from "@/common-ui/button/button";
 import Pincode from "@/common-ui/pincode/pincode";
 import SSNField from "@/common-ui/ssn/ssn";
-import { set } from "lodash";
+
 
 const fontSizeMapping = {
   small: "lg",
@@ -126,7 +126,7 @@ const Screen = ({ screen, globalConfig, onContinue, onBack, isFirstScreen, isLas
         </Text>
         <VStack spacing={4} align="stretch">
           {screen?.fields?.map((field, index) => (
-            <Box key={field.id || index} p={4}>
+            <Box key={field.id || index} p={field.type === "hidden" ? 0 : 4}>
               {field.type === "pincode" ? (
                 <Pincode
                   ref={fieldRefs.current[index]}
@@ -161,7 +161,7 @@ const Screen = ({ screen, globalConfig, onContinue, onBack, isFirstScreen, isLas
                   onValidate={(isValid) => handleFieldValidation(field.id || index, isValid)}
                 />
               ) : (
-                <Text>{field.field_name || `Field ${index + 1}`}</Text>
+                <input type="hidden" name={field.field_config?.attributes?.name} value="" />
               )}
             </Box>
           ))}

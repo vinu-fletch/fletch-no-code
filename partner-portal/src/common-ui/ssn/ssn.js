@@ -29,8 +29,10 @@ const SSNField = forwardRef(({
 
     for (const rule of rules) {
       if (rule.trigger === trigger) {
+        const {actions} = rule.config;
+        const action = actions[0]
         if (rule.type === "lengthCheck") {
-          const { minLength, maxLength, errorMessage } = rule.config;
+          const { minLength, maxLength, errorMessage } = actions || {};
           if (
             (minLength && ssn.join("").length < minLength) ||
             (maxLength && ssn.join("").length > maxLength)
