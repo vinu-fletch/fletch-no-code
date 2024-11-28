@@ -17,10 +17,11 @@ const SSNField = forwardRef(({
   borderRadius = "md",
   backgroundColor,
   rules = [],
+  value = "",
   onValidate,
   onChange,
 }, ref) => {
-  const [ssn, setSSN] = useState(Array(9).fill("")); 
+  const ssn = value.split("").slice(0, 9);
   const [error, setError] = useState("");
 
   const validateSSN = (trigger) => {
@@ -69,7 +70,6 @@ const SSNField = forwardRef(({
     if (/^\d?$/.test(value)) {
       const newSSN = [...ssn];
       newSSN[index] = value;
-      setSSN(newSSN);
       if (onChange) onChange(newSSN.join("")); 
       setError("");
 
@@ -93,12 +93,12 @@ const SSNField = forwardRef(({
         </FormLabel>
       )}
       <HStack spacing={2}>
-        {ssn.map((digit, index) => (
+        {Array.from({ length: 9 }).map((_, index) => (
           <React.Fragment key={index}>
             <Input
               id={`ssn-box-${index}`}
               type="text"
-              value={digit}
+              value={ssn[index] || ""}
               onChange={(e) => handleSSNChange(index, e.target.value)}
               onKeyDown={(e) => handleKeyDown(index, e)}
               onBlur={() => validateSSN("onBlur")}

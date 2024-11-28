@@ -22,12 +22,13 @@ const TextField = forwardRef(({
   height,
   placeholderPosition = "inside",
   rules = [],
+  value,
   onValidate,
   onChange
 }, ref) => {
-  const [text, setText] = useState("");
   const [error, setError] = useState("");
   const [isFocused, setIsFocused] = useState(false);
+  const text = value || "";
 
   const fontSizeMapping = {
     small: "sm",
@@ -45,7 +46,6 @@ const TextField = forwardRef(({
 
   const validateLength = (value, config) => {
     const { minLength, maxLength, minLengthErrorMessage, maxLengthErrorMessage } = config;
-    console.log("Value", value, "config" ,config)
     if (minLength && value.length < minLength) {
       return minLengthErrorMessage;
     }
@@ -98,7 +98,6 @@ const TextField = forwardRef(({
   };
 
   const handletextChange = (e) => {
-    setText(e.target.value);
     setError("");
     onChange && onChange(e.target.value);
   };

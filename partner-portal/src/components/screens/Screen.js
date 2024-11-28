@@ -169,6 +169,7 @@ const Screen = ({ screen, globalConfig, onContinue, onBack, isFirstScreen, isLas
                   fontWeight={field.field_config?.attributes?.style?.fontWeight || globalConfig.default_font_weight}
                   errorMessage={field.field_config?.attributes?.errorMessage || ""}
                   rules={field.field_config?.rules || []}
+                  value={fieldValues[field.field_config?.attributes?.name]}
                   onValidate={(isValid) => handleFieldValidation(field.id || index, isValid)}
                   onChange={handleFieldChange(field.field_config?.attributes?.name)}                />
               ) : field.type === "ssn" ? (
@@ -183,11 +184,12 @@ const Screen = ({ screen, globalConfig, onContinue, onBack, isFirstScreen, isLas
                   borderRadius={field.field_config?.attributes?.borderRadius}
                   backgroundColor={field.field_config?.attributes?.backgroundColor}
                   rules={field.field_config?.rules || []}
+                  value={fieldValues[field.field_config?.attributes?.name]}
                   onValidate={(isValid) => handleFieldValidation(field.id || index, isValid)}
                   onChange={handleFieldChange(field.field_config?.attributes?.name)}  
                 />
               ) : (
-                <input type="hidden" name={field.field_config?.attributes?.name} value="" />
+                <input type="hidden" name={field.field_config?.attributes?.name} value={fieldValues[field.field_config?.attributes?.name] || ""}/>
               )}
             </Box>
           ))}
