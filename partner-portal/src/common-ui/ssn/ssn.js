@@ -46,7 +46,6 @@ const SSNField = forwardRef(({
           const regex = new RegExp(pattern);
 
           if (!regex.test(formattedSSN)) {
-            console.log("Regex validation failed"); 
             validationError = errorMessage || "SSN format is invalid.";
           } else {
             console.log("Regex validation passed");

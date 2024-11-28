@@ -16,7 +16,7 @@ const RuleConfig = ({ onSave, onCancel, initialRule }) => {
   const [rule, setRule] = useState({
     type: "lengthCheck",
     trigger: "onBlur",
-    config: {},
+    actions: [], // Unified structure for all types of rules
   });
 
   useEffect(() => {
@@ -33,31 +33,40 @@ const RuleConfig = ({ onSave, onCancel, initialRule }) => {
   };
 
   const handleConfigChange = (e) => {
-    setRule({
-      ...rule,
-      config: {
-        ...rule.config,
-        [e.target.name]: e.target.value,
-      },
-    });
-  };
+    const value = e.target.value;
+    const name = e.target.name;
 
-  const handleJsonConfigChange = (e) => {
-    
-    setRule({
-      ...rule,
-      config: {
-        ...rule.config,
-        [e.target.name]: e.target.value,
-      },
-    });
-  };
-
-  const handleDynamicValueChange = (e) => {
-    const value = e.target.value.replace("{{field_value}}", rule.config.fieldValue || "");
-    handleConfigChange({
-      target: { name: e.target.name, value },
-    });
+    if (rule.type === "lengthCheck" || rule.type === "regexValidation") {
+      // Save directly to the single action config for static rules
+      setRule({
+        ...rule,
+        actions: [
+          {
+            type: rule.type,
+            config: {
+              ...rule.actions[0]?.config,
+              [name]: value,
+            },
+          },
+        ],
+      });
+    } else {
+      // Generic config for other rules
+      setRule({
+        ...rule,
+        actions: rule.actions.map((action, idx) =>
+          idx === 0
+            ? {
+                ...action,
+                config: {
+                  ...action.config,
+                  [name]: value,
+                },
+              }
+            : action
+        ),
+      });
+    }
   };
 
   const handleSave = () => {
@@ -70,6 +79,7 @@ const RuleConfig = ({ onSave, onCancel, initialRule }) => {
         {initialRule ? "Edit Validation Rule" : "Add Validation Rule"}
       </Heading>
       <VStack spacing={3} align="stretch">
+        {/* Rule Type */}
         <FormControl>
           <FormLabel>Rule Type</FormLabel>
           <Select
@@ -85,6 +95,7 @@ const RuleConfig = ({ onSave, onCancel, initialRule }) => {
           </Select>
         </FormControl>
 
+        {/* Trigger */}
         <FormControl>
           <FormLabel>Trigger</FormLabel>
           <Select
@@ -101,6 +112,7 @@ const RuleConfig = ({ onSave, onCancel, initialRule }) => {
           </Select>
         </FormControl>
 
+        {/* Length Check */}
         {rule.type === "lengthCheck" && (
           <>
             <FormControl>
@@ -108,7 +120,7 @@ const RuleConfig = ({ onSave, onCancel, initialRule }) => {
               <Input
                 name="minLength"
                 type="number"
-                value={rule.config.minLength || ""}
+                value={rule.actions[0]?.config?.minLength || ""}
                 onChange={handleConfigChange}
                 bg="background.dark"
                 color="text.primary"
@@ -119,7 +131,7 @@ const RuleConfig = ({ onSave, onCancel, initialRule }) => {
               <Input
                 name="maxLength"
                 type="number"
-                value={rule.config.maxLength || ""}
+                value={rule.actions[0]?.config?.maxLength || ""}
                 onChange={handleConfigChange}
                 bg="background.dark"
                 color="text.primary"
@@ -128,12 +140,13 @@ const RuleConfig = ({ onSave, onCancel, initialRule }) => {
           </>
         )}
 
+        {/* Regex Validation */}
         {rule.type === "regexValidation" && (
           <FormControl>
             <FormLabel>Regex Pattern</FormLabel>
             <Input
               name="pattern"
-              value={rule.config.pattern || ""}
+              value={rule.actions[0]?.config?.pattern || ""}
               onChange={handleConfigChange}
               placeholder="e.g., ^[0-9]{6}$"
               bg="background.dark"
@@ -142,122 +155,137 @@ const RuleConfig = ({ onSave, onCancel, initialRule }) => {
           </FormControl>
         )}
 
+        {/* API Call */}
         {rule.type === "apiCall" && (
           <>
-            <FormControl>
-              <FormLabel>API URL</FormLabel>
-              <Input
-                name="url"
-                value={rule.config.url || ""}
-                onChange={handleConfigChange}
-                placeholder="e.g., https://api.example.com/validate"
-                bg="background.dark"
-                color="text.primary"
-              />
-            </FormControl>
-            <FormControl>
-              <FormLabel>Method</FormLabel>
-              <Select
-                name="method"
-                value={rule.config.method || "GET"}
-                onChange={handleConfigChange}
-                bg="background.dark"
-                color="text.primary"
-              >
-                <option value="GET">GET</option>
-                <option value="POST">POST</option>
-              </Select>
-            </FormControl>
-            <FormControl>
-              <FormLabel>Headers (JSON)</FormLabel>
-              <Textarea
-                name="headers"
-                value={rule.config.headers || ""}
-                onChange={handleJsonConfigChange}
-                placeholder='e.g., { "Content-Type": "application/json" }'
-                bg="background.dark"
-                color="text.primary"
-                rows={4}
-              />
-            </FormControl>
-            <FormControl>
-              <FormLabel>Body (JSON)</FormLabel>
-              <Textarea
-                name="body"
-                value={rule.config.body || ""}
-                onChange={handleDynamicValueChange}
-                placeholder='e.g., { "pincode": "{{field_value}}" }'
-                bg="background.dark"
-                color="text.primary"
-                rows={4}
-              />
-            </FormControl>
-            <FormControl>
-              <FormLabel>Response Data Path</FormLabel>
-              <Input
-                name="responseDataPath"
-                value={rule.config.responseDataPath || ""}
-                onChange={handleConfigChange}
-                placeholder="e.g., data.isValid"
-                bg="background.dark"
-                color="text.primary"
-              />
-            </FormControl>
-            <FormControl>
-              <FormLabel>Expected Response Value</FormLabel>
-              <Input
-                name="expectedValue"
-                value={rule.config.expectedValue || ""}
-                onChange={handleConfigChange}
-                placeholder="e.g., true"
-                bg="background.dark"
-                color="text.primary"
-              />
-            </FormControl>
-            <FormControl>
-              <FormLabel>Condition</FormLabel>
-              <Select
-                name="condition"
-                value={rule.config.condition || "eq"}
-                onChange={handleConfigChange}
-                bg="background.dark"
-                color="text.primary"
-              >
-                <option value="eq">Equal to</option>
-                <option value="gt">Greater than</option>
-                <option value="lt">Less than</option>
-                <option value="includes">Includes</option>
-                <option value="starts_with">Starts With</option>
-                <option value="ends_with">Ends With</option>
-              </Select>
-            </FormControl>
-            <FormControl>
-              <FormLabel>Expected Value Type</FormLabel>
-              <Select
-                name="expectedValueType"
-                value={rule.config.expectedValueType || "string"}
-                onChange={handleConfigChange}
-                bg="background.dark"
-                color="text.primary"
-              >
-                <option value="string">String</option>
-                <option value="number">Number</option>
-                <option value="boolean">Boolean</option>
-              </Select>
-            </FormControl>
+            {rule.actions.map((action, index) => (
+              <Box key={index} p={3} bg="gray.700" borderRadius="md" mb={3}>
+                <FormControl>
+                  <FormLabel>Action Type</FormLabel>
+                  <Select
+                    value={action.type || ""}
+                    onChange={(e) =>
+                      setRule({
+                        ...rule,
+                        actions: rule.actions.map((a, i) =>
+                          i === index ? { ...a, type: e.target.value } : a
+                        ),
+                      })
+                    }
+                    bg="background.dark"
+                    color="text.primary"
+                  >
+                    <option value="validation">Validation</option>
+                    <option value="populateField">Populate Field</option>
+                  </Select>
+                </FormControl>
+
+                {action.type === "validation" && (
+                  <>
+                    <FormControl mt={3}>
+                      <FormLabel>Response Data Path</FormLabel>
+                      <Input
+                        name="responseDataPath"
+                        value={action.config.responseDataPath || ""}
+                        onChange={(e) =>
+                          setRule({
+                            ...rule,
+                            actions: rule.actions.map((a, i) =>
+                              i === index
+                                ? {
+                                    ...a,
+                                    config: {
+                                      ...a.config,
+                                      responseDataPath: e.target.value,
+                                    },
+                                  }
+                                : a
+                            ),
+                          })
+                        }
+                        placeholder="e.g., data.isValid"
+                        bg="background.dark"
+                        color="text.primary"
+                      />
+                    </FormControl>
+                    <FormControl mt={3}>
+                      <FormLabel>Condition</FormLabel>
+                      <Select
+                        name="condition"
+                        value={action.config.condition || "eq"}
+                        onChange={(e) =>
+                          setRule({
+                            ...rule,
+                            actions: rule.actions.map((a, i) =>
+                              i === index
+                                ? {
+                                    ...a,
+                                    config: {
+                                      ...a.config,
+                                      condition: e.target.value,
+                                    },
+                                  }
+                                : a
+                            ),
+                          })
+                        }
+                        bg="background.dark"
+                        color="text.primary"
+                      >
+                        <option value="eq">Equal to</option>
+                        <option value="gt">Greater than</option>
+                        <option value="lt">Less than</option>
+                      </Select>
+                    </FormControl>
+                  </>
+                )}
+
+                {action.type === "populateField" && (
+                  <>
+                    <FormControl mt={3}>
+                      <FormLabel>Target Field</FormLabel>
+                      <Input
+                        name="targetField"
+                        value={action.config.targetField || ""}
+                        onChange={(e) =>
+                          setRule({
+                            ...rule,
+                            actions: rule.actions.map((a, i) =>
+                              i === index
+                                ? {
+                                    ...a,
+                                    config: {
+                                      ...a.config,
+                                      targetField: e.target.value,
+                                    },
+                                  }
+                                : a
+                            ),
+                          })
+                        }
+                        placeholder="e.g., zipCode"
+                        bg="background.dark"
+                        color="text.primary"
+                      />
+                    </FormControl>
+                  </>
+                )}
+              </Box>
+            ))}
+            <Button
+              variant="outline"
+              colorScheme="primary"
+              onClick={() =>
+                setRule({
+                  ...rule,
+                  actions: [...rule.actions, { type: "", config: {} }],
+                })
+              }
+            >
+              Add Action
+            </Button>
           </>
         )}
-
-        <FormControl>
-          <FormLabel>Error Message</FormLabel>
-          <Input
-            name="errorMessage"
-            value={rule.config.errorMessage || ""}
-            onChange={handleConfigChange}
-            bg="background.dark"
-            color="text.primary"
-          />
-        </FormControl>
 
         <HStack spacing={2} mt={4}>
           <Button colorScheme="primary" onClick={handleSave}>

@@ -23,8 +23,9 @@ const HiddenFieldConfig = ({ showModal, onSave, onCancel, fieldData = {} }) => {
   const [fieldName, setFieldName] = useState("");
 
   useEffect(() => {
-    if (fieldData.name) {
-      setFieldName(fieldData.name);
+   const name = fieldData?.field_config?.attributes?.name;
+    if (name) {
+      setFieldName(name);
     }
   }, [fieldData]);
 
