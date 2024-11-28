@@ -1,14 +1,14 @@
 
 import React, { useState } from "react";
 import { Box, Heading, Button } from "@chakra-ui/react";
-import PincodeFieldConfig from "./fields/pincode-form";
 import HiddenFieldConfig from "./fields/hidden-form";
 import { usePartnerStore } from "../store";
 import SocialSecurityNumberConfig from "./fields/social-security-number-form";
+import TextFieldConfig from "./fields/text-form";
 
 const fields = [
   { label: "SSN", type: "ssn" },
-  { label: "Pincode", type: "pincode" },
+  { label: "Text", type: "text" },
   { label: "Hidden", type: "hidden" },
 ];
 
@@ -98,9 +98,9 @@ const FieldSidebar = ({
     updatePartnerDraft({ screens: updatedScreens });
   }
 
-  if (selectedField && selectedField.type === "pincode") {
+  if (selectedField && selectedField.type === "text") {
     return (
-      <PincodeFieldConfig
+      <TextFieldConfig
         onSave={handleSaveField}
         onDrag={handleDrag}
         onCancel={onCancel}

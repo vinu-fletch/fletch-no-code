@@ -29,7 +29,7 @@ import { AddIcon, EditIcon, DeleteIcon } from "@chakra-ui/icons";
 import RuleConfig from "../rules/rules-config";
 import { List, arrayMove } from "react-movable";
 
-const PincodeFieldConfig = ({
+const TextFieldConfig = ({
   showModal,
   onSave,
   onCancel,
@@ -120,7 +120,7 @@ const PincodeFieldConfig = ({
     <Modal isOpen={isOpen} onClose={onCancel || onClose} size="xl">
       <ModalOverlay bg="rgba(0, 0, 0, 0.8)" />
       <ModalContent bg="gray.800" color="white">
-        <ModalHeader>Configure Pincode Field</ModalHeader>
+        <ModalHeader>Configure Text Field</ModalHeader>
         <ModalCloseButton />
         <ModalBody>
           <Accordion allowToggle defaultIndex={[0]}>
@@ -359,4 +359,4 @@ const PincodeFieldConfig = ({
   );
 };
 
-export default PincodeFieldConfig;
+export default TextFieldConfig;

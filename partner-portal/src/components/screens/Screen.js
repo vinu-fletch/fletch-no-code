@@ -1,8 +1,9 @@
 import React, { useState, useRef } from "react";
 import { Box, Text, VStack, Flex } from "@chakra-ui/react";
 import Button from "@/common-ui/button/button";
-import Pincode from "@/common-ui/pincode/pincode";
+import Pincode from "@/common-ui/text/text";
 import SSNField from "@/common-ui/ssn/ssn";
+import TextField from "@/common-ui/text/text";
 
 
 const fontSizeMapping = {
@@ -127,12 +128,12 @@ const Screen = ({ screen, globalConfig, onContinue, onBack, isFirstScreen, isLas
         <VStack spacing={4} align="stretch">
           {screen?.fields?.map((field, index) => (
             <Box key={field.id || index} p={field.type === "hidden" ? 0 : 4}>
-              {field.type === "pincode" ? (
-                <Pincode
+              {field.type === "text" ? (
+                <TextField
                   ref={fieldRefs.current[index]}
                   id={`field-${field.id}`}
-                  label={field.field_config?.attributes?.label || "Pincode"}
-                  placeholder={field.field_config?.attributes?.placeholder || "Enter Pincode"}
+                  label={field.field_config?.attributes?.label || "Text"}
+                  placeholder={field.field_config?.attributes?.placeholder || "Enter value"}
                   required={field.field_config?.attributes?.required || false}
                   backgroundColor={field.field_config?.attributes?.style?.backgroundColor || globalConfig.primary_background_color}
                   placeholderPosition={field.field_config?.attributes?.style?.placeholderPosition}

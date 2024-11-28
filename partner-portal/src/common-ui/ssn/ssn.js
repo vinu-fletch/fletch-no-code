@@ -29,10 +29,11 @@ const SSNField = forwardRef(({
 
     for (const rule of rules) {
       if (rule.trigger === trigger) {
-        const {actions} = rule.config;
+        console.log("Rule is ", rule)
+        const {actions} = rule;
         const action = actions[0]
         if (rule.type === "lengthCheck") {
-          const { minLength, maxLength, errorMessage } = actions || {};
+          const { minLength, maxLength, errorMessage, minLengthErrorMessage, maxLengthErrorMessage } = action?.config || {};
           if (
             (minLength && ssn.join("").length < minLength) ||
             (maxLength && ssn.join("").length > maxLength)
@@ -40,10 +41,8 @@ const SSNField = forwardRef(({
             validationError = errorMessage;
           }
         } else if (rule.type === "regexValidation") {
-          const { pattern, errorMessage } = rule.config;
+          const { pattern, errorMessage } = action?.config || {};
           const formattedSSN = `${ssn.slice(0, 3).join("")}-${ssn.slice(3, 5).join("")}-${ssn.slice(5, 9).join("")}`;
-
-
           
           const regex = new RegExp(pattern);
 

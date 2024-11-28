@@ -7,7 +7,7 @@ import {
   Text,
 } from "@chakra-ui/react";
 
-const Pincode = forwardRef(({
+const TextField = forwardRef(({
   label,
   id,
   placeholder,
@@ -24,7 +24,7 @@ const Pincode = forwardRef(({
   rules = [],
   onValidate,
 }, ref) => {
-  const [pincode, setPincode] = useState("");
+  const [text, setText] = useState("");
   const [error, setError] = useState("");
   const [isFocused, setIsFocused] = useState(false);
 
@@ -70,10 +70,10 @@ const Pincode = forwardRef(({
         console.log("Rule is", rule)
         switch (rule.type) {
           case "lengthCheck":
-            validationError = validateLength(pincode, rule.actions[0].config);
+            validationError = validateLength(text, rule.actions[0].config);
             break;
           case "regexValidation":
-            validationError = validateRegex(pincode, rule.actions[0].config);
+            validationError = validateRegex(text, rule.actions[0].config);
             break;
           default:
             break;
@@ -97,8 +97,8 @@ const Pincode = forwardRef(({
     setError("");
   };
 
-  const handlePincodeChange = (e) => {
-    setPincode(e.target.value);
+  const handletextChange = (e) => {
+    setText(e.target.value);
     setError("");
   };
 
@@ -115,9 +115,9 @@ const Pincode = forwardRef(({
     placeholderPosition === "onInput"
       ? {
           position: "absolute",
-          top: isFocused || pincode ? "-25px" : "-10px",
+          top: isFocused || text ? "-25px" : "-10px",
           left: "8px",
-          fontSize: isFocused || pincode ? "xs" : fontSizeMapping[fontSize] || "md",
+          fontSize: isFocused || text ? "xs" : fontSizeMapping[fontSize] || "md",
           color: isFocused ? "text.primary" : textColor || "text.secondary",
           transition: "all 0.2s ease",
           backgroundColor: backgroundColor || "bg.field",
@@ -143,8 +143,8 @@ const Pincode = forwardRef(({
         type="text"
         id={id}
         w={width}
-        value={pincode}
-        onChange={handlePincodeChange}
+        value={text}
+        onChange={handletextChange}
         onBlur={handleBlur}
         onFocus={handleFocus}
         placeholder={placeholderPosition === "inside" ? placeholder : ""}
@@ -165,4 +165,4 @@ const Pincode = forwardRef(({
   );
 });
 
-export default Pincode;
+export default TextField;
