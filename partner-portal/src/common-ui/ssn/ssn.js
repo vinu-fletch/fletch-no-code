@@ -25,11 +25,8 @@ const SSNField = forwardRef(({
   const validateSSN = (trigger) => {
     let validationError = "";
 
-    console.log("rules", rules, "trigger", trigger);
-
     for (const rule of rules) {
       if (rule.trigger === trigger) {
-        console.log("Rule is ", rule)
         const {actions} = rule;
         const action = actions[0]
         if (rule.type === "lengthCheck") {

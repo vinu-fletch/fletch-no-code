@@ -67,7 +67,6 @@ const TextField = forwardRef(({
 
     for (const rule of rules) {
       if (rule.trigger === event) {
-        console.log("Rule is", rule)
         switch (rule.type) {
           case "lengthCheck":
             validationError = validateLength(text, rule.actions[0].config);

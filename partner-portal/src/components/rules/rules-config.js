@@ -400,10 +400,10 @@ const RuleConfig = ({ onSave, onCancel, initialRule }) => {
                       </Select>
                     </FormControl>
                     <FormControl mt={3}>
-                      <FormLabel>Condition Value</FormLabel>
+                      <FormLabel>Expected Value</FormLabel>
                       <Input
-                        name="conditionValue"
-                        value={action.config.conditionValue || ""}
+                        name="expectedValue"
+                        value={action.config.expectedValue || ""}
                         onChange={(e) =>
                           setRule({
                             ...rule,
@@ -413,7 +413,7 @@ const RuleConfig = ({ onSave, onCancel, initialRule }) => {
                                     ...a,
                                     config: {
                                       ...a.config,
-                                      conditionValue: e.target.value,
+                                      expectedValue: e.target.value,
                                     },
                                   }
                                 : a
@@ -425,6 +425,36 @@ const RuleConfig = ({ onSave, onCancel, initialRule }) => {
                         color="text.primary"
                       />
                     </FormControl>
+                    <FormControl>
+                    <FormLabel>Expected Value Type</FormLabel>
+                      <Select
+                        name="expectedValueType"
+                        value={action.config.expectedValueType || "string"}
+                        onChange={(e) =>
+                          setRule({
+                            ...rule,
+                            actions: rule.actions.map((a, i) =>
+                              i === index
+                                ? {
+                                    ...a,
+                                    config: {
+                                      ...a.config,
+                                      expectedValueType: e.target.value,
+                                    },
+                                  }
+                                : a
+                            ),
+                          })
+                        }
+                        bg="background.dark"
+                        color="text.primary"
+                      >
+                        <option value="string">String</option>
+                        <option value="number">Number</option>
+                        <option value="boolean">Boolean</option>
+                      </Select>
+                     </FormControl>
+   
                     {/* Error Message */}
                     <FormControl mt={3}>
                       <FormLabel>Error Message</FormLabel>

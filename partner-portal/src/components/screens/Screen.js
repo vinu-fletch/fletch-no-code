@@ -33,22 +33,23 @@ const Screen = ({ screen, globalConfig, onContinue, onBack, isFirstScreen, isLas
   const hasErrors = Object.values(fieldErrors).some((error) => error);
 
   const handleApiCall = async (rule, fieldValue) => {
-    const { url, method, headers, body, responseDataPath, expectedValue, expectedValueType, errorMessage } = rule.config;
-
-    const parsedHeaders = headers ? JSON.parse(headers.replace(/\[\[field_value\]\]/g, fieldValue)) : {};
-    const parsedBody = body ? JSON.parse(body.replace(/\[\[field_value\]\]/g, fieldValue)) : {};
+    const { apiUrl, requestMethod, requestHeaders, requestBody, responseDataPath, expectedValue, expectedValueType, errorMessage } = rule.actions[0].config;
+    
+    console.log("Parameters",  { apiUrl, requestMethod, requestHeaders, requestBody, responseDataPath, expectedValue, expectedValueType, errorMessage })
+    const parsedHeaders = requestHeaders ? JSON.parse(requestHeaders.replace(/\[\[field_value\]\]/g, fieldValue)) : {};
+    const parsedBody = requestBody ? JSON.parse(requestBody.replace(/\[\[field_value\]\]/g, fieldValue)) : {};
 
     try {
       const options = {
-        method: method || 'POST',
+        method: requestMethod || 'POST',
         headers: {
           'Content-Type': 'application/json',
           ...parsedHeaders,
         },
-        body: method === 'POST' || method === 'PUT' ? JSON.stringify(parsedBody) : undefined,
+        body: requestMethod === 'POST' || requestMethod === 'PUT' ? JSON.stringify(parsedBody) : undefined,
       };
 
-      const response = await fetch(url, options);
+      const response = await fetch(apiUrl, options);
       const responseData = await response.json();
       const actualValue = responseDataPath.split('.').reduce((acc, key) => acc[key], responseData);
 
@@ -101,6 +102,7 @@ const Screen = ({ screen, globalConfig, onContinue, onBack, isFirstScreen, isLas
 
       for (const rule of onSubmitRules) {
         if (rule.type === "apiCall") {
+          alert("Ran")
           const fieldValue = document.querySelector(`#field-${field.id}`).value; 
           isValid = await handleApiCall(rule, fieldValue);
           if (!isValid) break;
