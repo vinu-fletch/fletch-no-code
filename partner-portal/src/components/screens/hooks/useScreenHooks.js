@@ -2,15 +2,7 @@
 
 import { useEffect } from 'react';
 
-const useScreenHooks = (
-  screen,
-  fieldValues,
-  setFieldValues,
-  globalVariables,
-  setGlobalVariables
-) => {
-  // Helper function to replace placeholders in strings
-  const replacePlaceholders = (str, values) => {
+export const replacePlaceholders = (str, values) => {
     return str.replace(/\{\{(.*?)\}\}/g, (match, key) => {
       const keys = key.trim().split('.');
       return keys.reduce((acc, curr) => acc && acc[curr], values) || '';
@@ -18,7 +10,7 @@ const useScreenHooks = (
   };
 
   // Helper function to set a value at a nested path in an object
-  const setValueAtPath = (obj, path, value) => {
+ export const setValueAtPath = (obj, path, value) => {
     const keys = path.split('.');
     let curr = obj;
     for (let i = 0; i < keys.length - 1; i++) {
@@ -27,6 +19,16 @@ const useScreenHooks = (
     }
     curr[keys[keys.length - 1]] = value;
   };
+
+const useScreenHooks = (
+  screen,
+  fieldValues,
+  setFieldValues,
+  globalVariables,
+  setGlobalVariables
+) => {
+  // Helper function to replace placeholders in strings
+  
 
   // Function to handle API calls and populate values
   const handleApiCallAndPopulate = async (action) => {

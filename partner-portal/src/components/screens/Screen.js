@@ -1,11 +1,10 @@
 import React, { useState, useRef } from "react";
 import { Box, Text, VStack, Flex } from "@chakra-ui/react";
 import Button from "@/common-ui/button/button";
-import Pincode from "@/common-ui/text/text";
 import SSNField from "@/common-ui/ssn/ssn";
 import TextField from "@/common-ui/text/text";
 import { usePartnerStore } from "@/store";
-import useScreenHooks from "./hooks/useScreenHooks";
+import useScreenHooks, { replacePlaceholders } from "./hooks/useScreenHooks";
 
 
 const fontSizeMapping = {
@@ -46,17 +45,22 @@ const Screen = ({ screen, globalConfig, onContinue, onBack, isFirstScreen, isLas
     setFieldErrors((prevErrors) => ({ ...prevErrors, [fieldId]: !isValid }));
   };
 
-  const hasErrors = Object.values(fieldErrors).some((error) => error);
+  const handleFieldChange = (fieldName) => (value) => {
+    setFieldValues({ [fieldName]: value });
+  };
 
-  console.log("Screen rules", screen.screen_config.rules);
+  const values = {
+      field_values: fieldValues,
+      global: globalVariables,
+    };
+
+  const hasErrors = Object.values(fieldErrors).some((error) => error);
 
   const handleFieldApiCall = async (rule, fieldValue) => {
     const { apiUrl, requestMethod, requestHeaders, requestBody, responseDataPath, expectedValue, expectedValueType, errorMessage } = rule.actions[0].config;
     
-    console.log("Parameters",  { apiUrl, requestMethod, requestHeaders, requestBody, responseDataPath, expectedValue, expectedValueType, errorMessage })
-    const parsedHeaders = requestHeaders ? JSON.parse(requestHeaders.replace(/\[\[field_value\]\]/g, fieldValue)) : {};
-    const parsedBody = requestBody ? JSON.parse(requestBody.replace(/\[\[field_value\]\]/g, fieldValue)) : {};
-
+    const parsedHeaders = JSON.parse(replacePlaceholders(requestHeaders, values))
+    const parsedBody =  JSON.parse(replacePlaceholders(requestBody, values))
     try {
       const options = {
         method: requestMethod || 'POST',
@@ -129,6 +133,7 @@ const Screen = ({ screen, globalConfig, onContinue, onBack, isFirstScreen, isLas
     }
 
     if (isValid) {
+      await executeOnSubmitRules();
       onContinue();
     } else {
       console.log("Validation failed. Please correct the errors.");
@@ -165,7 +170,7 @@ const Screen = ({ screen, globalConfig, onContinue, onBack, isFirstScreen, isLas
                   errorMessage={field.field_config?.attributes?.errorMessage || ""}
                   rules={field.field_config?.rules || []}
                   onValidate={(isValid) => handleFieldValidation(field.id || index, isValid)}
-                />
+                  onChange={handleFieldChange(field.field_config?.attributes?.name)}                />
               ) : field.type === "ssn" ? (
                 <SSNField
                   ref={fieldRefs.current[index]}
@@ -179,6 +184,7 @@ const Screen = ({ screen, globalConfig, onContinue, onBack, isFirstScreen, isLas
                   backgroundColor={field.field_config?.attributes?.backgroundColor}
                   rules={field.field_config?.rules || []}
                   onValidate={(isValid) => handleFieldValidation(field.id || index, isValid)}
+                  onChange={handleFieldChange(field.field_config?.attributes?.name)}  
                 />
               ) : (
                 <input type="hidden" name={field.field_config?.attributes?.name} value="" />

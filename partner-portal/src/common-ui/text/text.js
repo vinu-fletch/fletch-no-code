@@ -23,6 +23,7 @@ const TextField = forwardRef(({
   placeholderPosition = "inside",
   rules = [],
   onValidate,
+  onChange
 }, ref) => {
   const [text, setText] = useState("");
   const [error, setError] = useState("");
@@ -99,6 +100,7 @@ const TextField = forwardRef(({
   const handletextChange = (e) => {
     setText(e.target.value);
     setError("");
+    onChange && onChange(e.target.value);
   };
 
   const hasOnBlurRule = rules.some((rule) => rule.trigger === "onBlur");

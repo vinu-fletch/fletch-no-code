@@ -10,6 +10,7 @@ router.put('/:partnerId/config/:configVersion/category/:categoryName/screens', p
 router.get('/:name/versions', partnerController.getPartnerConfigurations);
 router.post("/pincode/valid", partnerController.validatePincode); 
 router.get("/keys/x-api-key", partnerController.getApiKey);
+router.post("/lead", partnerController.createLead);
 
 
 module.exports = router;

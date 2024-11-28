@@ -6,6 +6,7 @@ import { usePartnerStore } from "../../store";
 
 const ScreensManager = () => {
   const partnerConfig = usePartnerStore((state) => state.partnerDraft);
+  const fieldValues = usePartnerStore((state) => state.fieldValues);
   const [currentScreenIndex, setCurrentScreenIndex] = useState(0);
   const [isSubmitted, setIsSubmitted] = useState(false);
 
@@ -66,8 +67,9 @@ const ScreensManager = () => {
               </Text>
             </ModalHeader>
             <ModalBody pb={8}>
-              <Text color="text.secondary" fontSize="lg">
-                {globalConfig.form_completion_paragraph || "We will get in touch with you shortly"}
+
+              <Text>
+                 {JSON.stringify(fieldValues, 2)}
               </Text>
             </ModalBody>
           </ModalContent>

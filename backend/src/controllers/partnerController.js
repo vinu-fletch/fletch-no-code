@@ -1,4 +1,5 @@
 const partnerService = require('../services/partnerService');
+const { v4: uuidv4 } = require('uuid');
 
 
 
@@ -128,6 +129,10 @@ async function getApiKey(req, res) {
   res.status(200).json({ apiKey: "123456"});
 }
 
+async function createLead(req, res) {
+  res.status(200).json({leadId: uuidv4()})
+}
+
 module.exports = {
   getPartnerByName,
   updatePartnerConfig,
@@ -137,5 +142,6 @@ module.exports = {
   deleteScreen,
   getPartnerConfigurations,
   validatePincode,
-  getApiKey
+  getApiKey,
+  createLead
 };

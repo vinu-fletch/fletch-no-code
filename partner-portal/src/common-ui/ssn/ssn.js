@@ -18,6 +18,7 @@ const SSNField = forwardRef(({
   backgroundColor,
   rules = [],
   onValidate,
+  onChange,
 }, ref) => {
   const [ssn, setSSN] = useState(Array(9).fill("")); 
   const [error, setError] = useState("");
@@ -69,6 +70,7 @@ const SSNField = forwardRef(({
       const newSSN = [...ssn];
       newSSN[index] = value;
       setSSN(newSSN);
+      if (onChange) onChange(newSSN.join("")); 
       setError("");
 
       if (value && index < 8) {
