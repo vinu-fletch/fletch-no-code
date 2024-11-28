@@ -7,7 +7,18 @@ export const usePartnerStore = create((set, get) => ({
   partnerData: null,       
   partnerDraft: null,      
   versions: [],            
-  selectedVersion: null,   
+  selectedVersion: null,
+  fieldValues: {},
+  globalVariables: {},
+  
+   setFieldValues: (fields) => {
+    console.log("Fields being added", fields);
+    set((state) => ({ fieldValues: { ...state.fieldValues, ...fields } }));
+  },
+
+  setGlobalVariables: (variables) => {
+    set((state) => ({ globalVariables: { ...state.globalVariables, ...variables } }));
+  },
 
   setPartnerData: (data) =>
     set({

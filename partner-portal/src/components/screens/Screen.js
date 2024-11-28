@@ -4,6 +4,8 @@ import Button from "@/common-ui/button/button";
 import Pincode from "@/common-ui/text/text";
 import SSNField from "@/common-ui/ssn/ssn";
 import TextField from "@/common-ui/text/text";
+import { usePartnerStore } from "@/store";
+import useScreenHooks from "./hooks/useScreenHooks";
 
 
 const fontSizeMapping = {
@@ -20,6 +22,20 @@ const Screen = ({ screen, globalConfig, onContinue, onBack, isFirstScreen, isLas
   const description = screenConfig.description;
   const descriptionColor = screenConfig.description_color;
   const continueButtonText = screenConfig.continue_button_text || "Continue";
+
+  const fieldValues = usePartnerStore((state) => state.fieldValues);
+  const setFieldValues = usePartnerStore((state) => state.setFieldValues);
+
+  const globalVariables = usePartnerStore((state) => state.globalVariables);
+  const setGlobalVariables = usePartnerStore((state) => state.setGlobalVariables);
+
+  const { executeOnSubmitRules } = useScreenHooks(
+    screen,
+    fieldValues,
+    setFieldValues,
+    globalVariables,
+    setGlobalVariables
+  );
 
   const [fieldErrors, setFieldErrors] = useState({});
   const [formError, setFormError] = useState("");
