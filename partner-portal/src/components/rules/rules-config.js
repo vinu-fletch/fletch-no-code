@@ -160,6 +160,22 @@ const RuleConfig = ({ onSave, onCancel, initialRule }) => {
           <>
             {rule.actions.map((action, index) => (
               <Box key={index} p={3} bg="gray.700" borderRadius="md" mb={3}>
+                <HStack justifyContent="space-between">
+                  <FormLabel>Action {index + 1}</FormLabel>
+                  <Button
+                    size="sm"
+                    colorScheme="red"
+                    onClick={() => {
+                      setRule({
+                        ...rule,
+                        actions: rule.actions.filter((_, i) => i !== index),
+                      });
+                    }}
+                  >
+                    Delete Action
+                  </Button>
+                </HStack>
+
                 <FormControl>
                   <FormLabel>Action Type</FormLabel>
                   <Select
@@ -182,6 +198,114 @@ const RuleConfig = ({ onSave, onCancel, initialRule }) => {
 
                 {action.type === "validation" && (
                   <>
+                    <FormControl mt={3}>
+                      <FormLabel>API URL</FormLabel>
+                      <Input
+                        name="apiUrl"
+                        value={action.config.apiUrl || ""}
+                        onChange={(e) =>
+                          setRule({
+                            ...rule,
+                            actions: rule.actions.map((a, i) =>
+                              i === index
+                                ? {
+                                    ...a,
+                                    config: {
+                                      ...a.config,
+                                      apiUrl: e.target.value,
+                                    },
+                                  }
+                                : a
+                            ),
+                          })
+                        }
+                        placeholder="e.g., https://api.example.com/validate"
+                        bg="background.dark"
+                        color="text.primary"
+                      />
+                    </FormControl>
+                    <FormControl mt={3}>
+                      <FormLabel>Request Method</FormLabel>
+                      <Select
+                        name="requestMethod"
+                        value={action.config.requestMethod || "GET"}
+                        onChange={(e) =>
+                          setRule({
+                            ...rule,
+                            actions: rule.actions.map((a, i) =>
+                              i === index
+                                ? {
+                                    ...a,
+                                    config: {
+                                      ...a.config,
+                                      requestMethod: e.target.value,
+                                    },
+                                  }
+                                : a
+                            ),
+                          })
+                        }
+                        bg="background.dark"
+                        color="text.primary"
+                      >
+                        <option value="GET">GET</option>
+                        <option value="POST">POST</option>
+                        <option value="PUT">PUT</option>
+                        <option value="DELETE">DELETE</option>
+                      </Select>
+                    </FormControl>
+                    <FormControl mt={3}>
+                      <FormLabel>Request Headers (JSON)</FormLabel>
+                      <Textarea
+                        name="requestHeaders"
+                        value={action.config.requestHeaders || ""}
+                        onChange={(e) =>
+                          setRule({
+                            ...rule,
+                            actions: rule.actions.map((a, i) =>
+                              i === index
+                                ? {
+                                    ...a,
+                                    config: {
+                                      ...a.config,
+                                      requestHeaders: e.target.value,
+                                    },
+                                  }
+                                : a
+                            ),
+                          })
+                        }
+                        placeholder='e.g., { "Authorization": "Bearer token" }'
+                        bg="background.dark"
+                        color="text.primary"
+                      />
+                    </FormControl>
+                    <FormControl mt={3}>
+                      <FormLabel>Request Body (JSON)</FormLabel>
+                      <Textarea
+                        name="requestBody"
+                        value={action.config.requestBody || ""}
+                        onChange={(e) =>
+                          setRule({
+                            ...rule,
+                            actions: rule.actions.map((a, i) =>
+                              i === index
+                                ? {
+                                    ...a,
+                                    config: {
+                                      ...a.config,
+                                      requestBody: e.target.value,
+                                    },
+                                  }
+                                : a
+                            ),
+                          })
+                        }
+                        placeholder='e.g., { "key": "value" }'
+                        bg="background.dark"
+                        color="text.primary"
+                      />
+                    </FormControl>
                     <FormControl mt={3}>
                       <FormLabel>Response Data Path</FormLabel>
                       <Input
@@ -237,6 +361,32 @@ const RuleConfig = ({ onSave, onCancel, initialRule }) => {
                         <option value="lt">Less than</option>
                       </Select>
                     </FormControl>
+                    <FormControl mt={3}>
+                      <FormLabel>Condition Value</FormLabel>
+                      <Input
+                        name="conditionValue"
+                        value={action.config.conditionValue || ""}
+                        onChange={(e) =>
+                          setRule({
+                            ...rule,
+                            actions: rule.actions.map((a, i) =>
+                              i === index
+                                ? {
+                                    ...a,
+                                    config: {
+                                      ...a.config,
+                                      conditionValue: e.target.value,
+                                    },
+                                  }
+                                : a
+                            ),
+                          })
+                        }
+                        placeholder="e.g., true"
+                        bg="background.dark"
+                        color="text.primary"
+                      />
+                    </FormControl>
                   </>
                 )}
 
@@ -268,6 +418,7 @@ const RuleConfig = ({ onSave, onCancel, initialRule }) => {
                         color="text.primary"
                       />
                     </FormControl>
+                    {/* You can add more fields here if needed */}
                   </>
                 )}
               </Box>
