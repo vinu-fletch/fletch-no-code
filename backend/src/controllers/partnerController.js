@@ -124,6 +124,10 @@ async function validatePincode(req, res) {
   }
 }
 
+async function getApiKey(req, res) {
+  res.status(200).json({ apiKey: "123456"});
+}
+
 module.exports = {
   getPartnerByName,
   updatePartnerConfig,
@@ -132,5 +136,6 @@ module.exports = {
   saveScreens,
   deleteScreen,
   getPartnerConfigurations,
-  validatePincode
+  validatePincode,
+  getApiKey
 };

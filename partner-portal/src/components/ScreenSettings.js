@@ -11,15 +11,22 @@ import {
   AccordionPanel,
   AccordionIcon,
   Select,
+  Button,
+  HStack,
 } from "@chakra-ui/react";
 import { ChromePicker } from "react-color";
+import ScreenRuleConfig from "./rules/screen-rules-config";
+
 
 export const ScreenSettings = ({ screens, activeScreenIndex, onUpdateScreen }) => {
   const [showColorPicker, setShowColorPicker] = useState({ background: false, heading: false, description: false });
-
   
+  const [isAddingRule, setIsAddingRule] = useState(false);
+  const [editingRuleIndex, setEditingRuleIndex] = useState(null);
+
   const activeScreen = screens[activeScreenIndex];
   const screenConfig = activeScreen?.screen_config || {};
+  const sectionRules = screenConfig.rules || [];
 
   const toggleColorPicker = (key) => {
     setShowColorPicker((prev) => ({
@@ -31,6 +38,7 @@ export const ScreenSettings = ({ screens, activeScreenIndex, onUpdateScreen }) =
   return (
     <Box p={4} bg="background.dark" color="text.primary" width="100%">
       <Accordion allowMultiple>
+        {/* Existing AccordionItem for Screen Settings */}
         <AccordionItem>
           <AccordionButton>
             <Box flex="1" textAlign="left">
@@ -268,6 +276,110 @@ export const ScreenSettings = ({ screens, activeScreenIndex, onUpdateScreen }) =
                 />
               </FormControl>
             </VStack>
+          </AccordionPanel>
+        </AccordionItem>
+
+        {/* New AccordionItem for Section Rules */}
+        <AccordionItem>
+          <AccordionButton>
+            <Box flex="1" textAlign="left">
+              Section Rules
+            </Box>
+            <AccordionIcon />
+          </AccordionButton>
+          <AccordionPanel pb={4}>
+            {isAddingRule || editingRuleIndex !== null ? (
+              <ScreenRuleConfig
+                initialRule={editingRuleIndex !== null ? sectionRules[editingRuleIndex] : null}
+                onSave={(rule) => {
+                  const updatedScreens = [...screens];
+                  const updatedRules = [...sectionRules];
+
+                  if (editingRuleIndex !== null) {
+                    // Editing an existing rule
+                    updatedRules[editingRuleIndex] = rule;
+                  } else {
+                    // Adding a new rule
+                    updatedRules.push(rule);
+                  }
+
+                  updatedScreens[activeScreenIndex].screen_config = {
+                    ...screenConfig,
+                    rules: updatedRules,
+                  };
+
+                  onUpdateScreen(updatedScreens);
+
+                  // Reset states
+                  setIsAddingRule(false);
+                  setEditingRuleIndex(null);
+                }}
+                onCancel={() => {
+                  setIsAddingRule(false);
+                  setEditingRuleIndex(null);
+                }}
+              />
+            ) : (
+              <>
+                <VStack spacing={4} align="stretch">
+                  {sectionRules.length > 0 ? (
+                    sectionRules.map((rule, index) => (
+                      <Box key={index} p={4} bg="gray.700" borderRadius="md">
+                        {/* Display rule details */}
+                        <Box>
+                          <strong>Trigger:</strong> {rule.trigger}
+                        </Box>
+                        <Box>
+                          <strong>Type:</strong> {rule.type}
+                        </Box>
+                        {/* You can display more details or actions here */}
+
+                        {/* Buttons to edit or delete the rule */}
+                        <HStack spacing={2} mt={2}>
+                          <Button
+                            size="sm"
+                            onClick={() => {
+                              setEditingRuleIndex(index);
+                            }}
+                          >
+                            Edit
+                          </Button>
+                          <Button
+                            size="sm"
+                            colorScheme="red"
+                            onClick={() => {
+                              // Delete the rule
+                              const updatedScreens = [...screens];
+                              const updatedRules = sectionRules.filter((_, i) => i !== index);
+                              updatedScreens[activeScreenIndex].screen_config = {
+                                ...screenConfig,
+                                rules: updatedRules,
+                              };
+                              onUpdateScreen(updatedScreens);
+                            }}
+                          >
+                            Delete
+                          </Button>
+                        </HStack>
+                      </Box>
+                    ))
+                  ) : (
+                    <Box>No rules defined.</Box>
+                  )}
+
+                  {/* Button to add a new rule */}
+                  <Button
+                    variant="outline"
+                    colorScheme="primary"
+                    onClick={() => {
+                      setIsAddingRule(true);
+                    }}
+                  >
+                    Add Rule
+                  </Button>
+                </VStack>
+              </>
+            )}
           </AccordionPanel>
         </AccordionItem>
       </Accordion>

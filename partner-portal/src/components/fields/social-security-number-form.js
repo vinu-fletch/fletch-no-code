@@ -25,7 +25,7 @@ import {
   useDisclosure,
 } from "@chakra-ui/react";
 import { AddIcon, EditIcon, DeleteIcon } from "@chakra-ui/icons";
-import RuleConfig from "../rules/rules-config";
+import RuleConfig from "../rules/field-rules-config";
 import { List, arrayMove } from "react-movable";
 
 const SocialSecurityNumberConfig = ({

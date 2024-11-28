@@ -9,6 +9,7 @@ router.put("/category/:categoryName", partnerController.updateCategoryStatus);
 router.put('/:partnerId/config/:configVersion/category/:categoryName/screens', partnerController.saveScreens);
 router.get('/:name/versions', partnerController.getPartnerConfigurations);
 router.post("/pincode/valid", partnerController.validatePincode); 
+router.get("/keys/x-api-key", partnerController.getApiKey);
 
 
 module.exports = router;

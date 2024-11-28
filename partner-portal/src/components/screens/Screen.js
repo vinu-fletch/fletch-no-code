@@ -32,7 +32,9 @@ const Screen = ({ screen, globalConfig, onContinue, onBack, isFirstScreen, isLas
 
   const hasErrors = Object.values(fieldErrors).some((error) => error);
 
-  const handleApiCall = async (rule, fieldValue) => {
+  console.log("Screen rules", screen.screen_config.rules);
+
+  const handleFieldApiCall = async (rule, fieldValue) => {
     const { apiUrl, requestMethod, requestHeaders, requestBody, responseDataPath, expectedValue, expectedValueType, errorMessage } = rule.actions[0].config;
     
     console.log("Parameters",  { apiUrl, requestMethod, requestHeaders, requestBody, responseDataPath, expectedValue, expectedValueType, errorMessage })
@@ -102,9 +104,8 @@ const Screen = ({ screen, globalConfig, onContinue, onBack, isFirstScreen, isLas
 
       for (const rule of onSubmitRules) {
         if (rule.type === "apiCall") {
-          alert("Ran")
           const fieldValue = document.querySelector(`#field-${field.id}`).value; 
-          isValid = await handleApiCall(rule, fieldValue);
+          isValid = await handleFieldApiCall(rule, fieldValue);
           if (!isValid) break;
         }
       }
