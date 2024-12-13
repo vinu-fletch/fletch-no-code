@@ -125,6 +125,22 @@ const ScreenRuleConfig = ({ onSave, onCancel, initialRule }) => {
 
                 {/* API Configuration */}
                 <FormControl mt={3}>
+                  <FormLabel>API Type</FormLabel>
+                  <Select
+                    name="apiType"
+                    value={action.config?.apiType || "GET"}
+                    onChange={(e) =>
+                      handleActionConfigChange(index, "apiType", e.target.value)
+                    }
+                    bg="background.dark"
+                    color="text.primary"
+                  >
+                    <option value="Non Sensitive">Non Sensitive</option>
+                    <option value="Sensitive">Sensitive</option>
+                  </Select>
+                </FormControl>
+
+                <FormControl mt={3}>
                   <FormLabel>API URL</FormLabel>
                   <Input
                     name="apiUrl"

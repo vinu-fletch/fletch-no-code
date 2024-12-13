@@ -29,41 +29,58 @@ import { Preview } from "./preview/preview";
 const GlobalCustomization = () => {
   const partnerDraft = usePartnerStore((state) => state.partnerDraft);
   const partnerData = usePartnerStore((state) => state.partnerData);
-  const updatePartnerDraft = usePartnerStore((state) => state.updatePartnerDraft);
+  const updatePartnerDraft = usePartnerStore(
+    (state) => state.updatePartnerDraft
+  );
   const savePartnerDraft = usePartnerStore((state) => state.savePartnerDraft);
-  const discardPartnerDraft = usePartnerStore((state) => state.discardPartnerDraft);
+  const discardPartnerDraft = usePartnerStore(
+    (state) => state.discardPartnerDraft
+  );
 
   const config = partnerDraft?.config || {};
 
-  
-  const [logoLink, setLogoLink] = useState("");
+  const [logoURL, setLogoURL] = useState("");
   const [logoWidth, setLogoWidth] = useState("");
   const [logoHeight, setLogoHeight] = useState("");
   const [logoAlignment, setLogoAlignment] = useState("center");
+  const [headerBackgroundColor, setHeaderBackgroundColor] = useState("#fff");
+
   const [footerText, setFooterText] = useState("");
+  const [footerFontColor, setFooterFontColor] = useState("#000");
+  const [footerFontSize, setFooterFontSize] = useState("16px");
+  const [footerFontWeight, setFooterFontWeight] = useState("400");
+  const [footerBackgroundColor, setFooterBackgroundColor] = useState("#000");
+
   const [layoutPercentage, setLayoutPercentage] = useState(60);
   const [fontFamily, setFontFamily] = useState("Arial");
 
-  
-    const [isPreviewOpen, setPreviewOpen] = useState(false);
+  const [isPreviewOpen, setPreviewOpen] = useState(false);
 
-
-  
-  const [formCompletionHeading, setFormCompletionHeading] = useState("");
   const [formCompletionParagraph, setFormCompletionParagraph] = useState("");
+
   const [primaryColor, setPrimaryColor] = useState("#333");
   const [secondaryColor, setSecondaryColor] = useState("#555");
-  const [bgColor, setBgColor] = useState("#fff");
-  const [secondaryBgColor, setSecondaryBgColor] = useState("#f5f5f5");
-  const [fieldBgColor, setFieldBgColor] = useState("#f5f5f5");
-  const [modalBgColor, setModalBgColor] = useState("#f5f5f5");
-  const [textPrimaryColor, setTextPrimaryColor] = useState("#000");
-  const [textSecondaryColor, setTextSecondaryColor] = useState("#666");
-  const [textPlaceholderColor, setTextPlaceholderColor] = useState("#999");
-  const [textErrorColor, setTextErrorColor] = useState("#ff0000");
+  const [backgroundColor, setBackgroundColor] = useState("#fff");
+  const [primaryTextColor, setPrimaryTextColor] = useState("#000");
+  const [secondaryTextColor, setSecondaryTextColor] = useState("#666");
   const [buttonPrimaryColor, setButtonPrimaryColor] = useState("#007bff");
   const [buttonSecondaryColor, setButtonSecondaryColor] = useState("#6c757d");
+  const [buttonTextColor, setButtonTextColor] = useState("#000");
+  const [fieldPlaceholderColor, setFieldPlaceholderColor] = useState("#ced4da");
   const [fieldBorderColor, setFieldBorderColor] = useState("#ced4da");
+  const [fieldErrorColor, setFieldErrorColor] = useState("#ff0000");
+  const [sectionHeadingColor, setSectionHeadingColor] = useState("#000");
+  const [primaryFontSize, setPrimaryFontSize] = useState("16px");
+  const [primaryFontWeight, setPrimaryFontWeight] = useState("400");
+  const [buttonFontSize, setButtonFontSize] = useState("16px");
+  const [buttonFontWeight, setButtonFontWeight] = useState("400");
+  const [buttonBorderRadius, setButtonBorderRadius] = useState("20px");
+  const [sectionHeading, setSectionHeading] = useState("");
+  const [sectionHeadingFontWeight, setSectionHeadingFontWeight] =
+    useState("500");
+  const [sectionHeadingFontSize, setSectionHeadingFontSize] = useState("20px");
+  const [formParagraph, setFormParagraph] = useState("");
+
   const [showColorPicker, setShowColorPicker] = useState({
     primaryColor: false,
     secondaryColor: false,
@@ -81,41 +98,79 @@ const GlobalCustomization = () => {
     if (partnerDraft && partnerDraft.config) {
       const config = partnerDraft.config;
 
-      
-      setLogoLink(config.header_config?.logo_link || "");
+      setLogoURL(config.header_config?.logo_url || "");
       setLogoWidth(config.header_config?.logo_width || "");
       setLogoHeight(config.header_config?.logo_height || "");
       setLogoAlignment(config.header_config?.logo_alignment || "center");
+      setHeaderBackgroundColor(
+        config.header_config?.header_background_color || "#fff"
+      );
+
       setFooterText(config.footer_config?.footer_text || "");
+      setFooterFontColor(config.footer_config?.footer_font_color || "#000");
+      setFooterFontSize(config.footer_config?.footer_font_size || "16px");
+      setFooterFontWeight(config.footer_config?.footer_font_weight || "400");
+      setFooterBackgroundColor(
+        config.footer_config?.footer_background_color || "#fff"
+      );
+
       setLayoutPercentage(config.layout_config?.layout_percentage || 60);
       setFontFamily(config.global_config?.font_family || "Arial");
 
-      
-      setFormCompletionHeading(config.global_config?.form_completion_heading || "");
-      setFormCompletionParagraph(config.global_config?.form_completion_paragraph || "");
       setPrimaryColor(config.global_config?.primary_color || "#333");
       setSecondaryColor(config.global_config?.secondary_color || "#555");
-      setBgColor(config.global_config?.primary_background_color || "#fff");
-      setSecondaryBgColor(config.global_config?.secondary_background_color || "#f5f5f5");
-      setFieldBgColor(config.global_config?.field_background_color || "#f5f5f5");
-      setModalBgColor(config.global_config?.modal_background_color || "#f5f5f5");
+      setBackgroundColor(config.global_config?.background_color || "#fff");
+      setPrimaryTextColor(
+        config.global_config?.primary_text_color || "#f5f5f5"
+      );
+      setSecondaryTextColor(
+        config.global_config?.secndary_text_color || "#f5f5f5"
+      );
 
-      setTextPrimaryColor(config.global_config?.text_primary_color || "#000");
-      setTextSecondaryColor(config.global_config?.text_secondary_color || "#666");
-      setTextPlaceholderColor(config.global_config?.text_placeholder_color || "#999");
-      setTextErrorColor(config.global_config?.text_error_color || "#ff0000");
-      setButtonPrimaryColor(config.global_config?.button_primary_color || "#007bff");
-      setButtonSecondaryColor(config.global_config?.button_secondary_color || "#6c757d");
-      setFieldBorderColor(config.global_config?.field_border_color || "#ced4da");
+      setButtonPrimaryColor(
+        config.global_config?.button_primary_color || "#000"
+      );
+      setButtonSecondaryColor(
+        config.global_config?.button_secondary_color || "#666"
+      );
+      setButtonTextColor(config.global_config?.button_text_color || "#999");
+      setFieldPlaceholderColor(
+        config.global_config?.field_placeholder_color || "#ff0000"
+      );
+      setFieldBorderColor(
+        config.global_config?.field_border_color || "#007bff"
+      );
+      setFieldErrorColor(config.global_config?.field_error_color || "#6c757d");
+      setSectionHeadingColor(
+        config.global_config?.section_heading_color || "#ced4da"
+      );
 
-      setSpacingBetweenFields(config.layout_config?.margin_between_fields || "medium");
-      setPaddingInsideFields(config.layout_config?.padding_inside_fields || "medium");
+      setPrimaryFontSize(config.global_config?.primary_font_size || "16px");
+      setPrimaryFontWeight(config.global_config?.primary_font_weight || "400");
+      setButtonFontSize(config.global_config?.button_font_size || "16px");
+      setButtonFontWeight(config.global_config?.button_font_weight || "400");
+      setButtonBorderRadius(
+        config.global_config?.button_border_radius || "20px"
+      );
+      setSectionHeading(config.global_config?.section_heading || "");
+      setSectionHeadingFontSize(
+        config.global_config?.section_heading_font_size || "20px"
+      );
+      setSectionHeadingFontWeight(
+        config.global_config?.section_heading_font_weight || "500"
+      );
+      setFormParagraph(config.global_config?.form_paragraph || "");
+
+      setSpacingBetweenFields(
+        config.layout_config?.margin_between_fields || "medium"
+      );
+      setPaddingInsideFields(
+        config.layout_config?.padding_inside_fields || "medium"
+      );
       setButtonPadding(config.layout_config?.button_padding || "medium");
       setIsResponsive(config.layout_config?.mobile_responsiveness || true);
-
     }
 
-    
     const handleClickOutside = (event) => {
       if (!event.target.closest(".color-picker")) {
         setShowColorPicker({
@@ -133,22 +188,23 @@ const GlobalCustomization = () => {
   }, [partnerData]);
 
   const handleColorChange = (color, setColor, configKey) => {
-  setColor(color.hex);
-  updatePartnerDraft({
-    config: {
-      global_config: {
-        ...config.global_config,
-        [configKey]: color.hex,
+    setColor(color.hex);
+    updatePartnerDraft({
+      config: {
+        global_config: {
+          ...config.global_config,
+          [configKey]: color.hex,
+        },
       },
-    },
-  });
-};
+    });
+  };
 
   const toggleColorPicker = (key) => {
     setShowColorPicker((prev) => ({ ...prev, [key]: !prev[key] }));
   };
 
-  const hasUnsavedChanges = JSON.stringify(partnerData) !== JSON.stringify(partnerDraft);
+  const hasUnsavedChanges =
+    JSON.stringify(partnerData) !== JSON.stringify(partnerDraft);
 
   return (
     <Box p={8} bg="black" minHeight="100vh">
@@ -156,12 +212,14 @@ const GlobalCustomization = () => {
         <Heading mr={8}>Global Customization</Heading>
         <HStack spacing={4}>
           <Button colorScheme="yellow" onClick={() => setPreviewOpen(true)}>
-              Preview
+            Preview
           </Button>
-        {hasUnsavedChanges && (
+          {hasUnsavedChanges && (
             <>
-              
-              <Button colorScheme="green" onClick={() => savePartnerDraft(false)}>
+              <Button
+                colorScheme="green"
+                onClick={() => savePartnerDraft(false)}
+              >
                 Save
               </Button>
               <Button colorScheme="blue" onClick={() => savePartnerDraft(true)}>
@@ -171,9 +229,8 @@ const GlobalCustomization = () => {
                 Discard
               </Button>
             </>
-         
-        )}
-         </HStack>
+          )}
+        </HStack>
       </Flex>
 
       <Box bg="black" p={6} rounded="md" shadow="md">
@@ -215,23 +272,78 @@ const GlobalCustomization = () => {
 
                 <HStack flexWrap={"wrap"} spacing={4}>
                   {[
-                    { label: "Primary Color", color: primaryColor, key: "primary_color", setColor: setPrimaryColor },
-                    { label: "Secondary Color", color: secondaryColor, key: "secondary_color", setColor: setSecondaryColor },
-                    { label: "Primary Background Color", color: bgColor, key: "primary_background_color", setColor: setBgColor },
-                    { label: "Secondary Background Color", color: secondaryBgColor, key: "secondary_background_color", setColor: setSecondaryBgColor },
                     {
-                      label: "Field Background Color", color: fieldBgColor, key: "field_background_color", setColor: setFieldBgColor,
+                      label: "Primary Color",
+                      color: primaryColor,
+                      key: "primary_color",
+                      setColor: setPrimaryColor,
                     },
                     {
-                      label: "Modal Background Color", color: modalBgColor, key: "modal_background_color", setColor: setModalBgColor, 
+                      label: "Secondary Color",
+                      color: secondaryColor,
+                      key: "secondary_color",
+                      setColor: setSecondaryColor,
                     },
-                    { label: "Text Primary Color", color: textPrimaryColor, key: "text_primary_color", setColor: setTextPrimaryColor },
-                    { label: "Text Secondary Color", color: textSecondaryColor, key: "text_secondary_color", setColor: setTextSecondaryColor },
-                    {label:"Text Placeholder Color", color: textPlaceholderColor, key: "text_placeholder_color", setColor: setTextPlaceholderColor},
-                    {label: "Text Error Color", color: textErrorColor, key: "text_error_color", setColor: setTextErrorColor}, 
-                    {label: "Button Primary Color", color: buttonPrimaryColor, key: "button_primary_color", setColor: setButtonPrimaryColor},
-                    {label: "Button Secondary Color", color: buttonSecondaryColor, key: "button_secondary_color", setColor: setButtonSecondaryColor},
-                    {label: "Field Border Color", color: fieldBorderColor, key: "field_border_color", setColor: setFieldBorderColor},
+                    {
+                      label: "Background Color",
+                      color: backgroundColor,
+                      key: "background_color",
+                      setColor: setBackgroundColor,
+                    },
+                    {
+                      label: "Primary Text Color",
+                      color: primaryTextColor,
+                      key: "primary_text_color",
+                      setColor: setPrimaryTextColor,
+                    },
+                    {
+                      label: "Secondary Text Color",
+                      color: secondaryTextColor,
+                      key: "secondary_text_color",
+                      setColor: setSecondaryTextColor,
+                    },
+                    {
+                      label: "Button Primary Color",
+                      color: buttonPrimaryColor,
+                      key: "button_primary_color",
+                      setColor: setButtonPrimaryColor,
+                    },
+                    {
+                      label: "Button Secondary Color",
+                      color: buttonSecondaryColor,
+                      key: "button_secondary_color",
+                      setColor: setButtonSecondaryColor,
+                    },
+                    {
+                      label: "Button Text Color",
+                      color: buttonTextColor,
+                      key: "button_text_color",
+                      setColor: setButtonTextColor,
+                    },
+                    {
+                      label: "Field Placeholder Color",
+                      color: fieldPlaceholderColor,
+                      key: "field_placeholder_color",
+                      setColor: setFieldPlaceholderColor,
+                    },
+                    {
+                      label: "Field Border Color",
+                      color: fieldBorderColor,
+                      key: "field_border_color",
+                      setColor: setFieldBorderColor,
+                    },
+                    {
+                      label: "Field Error Color",
+                      color: fieldErrorColor,
+                      key: "field_error_color",
+                      setColor: setFieldErrorColor,
+                    },
+                    {
+                      label: "Section Heading Color",
+                      color: sectionHeadingColor,
+                      key: "section_heading_color",
+                      setColor: setSectionHeadingColor,
+                    },
                   ].map(({ label, color, key, setColor }) => (
                     <Box key={key}>
                       <FormLabel>{label}</FormLabel>
@@ -249,7 +361,9 @@ const GlobalCustomization = () => {
                           id={key}
                           className="color-picker"
                           color={color}
-                          onChange={(updatedColor) => handleColorChange(updatedColor, setColor, key)}
+                          onChange={(updatedColor) =>
+                            handleColorChange(updatedColor, setColor, key)
+                          }
                           onClose={() => toggleColorPicker(key)}
                         />
                       )}
@@ -259,17 +373,17 @@ const GlobalCustomization = () => {
 
                 {/* Form Completion Message */}
                 <FormControl>
-                  <FormLabel>Form Completion Heading</FormLabel>
+                  <FormLabel>Primary Font Size</FormLabel>
                   <Input
-                    value={formCompletionHeading}
+                    value={primaryFontSize}
                     onChange={(e) => {
                       const value = e.target.value;
-                      setFormCompletionHeading(value);
+                      setPrimaryFontSize(value);
                       updatePartnerDraft({
                         config: {
                           global_config: {
                             ...config.global_config,
-                            form_completion_heading: value,
+                            primary_font_size: value,
                           },
                         },
                       });
@@ -277,17 +391,143 @@ const GlobalCustomization = () => {
                   />
                 </FormControl>
                 <FormControl>
-                  <FormLabel>Form Completion Paragraph</FormLabel>
-                  <Textarea
-                    value={formCompletionParagraph}
+                  <FormLabel>Primary Font Weight</FormLabel>
+                  <Input
+                    value={primaryFontWeight}
                     onChange={(e) => {
                       const value = e.target.value;
-                      setFormCompletionParagraph(value);
+                      setPrimaryFontWeight(value);
                       updatePartnerDraft({
                         config: {
                           global_config: {
                             ...config.global_config,
-                            form_completion_paragraph: value,
+                            primary_font_weight: value,
+                          },
+                        },
+                      });
+                    }}
+                  />
+                </FormControl>
+                <FormControl>
+                  <FormLabel>Button Font Size</FormLabel>
+                  <Input
+                    value={buttonFontSize}
+                    onChange={(e) => {
+                      const value = e.target.value;
+                      setButtonFontSize(value);
+                      updatePartnerDraft({
+                        config: {
+                          global_config: {
+                            ...config.global_config,
+                            button_font_size: value,
+                          },
+                        },
+                      });
+                    }}
+                  />
+                </FormControl>
+                <FormControl>
+                  <FormLabel>Button Font Weight</FormLabel>
+                  <Input
+                    value={buttonFontWeight}
+                    onChange={(e) => {
+                      const value = e.target.value;
+                      setButtonFontWeight(value);
+                      updatePartnerDraft({
+                        config: {
+                          global_config: {
+                            ...config.global_config,
+                            button_font_weight: value,
+                          },
+                        },
+                      });
+                    }}
+                  />
+                </FormControl>
+                <FormControl>
+                  <FormLabel>Button Border Radius</FormLabel>
+                  <Input
+                    value={buttonBorderRadius}
+                    onChange={(e) => {
+                      const value = e.target.value;
+                      setButtonBorderRadius(value);
+                      updatePartnerDraft({
+                        config: {
+                          global_config: {
+                            ...config.global_config,
+                            button_border_radius: value,
+                          },
+                        },
+                      });
+                    }}
+                  />
+                </FormControl>
+                <FormControl>
+                  <FormLabel>Section Heading</FormLabel>
+                  <Input
+                    value={sectionHeading}
+                    onChange={(e) => {
+                      const value = e.target.value;
+                      setSectionHeading(value);
+                      updatePartnerDraft({
+                        config: {
+                          global_config: {
+                            ...config.global_config,
+                            section_heading: value,
+                          },
+                        },
+                      });
+                    }}
+                  />
+                </FormControl>
+                <FormControl>
+                  <FormLabel>Section Heading Font Size</FormLabel>
+                  <Input
+                    value={sectionHeadingFontSize}
+                    onChange={(e) => {
+                      const value = e.target.value;
+                      setSectionHeadingFontSize(value);
+                      updatePartnerDraft({
+                        config: {
+                          global_config: {
+                            ...config.global_config,
+                            section_heading_font_size: value,
+                          },
+                        },
+                      });
+                    }}
+                  />
+                </FormControl>
+                <FormControl>
+                  <FormLabel>Section Heading Font Weight</FormLabel>
+                  <Input
+                    value={sectionHeadingFontWeight}
+                    onChange={(e) => {
+                      const value = e.target.value;
+                      setSectionHeadingFontWeight(value);
+                      updatePartnerDraft({
+                        config: {
+                          global_config: {
+                            ...config.global_config,
+                            section_heading_font_weight: value,
+                          },
+                        },
+                      });
+                    }}
+                  />
+                </FormControl>
+                <FormControl>
+                  <FormLabel>Form Paragraph</FormLabel>
+                  <Textarea
+                    value={formParagraph}
+                    onChange={(e) => {
+                      const value = e.target.value;
+                      setFormParagraph(value);
+                      updatePartnerDraft({
+                        config: {
+                          global_config: {
+                            ...config.global_config,
+                            form_paragraph: value,
                           },
                         },
                       });
@@ -312,15 +552,15 @@ const GlobalCustomization = () => {
                   <FormLabel>Logo Link (URL)</FormLabel>
                   <Input
                     type="text"
-                    value={logoLink}
+                    value={logoURL}
                     onChange={(e) => {
                       const value = e.target.value;
-                      setLogoLink(value);
+                      setLogoURL(value);
                       updatePartnerDraft({
                         config: {
                           header_config: {
                             ...config.header_config,
-                            logo_link: value,
+                            logo_url: value,
                           },
                         },
                       });
@@ -388,6 +628,40 @@ const GlobalCustomization = () => {
                     <option value="right">Right</option>
                   </Select>
                 </FormControl>
+                <HStack flexWrap={"wrap"} spacing={4}>
+                  {[
+                    {
+                      label: "Header Background Color",
+                      color: headerBackgroundColor,
+                      key: "header_background_color",
+                      setColor: setHeaderBackgroundColor,
+                    },
+                  ].map(({ label, color, key, setColor }) => (
+                    <Box key={key}>
+                      <FormLabel>{label}</FormLabel>
+                      <Box
+                        className="color-picker"
+                        bg={color}
+                        width="24px"
+                        height="24px"
+                        borderRadius="50%"
+                        cursor="pointer"
+                        onClick={() => toggleColorPicker(key)}
+                      />
+                      {showColorPicker[key] && (
+                        <ChromePicker
+                          id={key}
+                          className="color-picker"
+                          color={color}
+                          onChange={(updatedColor) =>
+                            handleColorChange(updatedColor, setColor, key)
+                          }
+                          onClose={() => toggleColorPicker(key)}
+                        />
+                      )}
+                    </Box>
+                  ))}
+                </HStack>
               </VStack>
             </AccordionPanel>
           </AccordionItem>
@@ -414,12 +688,87 @@ const GlobalCustomization = () => {
                           ...config.footer_config,
                           footer_text: value,
                         },
-                      }
-                      });
-                      
+                      },
+                    });
                   }}
                 />
               </FormControl>
+              <FormControl>
+                <FormLabel>Footer Font Size</FormLabel>
+                <Input
+                  value={footerFontSize}
+                  onChange={(e) => {
+                    const value = e.target.value;
+                    setFooterFontSize(value);
+                    updatePartnerDraft({
+                      config: {
+                        global_config: {
+                          ...config.global_config,
+                          footer_font_size: value,
+                        },
+                      },
+                    });
+                  }}
+                />
+              </FormControl>
+              <FormControl>
+                <FormLabel>Footer Font Weight</FormLabel>
+                <Input
+                  value={footerFontWeight}
+                  onChange={(e) => {
+                    const value = e.target.value;
+                    setFooterFontWeight(value);
+                    updatePartnerDraft({
+                      config: {
+                        global_config: {
+                          ...config.global_config,
+                          footer_font_weight: value,
+                        },
+                      },
+                    });
+                  }}
+                />
+              </FormControl>
+              <HStack flexWrap={"wrap"} spacing={4}>
+                {[
+                  {
+                    label: "Footer Font Color",
+                    color: footerFontColor,
+                    key: "footer_font_color",
+                    setColor: setFooterFontColor,
+                  },
+                  {
+                    label: "Footer Background Color",
+                    color: footerBackgroundColor,
+                    key: "footer_background_color",
+                    setColor: setFooterBackgroundColor,
+                  },
+                ].map(({ label, color, key, setColor }) => (
+                  <Box key={key}>
+                    <FormLabel>{label}</FormLabel>
+                    <Box
+                      className="color-picker"
+                      bg={color}
+                      width="24px"
+                      height="24px"
+                      borderRadius="50%"
+                      cursor="pointer"
+                      onClick={() => toggleColorPicker(key)}
+                    />
+                    {showColorPicker[key] && (
+                      <ChromePicker
+                        id={key}
+                        className="color-picker"
+                        color={color}
+                        onChange={(updatedColor) =>
+                          handleColorChange(updatedColor, setColor, key)
+                        }
+                        onClose={() => toggleColorPicker(key)}
+                      />
+                    )}
+                  </Box>
+                ))}
+              </HStack>
             </AccordionPanel>
           </AccordionItem>
 
@@ -447,8 +796,8 @@ const GlobalCustomization = () => {
                           ...config.layout_config,
                           layout_percentage: val,
                         },
-                      }
-                      });
+                      },
+                    });
                   }}
                 >
                   <SliderTrack bg="gray.200">
@@ -466,7 +815,7 @@ const GlobalCustomization = () => {
                 <Select
                   value={spacingBetweenFields}
                   onChange={(e) => {
-                    const value = e.target.value
+                    const value = e.target.value;
                     setSpacingBetweenFields(value);
                     updatePartnerDraft({
                       config: {
@@ -474,8 +823,8 @@ const GlobalCustomization = () => {
                           ...config.layout_config,
                           margin_between_fields: value,
                         },
-                      }
-                      });
+                      },
+                    });
                   }}
                 >
                   <option value="small">Small</option>
@@ -489,7 +838,7 @@ const GlobalCustomization = () => {
                 <Select
                   value={paddingInsideFields}
                   onChange={(e) => {
-                    const value = e.target.value
+                    const value = e.target.value;
                     setPaddingInsideFields(value);
                     updatePartnerDraft({
                       config: {
@@ -497,8 +846,8 @@ const GlobalCustomization = () => {
                           ...config.layout_config,
                           padding_inside_fields: value,
                         },
-                      }
-                      });
+                      },
+                    });
                   }}
                 >
                   <option value="small">Small</option>
@@ -512,7 +861,7 @@ const GlobalCustomization = () => {
                 <Select
                   value={buttonPadding}
                   onChange={(e) => {
-                    const value = e.target.value
+                    const value = e.target.value;
                     setButtonPadding(value);
                     updatePartnerDraft({
                       config: {
@@ -520,8 +869,8 @@ const GlobalCustomization = () => {
                           ...config.layout_config,
                           button_padding: value,
                         },
-                      }
-                      });
+                      },
+                    });
                   }}
                 >
                   <option value="small">Small</option>
@@ -543,8 +892,8 @@ const GlobalCustomization = () => {
                           ...config.layout_config,
                           mobile_responsiveness: value,
                         },
-                      }
-                      });
+                      },
+                    });
                   }}
                 >
                   <option value="responsive">Responsive (Stacked)</option>
@@ -556,10 +905,9 @@ const GlobalCustomization = () => {
         </Accordion>
       </Box>
       {/* Prevents overriding of theme */}
-      {
-        isPreviewOpen && <Preview isOpen={isPreviewOpen} onClose={() => setPreviewOpen(false)} />
-      }
-      
+      {isPreviewOpen && (
+        <Preview isOpen={isPreviewOpen} onClose={() => setPreviewOpen(false)} />
+      )}
     </Box>
   );
 };

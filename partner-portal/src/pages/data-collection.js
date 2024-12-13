@@ -1,12 +1,5 @@
-
-
 import { useState, useEffect, useMemo } from "react";
-import {
-  Flex,
-  Box,
-  Button,
-  useDisclosure,
-} from "@chakra-ui/react";
+import { Flex, Box, Button, useDisclosure } from "@chakra-ui/react";
 import FieldSidebar from "../components/FieldSidebar";
 import Canvas from "../components/Canvas";
 import BottomTabs from "../components/BottomTabs";
@@ -21,13 +14,18 @@ import { Preview } from "@/components/preview/preview";
 const DataCollectionFormBuilderPage = ({ globalSettings }) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
 
-  
   const partnerData = usePartnerStore((state) => state.partnerData);
   const partnerDraft = usePartnerStore((state) => state.partnerDraft);
-  const updatePartnerDraft = usePartnerStore((state) => state.updatePartnerDraft);
+  const updatePartnerDraft = usePartnerStore(
+    (state) => state.updatePartnerDraft
+  );
   const updateScreens = usePartnerStore((state) => state.updateScreens);
-  const discardPartnerDraft = usePartnerStore((state) => state.discardPartnerDraft);
-  const updateCategoryStatus = usePartnerStore((state) => state.updateCategoryStatus);
+  const discardPartnerDraft = usePartnerStore(
+    (state) => state.discardPartnerDraft
+  );
+  const updateCategoryStatus = usePartnerStore(
+    (state) => state.updateCategoryStatus
+  );
 
   const [activeScreenIndex, setActiveScreenIndex] = useState(0);
   const [selectedField, setSelectedField] = useState(null);
@@ -36,56 +34,44 @@ const DataCollectionFormBuilderPage = ({ globalSettings }) => {
   const categoryName = "Data Collection";
 
   const [isPreviewOpen, setIsPreviewOpen] = useState(false);
-  
+
   useEffect(() => {
     if (partnerData) {
       updatePartnerDraft(JSON.parse(JSON.stringify(partnerData)));
     }
   }, [partnerData, updatePartnerDraft]);
 
-  
   const category = partnerData?.categories?.find(
     (category) => category.name === categoryName
   );
 
-  
   useEffect(() => {
     if (category) {
       setCategoryEnabled(category.is_active);
     }
   }, [category]);
 
-  
   const handleScreenUpdate = (updatedScreens) => {
     const clonedDraft = { ...partnerDraft, screens: updatedScreens };
     updatePartnerDraft(clonedDraft);
-    
   };
 
-  
   const handleFieldSelect = (field) => {
     setSelectedField(field);
   };
 
-  
   const handleSaveField = () => {
     setSelectedField(null);
-    
   };
 
-  
   const handleSave = () => {
     updateScreens();
-    
   };
 
-  
   const handleDiscard = () => {
     updatePartnerDraft(JSON.parse(JSON.stringify(partnerData)));
-    
   };
 
-  
   const handleCategoryToggle = (value) => {
     const newValue = value === "enable";
     if (newValue !== categoryEnabled) {
@@ -99,12 +85,11 @@ const DataCollectionFormBuilderPage = ({ globalSettings }) => {
     onClose();
   };
 
-  
   const handleEditField = (field) => {
+    console.log("edit", field);
     setSelectedField(field);
   };
 
-  
   const hasUnsavedChanges = useMemo(() => {
     return JSON.stringify(partnerDraft) !== JSON.stringify(partnerData);
   }, [partnerDraft, partnerData]);
@@ -136,56 +121,20 @@ const DataCollectionFormBuilderPage = ({ globalSettings }) => {
           />
           <Flex gap={3}>
             <Button onClick={() => setIsPreviewOpen(true)} colorScheme="yellow">
-                Preview
+              Preview
             </Button>
-          {hasUnsavedChanges && (
-              <>  
-              <Button onClick={handleSave} colorScheme="teal">
-                Save
-              </Button>
-              <Button onClick={handleDiscard} colorScheme="red">
-                Discard
-              </Button>
+            {hasUnsavedChanges && (
+              <>
+                <Button onClick={handleSave} colorScheme="teal">
+                  Save
+                </Button>
+                <Button onClick={handleDiscard} colorScheme="red">
+                  Discard
+                </Button>
               </>
-           
-          )}
-           </Flex>
-        </Flex>
-
-        {partnerDraft?.screens && (
-          <ScreenSettings
-            screens={partnerDraft.screens}
-            activeScreenIndex={activeScreenIndex}
-            onUpdateScreen={handleScreenUpdate}
-          />
-        )}
-
-        {partnerDraft?.screens && (
-          <Flex flex="1">
-            <Box
-              flex="1"
-              p={4}
-              border="1px solid"
-              borderColor="gray.300"
-              m={4}
-            >
-              <Canvas
-                screens={partnerDraft.screens}
-                activeScreenIndex={activeScreenIndex}
-                onEditField={handleEditField}
-              />
-            </Box>
-
-            <FieldSidebar
-              selectedField={selectedField}
-              onFieldSelect={handleFieldSelect}
-              activeScreenIndex={activeScreenIndex}
-              onSaveField={handleSaveField}
-              onCancel={() => setSelectedField(null)}
-              showFieldModal={selectedField !== null}
-            />
+            )}
           </Flex>
-        )}
+        </Flex>
 
         {partnerDraft?.screens && (
           <BottomTabs
@@ -194,6 +143,42 @@ const DataCollectionFormBuilderPage = ({ globalSettings }) => {
             activeScreenIndex={activeScreenIndex}
             setActiveScreenIndex={setActiveScreenIndex}
           />
+        )}
+
+        {partnerDraft?.screens && (
+          <Flex flex="1">
+            <Box p={2}>
+              <ScreenSettings
+                screens={partnerDraft.screens}
+                activeScreenIndex={activeScreenIndex}
+                onUpdateScreen={handleScreenUpdate}
+                selectedField={selectedField}
+                onFieldSelect={handleFieldSelect}
+                onSaveField={handleSaveField}
+                onCancel={() => setSelectedField(null)}
+                showFieldModal={selectedField !== null}
+              />
+            </Box>
+            <Box flex="1" p={4} border="1px solid" borderColor="gray.300" m={4}>
+              <Canvas
+                screens={partnerDraft.screens}
+                activeScreenIndex={activeScreenIndex}
+                onEditField={handleEditField}
+              />
+            </Box>
+            <Box p={2}>
+              <FieldSidebar
+                screens={partnerDraft.screens}
+                activeScreenIndex={activeScreenIndex}
+                onUpdateScreen={handleScreenUpdate}
+                selectedField={selectedField}
+                onFieldSelect={handleFieldSelect}
+                onSaveField={handleSaveField}
+                onCancel={() => setSelectedField(null)}
+                showFieldModal={selectedField !== null}
+              />
+            </Box>
+          </Flex>
         )}
       </Flex>
 

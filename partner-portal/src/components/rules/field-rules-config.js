@@ -237,6 +237,34 @@ const RuleConfig = ({ onSave, onCancel, initialRule }) => {
                 {action.type === "validation" && (
                   <>
                     <FormControl mt={3}>
+                      <FormLabel>API Type</FormLabel>
+                      <Select
+                        name="apiType"
+                        value={action.config.apiType || "Non Sensitive"}
+                        onChange={(e) =>
+                          setRule({
+                            ...rule,
+                            actions: rule.actions.map((a, i) =>
+                              i === index
+                                ? {
+                                    ...a,
+                                    config: {
+                                      ...a.config,
+                                      apiType: e.target.value,
+                                    },
+                                  }
+                                : a
+                            ),
+                          })
+                        }
+                        bg="background.dark"
+                        color="text.primary"
+                      >
+                        <option value="Non Sensitive">Non Sensitive</option>
+                        <option value="Sensitive">Sensitive</option>
+                      </Select>
+                    </FormControl>
+                    <FormControl mt={3}>
                       <FormLabel>API URL</FormLabel>
                       <Input
                         name="apiUrl"
@@ -426,7 +454,7 @@ const RuleConfig = ({ onSave, onCancel, initialRule }) => {
                       />
                     </FormControl>
                     <FormControl>
-                    <FormLabel>Expected Value Type</FormLabel>
+                      <FormLabel>Expected Value Type</FormLabel>
                       <Select
                         name="expectedValueType"
                         value={action.config.expectedValueType || "string"}
@@ -453,8 +481,8 @@ const RuleConfig = ({ onSave, onCancel, initialRule }) => {
                         <option value="number">Number</option>
                         <option value="boolean">Boolean</option>
                       </Select>
-                     </FormControl>
-   
+                    </FormControl>
+
                     {/* Error Message */}
                     <FormControl mt={3}>
                       <FormLabel>Error Message</FormLabel>

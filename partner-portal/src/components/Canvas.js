@@ -25,14 +25,12 @@ const Canvas = ({ screens, activeScreenIndex, onEditField }) => {
       (id) => id !== fieldId
     );
 
-    
     const updatedScreens = screens.map((screen, idx) =>
       idx === activeScreenIndex
         ? { ...screen, fields: updatedFields, field_ids: updatedFieldIds }
         : screen
     );
 
-    
     updatePartnerDraft({ screens: updatedScreens });
   };
 
@@ -40,20 +38,19 @@ const Canvas = ({ screens, activeScreenIndex, onEditField }) => {
     const updatedFields = arrayMove(currentScreen.fields, oldIndex, newIndex);
     const updatedFieldIds = updatedFields.map((field) => field.id);
 
-    
     const updatedScreens = screens.map((screen, idx) =>
       idx === activeScreenIndex
         ? { ...screen, fields: updatedFields, field_ids: updatedFieldIds }
         : screen
     );
 
-    
     updatePartnerDraft({ screens: updatedScreens });
   };
 
   return (
     <Box
       flex="1"
+      height="100%"
       minHeight="calc(100vh - 100px)"
       overflowY="auto"
       bg={currentScreen?.backgroundColor || "background.dark"}
@@ -93,7 +90,9 @@ const Canvas = ({ screens, activeScreenIndex, onEditField }) => {
               {...props}
             >
               <Text fontSize="lg" fontWeight="bold">
-                {value?.field_config?.attributes?.label || value?.field_config?.attributes?.name || `Field ${index + 1}`}
+                {value?.field_config?.attributes?.label ||
+                  value?.field_config?.attributes?.name ||
+                  `Field ${index + 1}`}
               </Text>
               <Box>
                 <IconButton

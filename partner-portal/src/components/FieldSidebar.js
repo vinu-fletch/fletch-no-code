@@ -1,10 +1,9 @@
-
 import React, { useState } from "react";
 import { Box, Heading, Button } from "@chakra-ui/react";
-import HiddenFieldConfig from "./fields/hidden-form";
+import HiddenField from "./fields/hidden-form/hidden-form";
 import { usePartnerStore } from "../store";
-import SocialSecurityNumberConfig from "./fields/social-security-number-form";
-import TextFieldConfig from "./fields/text-form";
+import SocialSecurityNumber from "./fields/social-security-number/social-security-number-form";
+import TextField from "./fields/text-from/text-form";
 
 const fields = [
   { label: "SSN", type: "ssn" },
@@ -18,7 +17,7 @@ const FieldSidebar = ({
   onSaveField,
   onCancel,
   activeScreenIndex,
-  showFieldModal
+  showFieldModal,
 }) => {
   const partnerDraft = usePartnerStore((state) => state.partnerDraft);
   const updatePartnerDraft = usePartnerStore(
@@ -27,14 +26,12 @@ const FieldSidebar = ({
 
   const [showModal, setShowModal] = useState(showFieldModal || false);
 
-
   const handleSaveField = (fieldAttributes, fieldRules = []) => {
     const currentScreen = partnerDraft.screens[activeScreenIndex];
     if (!currentScreen) {
       return;
     }
 
-    
     const fieldData = {
       ...selectedField,
       field_config: {
@@ -43,8 +40,6 @@ const FieldSidebar = ({
       },
     };
 
-
-    
     const existingFieldIndex = currentScreen.fields.findIndex(
       (field) => field.id === selectedField.id
     );
@@ -52,16 +47,11 @@ const FieldSidebar = ({
     const updatedFields = [...currentScreen.fields];
 
     if (existingFieldIndex !== -1) {
-      
       updatedFields[existingFieldIndex] = fieldData;
     } else {
-      
       updatedFields.push(fieldData);
     }
 
-
-
-    
     const updatedScreens = partnerDraft.screens.map((screen, idx) =>
       idx === activeScreenIndex
         ? {
@@ -71,11 +61,8 @@ const FieldSidebar = ({
         : screen
     );
 
-
-    
     updatePartnerDraft({ screens: updatedScreens });
 
-    
     onSaveField(fieldData);
   };
 
@@ -94,13 +81,12 @@ const FieldSidebar = ({
         : screen
     );
 
-    
     updatePartnerDraft({ screens: updatedScreens });
-  }
+  };
 
   if (selectedField && selectedField.type === "text") {
     return (
-      <TextFieldConfig
+      <TextField
         onSave={handleSaveField}
         onDrag={handleDrag}
         onCancel={onCancel}
@@ -112,19 +98,19 @@ const FieldSidebar = ({
 
   if (selectedField?.type === "ssn") {
     return (
-      <SocialSecurityNumberConfig
+      <SocialSecurityNumber
         onSave={handleSaveField}
         onDrag={handleDrag}
         onCancel={onCancel}
         showModal={showModal}
         fieldData={selectedField}
       />
-    )
+    );
   }
 
   if (selectedField?.type === "hidden") {
     return (
-      <HiddenFieldConfig
+      <HiddenField
         onSave={handleSaveField}
         onCancel={onCancel}
         showModal={showModal}
@@ -133,35 +119,7 @@ const FieldSidebar = ({
     );
   }
 
-  
-  return (
-    <Box
-      height="100vh"
-      py={4}
-      width="300px"
-      overflowY="auto"
-      p={4}
-      bg="background.gray"
-      color="text.primary"
-    >
-      <Heading size="md" mb={4}>
-        Add Field
-      </Heading>
-      {fields.map((field) => (
-        <Button
-          key={field.id}
-          onClick={() => onFieldSelect(field, activeScreenIndex)}
-          width="100%"
-          mb={2}
-          bg="secondary.200"
-          color="text.primary"
-          _hover={{ bg: "secondary.100" }}
-        >
-          {field.label}
-        </Button>
-      ))}
-    </Box>
-  );
+  return null;
 };
 
 export default FieldSidebar;
